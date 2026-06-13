@@ -1,5 +1,4 @@
-# Xcode / XcodeGen
-*.xcodeproj
+	# Xcode / XcodeGen
 xcuserdata/
 DerivedData/
 build/
