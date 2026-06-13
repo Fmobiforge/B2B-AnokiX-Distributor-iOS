@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell contentMode="scaleToFill" reuseIdentifier="ProductCell" id="root" customClass="ProductCell" customModule="AnokiXDistributor" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="361" height="80"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="cv">
+                <rect key="frame" x="0.0" y="0.0" width="393" height="88"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="card">
+                        <rect key="frame" x="16" y="4" width="361" height="80"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="row">
+                                <rect key="frame" x="12" y="12" width="337" height="56"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="shippingbox" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="thumb">
+                                        <rect key="frame" x="0.0" y="4" width="48" height="48"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="48" id="th-w"/>
+                                            <constraint firstAttribute="height" constant="48" id="th-h"/>
+                                        </constraints>
+                                    </imageView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="3" alignment="leading" translatesAutoresizingMaskIntoConstraints="NO" id="textStack">
+                                        <rect key="frame" x="60" y="0.0" width="277" height="56"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Product name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="name">
+                                                <rect key="frame" x="0.0" y="0.0" width="277" height="18"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="SKU · Category" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="meta">
+                                                <rect key="frame" x="0.0" y="21" width="277" height="15"/>
+                                            </label>
+                                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="priceRow">
+                                                <rect key="frame" x="0.0" y="39" width="277" height="17"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="R0.00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="price">
+                                                        <rect key="frame" x="0.0" y="0.0" width="48" height="17"/>
+                                                    </label>
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="priceSpacer">
+                                                        <rect key="frame" x="56" y="0.0" width="180" height="17"/>
+                                                    </view>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="1000" verticalHuggingPriority="251" text="In Stock" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="status" customClass="PaddingLabel" customModule="AnokiXDistributor" customModuleProvider="target">
+                                                        <rect key="frame" x="244" y="0.0" width="33" height="17"/>
+                                                    </label>
+                                                </subviews>
+                                            </stackView>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="row" firstAttribute="leading" secondItem="card" secondAttribute="leading" constant="12" id="r-l"/>
+                            <constraint firstItem="row" firstAttribute="top" secondItem="card" secondAttribute="top" constant="12" id="r-t"/>
+                            <constraint firstAttribute="trailing" secondItem="row" secondAttribute="trailing" constant="12" id="r-tr"/>
+                            <constraint firstAttribute="bottom" secondItem="row" secondAttribute="bottom" constant="12" id="r-b"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="card" firstAttribute="leading" secondItem="cv" secondAttribute="leading" id="c-l"/>
+                    <constraint firstItem="card" firstAttribute="top" secondItem="cv" secondAttribute="top" id="c-t"/>
+                    <constraint firstAttribute="trailing" secondItem="card" secondAttribute="trailing" id="c-tr"/>
+                    <constraint firstAttribute="bottom" secondItem="card" secondAttribute="bottom" id="c-b"/>
+                </constraints>
+            </view>
+            <connections>
+                <outlet property="cardView" destination="card" id="o-card"/>
+                <outlet property="metaLabel" destination="meta" id="o-meta"/>
+                <outlet property="nameLabel" destination="name" id="o-name"/>
+                <outlet property="priceLabel" destination="price" id="o-price"/>
+                <outlet property="statusBadge" destination="status" id="o-status"/>
+                <outlet property="thumbImageView" destination="thumb" id="o-thumb"/>
+            </connections>
+            <point key="canvasLocation" x="132" y="124"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="shippingbox" catalog="system" width="128" height="100"/>
+    </resources>
+</document>

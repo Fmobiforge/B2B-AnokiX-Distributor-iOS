@@ -1,0 +1,114 @@
+import Foundation
+import SwiftyJSON
+
+/// An error carrying the server-provided (or synthesized) message.
+struct ApiError: Error {
+    let message: String
+}
+
+/// Typed facade over `Http`, port of network/ApiClient.java.
+final class ApiClient {
+
+    static let shared = ApiClient()
+
+    static let baseURL = "http://155.117.20.51/ax/"
+
+    private let session = SessionManager.shared
+    private let decoder: JSONDecoder = {
+        let d = JSONDecoder()
+        d.keyDecodingStrategy = .convertFromSnakeCase
+        return d
+    }()
+
+    private init() {}
+
+    // MARK: - Endpoints
+
+    func login(email: String, password: String, completion: @escaping (Result<LoginData, ApiError>) -> Void) {
+        let form = ["email": email, "password": password]
+        Http.postForm(baseUrl: Self.baseURL, path: "api/common/login", form: form, token: nil) { [weak self] r in
+            self?.deliver(r, type: LoginData.self, completion: completion)
+        }
+    }
+
+    func getDashboard(completion: @escaping (Result<DashboardData, ApiError>) -> Void) {
+        getAuthed("api/distributor/dashboard", query: nil, type: DashboardData.self, completion: completion)
+    }
+
+    func getStores(keyword: String, completion: @escaping (Result<StoresData, ApiError>) -> Void) {
+        let q = ["offset": "0", "page_size": "50", "keyword": keyword]
+        getAuthed("api/distributor/stores/all", query: q, type: StoresData.self, completion: completion)
+    }
+
+    func getTraders(search: String, completion: @escaping (Result<TradersData, ApiError>) -> Void) {
+        let q = ["search": search, "status": "", "registration_status": "", "credit_status": ""]
+        getAuthed("api/distributor/traders", query: q, type: TradersData.self, completion: completion)
+    }
+
+    func getProducts(completion: @escaping (Result<ProductsData, ApiError>) -> Void) {
+        getAuthed("api/distributor/products", query: nil, type: ProductsData.self, completion: completion)
+    }
+
+    func getInventorySummary(completion: @escaping (Result<InventorySummaryData, ApiError>) -> Void) {
+        getAuthed("api/distributor/inventory/summary", query: nil, type: InventorySummaryData.self, completion: completion)
+    }
+
+    func getBaseInfo(completion: @escaping (Result<BaseInfoData, ApiError>) -> Void) {
+        getAuthed("api/common/base-info", query: nil, type: BaseInfoData.self, completion: completion)
+    }
+
+    func getStore(id: String, completion: @escaping (Result<StoreDetailData, ApiError>) -> Void) {
+        getAuthed("api/distributor/stores", query: ["id": id], type: StoreDetailData.self, completion: completion)
+    }
+
+    func createStore(form: [String: String], completion: @escaping (Result<StoreDetailData, ApiError>) -> Void) {
+        postAuthed("api/distributor/stores/create", form: form, type: StoreDetailData.self, completion: completion)
+    }
+
+    func updateStore(form: [String: String], completion: @escaping (Result<StoreDetailData, ApiError>) -> Void) {
+        postAuthed("api/distributor/stores/update", form: form, type: StoreDetailData.self, completion: completion)
+    }
+
+    // MARK: - Internals
+
+    private func getAuthed<T: Decodable>(_ path: String, query: [String: String]?, type: T.Type,
+                                         completion: @escaping (Result<T, ApiError>) -> Void) {
+        Http.get(baseUrl: Self.baseURL, path: path, query: query, token: session.token) { [weak self] r in
+            self?.deliver(r, type: type, completion: completion)
+        }
+    }
+
+    private func postAuthed<T: Decodable>(_ path: String, form: [String: String], type: T.Type,
+                                          completion: @escaping (Result<T, ApiError>) -> Void) {
+        Http.postForm(baseUrl: Self.baseURL, path: path, form: form, token: session.token) { [weak self] r in
+            self?.deliver(r, type: type, completion: completion)
+        }
+    }
+
+    /// Parses the `{ status, message, data }` envelope with SwiftyJSON, then decodes `data` with Codable.
+    private func deliver<T: Decodable>(_ r: Http.Result, type: T.Type,
+                                       completion: @escaping (Result<T, ApiError>) -> Void) {
+        var result: Result<T, ApiError>
+        if let body = r.body, !body.isEmpty {
+            let envelope = JSON(parseJSON: body)
+            if envelope["status"].boolValue {
+                let dataJson = envelope["data"]
+                if dataJson.type == .null {
+                    result = .failure(ApiError(message: "Empty response from server"))
+                } else if let raw = try? dataJson.rawData(),
+                          let decoded = try? decoder.decode(T.self, from: raw) {
+                    result = .success(decoded)
+                } else {
+                    print("\(Http.tag): decode failed for \(T.self)")
+                    result = .failure(ApiError(message: "Unexpected response from server"))
+                }
+            } else {
+                let message = envelope["message"].string ?? "Request failed"
+                result = .failure(ApiError(message: message))
+            }
+        } else {
+            result = .failure(ApiError(message: "Network error (HTTP \(r.code))"))
+        }
+        DispatchQueue.main.async { completion(result) }
+    }
+}

@@ -1,0 +1,17 @@
+# Xcode / XcodeGen
+*.xcodeproj
+xcuserdata/
+DerivedData/
+build/
+*.xcuserstate
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# macOS
+.DS_Store
+
+# Swift Package Manager
+.build/
+.swiftpm/

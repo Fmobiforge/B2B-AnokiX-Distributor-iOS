@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="OrderCell" id="root" customClass="OrderCell" customModule="AnokiXDistributor" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="360"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="root" id="cv">
+                <rect key="frame" x="0.0" y="0.0" width="393" height="360"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="card">
+                        <rect key="frame" x="16" y="6" width="361" height="348"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="stack">
+                                <rect key="frame" x="14" y="12" width="333" height="322"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="ribbonRow">
+                                        <rect key="frame" x="0.0" y="0.0" width="333" height="18"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="1000" verticalHuggingPriority="251" text="NEW ORDER" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ribbon" customClass="PaddingLabel" customModule="AnokiXDistributor" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="86" height="18"/>
+                                            </label>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ribbonSpacer">
+                                                <rect key="frame" x="94" y="0.0" width="180" height="18"/>
+                                            </view>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2h ago" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="time">
+                                                <rect key="frame" x="282" y="1" width="51" height="16"/>
+                                            </label>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="traderRow">
+                                        <rect key="frame" x="0.0" y="30" width="333" height="56"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AB" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="avatar">
+                                                <rect key="frame" x="0.0" y="6" width="44" height="44"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="44" id="av-w"/>
+                                                    <constraint firstAttribute="height" constant="44" id="av-h"/>
+                                                </constraints>
+                                            </label>
+                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="4" alignment="leading" translatesAutoresizingMaskIntoConstraints="NO" id="traderStack">
+                                                <rect key="frame" x="56" y="0.0" width="277" height="56"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Trader name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="traderName">
+                                                        <rect key="frame" x="0.0" y="0.0" width="277" height="20"/>
+                                                    </label>
+                                                    <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="idRow">
+                                                        <rect key="frame" x="0.0" y="24" width="277" height="18"/>
+                                                        <subviews>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="#ORD-000" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="orderId">
+                                                                <rect key="frame" x="0.0" y="0.0" width="65" height="18"/>
+                                                            </label>
+                                                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="copyButton">
+                                                                <rect key="frame" x="71" y="0.0" width="18" height="18"/>
+                                                                <constraints>
+                                                                    <constraint firstAttribute="width" constant="18" id="cp-w"/>
+                                                                    <constraint firstAttribute="height" constant="18" id="cp-h"/>
+                                                                </constraints>
+                                                                <state key="normal" image="doc.on.doc" catalog="system"/>
+                                                                <connections>
+                                                                    <action selector="copyTapped" destination="root" eventType="touchUpInside" id="cp-act"/>
+                                                                </connections>
+                                                            </button>
+                                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="idSpacer">
+                                                                <rect key="frame" x="95" y="0.0" width="182" height="18"/>
+                                                            </view>
+                                                        </subviews>
+                                                    </stackView>
+                                                    <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="locationRow">
+                                                        <rect key="frame" x="0.0" y="46" width="277" height="14"/>
+                                                        <subviews>
+                                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="mappin.and.ellipse" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="pin">
+                                                                <rect key="frame" x="0.0" y="0.0" width="14" height="14"/>
+                                                                <constraints>
+                                                                    <constraint firstAttribute="width" constant="14" id="pin-w"/>
+                                                                    <constraint firstAttribute="height" constant="14" id="pin-h"/>
+                                                                </constraints>
+                                                                <color key="tintColor" red="0.39215686274509803" green="0.45490196078431372" blue="0.54509803921568623" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            </imageView>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Location" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="location">
+                                                                <rect key="frame" x="18" y="0.0" width="60" height="14"/>
+                                                            </label>
+                                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="locSpacer">
+                                                                <rect key="frame" x="82" y="0.0" width="195" height="14"/>
+                                                            </view>
+                                                        </subviews>
+                                                    </stackView>
+                                                </subviews>
+                                            </stackView>
+                                        </subviews>
+                                    </stackView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" numberOfLines="2" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Product summary" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="summary">
+                                        <rect key="frame" x="0.0" y="98" width="333" height="15"/>
+                                    </label>
+                                    <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="valueRow">
+                                        <rect key="frame" x="0.0" y="125" width="333" height="40"/>
+                                        <subviews>
+                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="2" alignment="leading" translatesAutoresizingMaskIntoConstraints="NO" id="valueStack">
+                                                <rect key="frame" x="0.0" y="0.0" width="120" height="40"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Order Value" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="valueTitle">
+                                                        <rect key="frame" x="0.0" y="0.0" width="120" height="16"/>
+                                                        <fontDescription key="fontDescription" type="system" weight="light" pointSize="11"/>
+                                                        <color key="textColor" red="0.39215686274509803" green="0.45490196078431372" blue="0.54509803921568623" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </label>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="R0.00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="amount">
+                                                        <rect key="frame" x="0.0" y="18" width="120" height="22"/>
+                                                    </label>
+                                                </subviews>
+                                            </stackView>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="valueSpacer">
+                                                <rect key="frame" x="128" y="0.0" width="120" height="40"/>
+                                            </view>
+                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" horizontalHuggingPriority="1000" spacing="6" alignment="trailing" translatesAutoresizingMaskIntoConstraints="NO" id="badgeStack">
+                                                <rect key="frame" x="256" y="0.0" width="77" height="40"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PAID" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="paidBadge" customClass="PaddingLabel" customModule="AnokiXDistributor" customModuleProvider="target">
+                                                        <rect key="frame" x="37" y="0.0" width="40" height="17"/>
+                                                    </label>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cash" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="paymentBadge" customClass="PaddingLabel" customModule="AnokiXDistributor" customModuleProvider="target">
+                                                        <rect key="frame" x="33" y="23" width="44" height="17"/>
+                                                    </label>
+                                                </subviews>
+                                            </stackView>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="actionsStack">
+                                        <rect key="frame" x="0.0" y="177" width="333" height="145"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="viewButton">
+                                                <rect key="frame" x="0.0" y="0.0" width="333" height="44"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="44" id="vb-h"/>
+                                                </constraints>
+                                                <connections>
+                                                    <action selector="viewTapped" destination="root" eventType="touchUpInside" id="vb-act"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="acceptButton">
+                                                <rect key="frame" x="0.0" y="52" width="333" height="44"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="44" id="ab-h"/>
+                                                </constraints>
+                                                <connections>
+                                                    <action selector="acceptTapped" destination="root" eventType="touchUpInside" id="ab-act"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rejectButton">
+                                                <rect key="frame" x="0.0" y="104" width="333" height="44"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="44" id="rb-h"/>
+                                                </constraints>
+                                                <connections>
+                                                    <action selector="rejectTapped" destination="root" eventType="touchUpInside" id="rb-act"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="stack" firstAttribute="leading" secondItem="card" secondAttribute="leading" constant="14" id="s-l"/>
+                            <constraint firstItem="stack" firstAttribute="top" secondItem="card" secondAttribute="top" constant="12" id="s-t"/>
+                            <constraint firstAttribute="trailing" secondItem="stack" secondAttribute="trailing" constant="14" id="s-tr"/>
+                            <constraint firstAttribute="bottom" secondItem="stack" secondAttribute="bottom" constant="14" id="s-b"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="card" firstAttribute="leading" secondItem="cv" secondAttribute="leading" constant="16" id="c-l"/>
+                    <constraint firstItem="card" firstAttribute="top" secondItem="cv" secondAttribute="top" constant="6" id="c-t"/>
+                    <constraint firstAttribute="trailing" secondItem="card" secondAttribute="trailing" constant="16" id="c-tr"/>
+                    <constraint firstAttribute="bottom" secondItem="card" secondAttribute="bottom" constant="6" id="c-b"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="acceptButton" destination="acceptButton" id="o-accept"/>
+                <outlet property="actionsStack" destination="actionsStack" id="o-actions"/>
+                <outlet property="amountLabel" destination="amount" id="o-amount"/>
+                <outlet property="avatarLabel" destination="avatar" id="o-avatar"/>
+                <outlet property="cardView" destination="card" id="o-card"/>
+                <outlet property="copyButton" destination="copyButton" id="o-copy"/>
+                <outlet property="locationLabel" destination="location" id="o-loc"/>
+                <outlet property="locationRow" destination="locationRow" id="o-locrow"/>
+                <outlet property="orderIdLabel" destination="orderId" id="o-oid"/>
+                <outlet property="paidBadge" destination="paidBadge" id="o-paid"/>
+                <outlet property="paymentBadge" destination="paymentBadge" id="o-pay"/>
+                <outlet property="rejectButton" destination="rejectButton" id="o-reject"/>
+                <outlet property="ribbonBadge" destination="ribbon" id="o-ribbon"/>
+                <outlet property="summaryLabel" destination="summary" id="o-summary"/>
+                <outlet property="timeLabel" destination="time" id="o-time"/>
+                <outlet property="traderNameLabel" destination="traderName" id="o-trader"/>
+                <outlet property="viewButton" destination="viewButton" id="o-view"/>
+            </connections>
+            <point key="canvasLocation" x="132" y="200"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="doc.on.doc" catalog="system" width="115" height="128"/>
+        <image name="mappin.and.ellipse" catalog="system" width="110" height="128"/>
+    </resources>
+</document>

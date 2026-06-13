@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="dh-root" customClass="DashboardHeaderView" customModule="AnokiXDistributor" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="88"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dh-menu">
+                    <rect key="frame" x="12" y="52" width="40" height="40"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="40" id="dh-menu-w"/>
+                        <constraint firstAttribute="height" constant="40" id="dh-menu-h"/>
+                    </constraints>
+                    <state key="normal" image="line.3.horizontal" catalog="system"/>
+                    <connections>
+                        <action selector="menuTapped:" destination="dh-root" eventType="touchUpInside" id="dh-menu-act"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Welcome back" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dh-welcome">
+                    <rect key="frame" x="60" y="52" width="120" height="20"/>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                    <color key="textColor" red="0.058823529411764705" green="0.090196078431372548" blue="0.16470588235294117" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Here's what's happening today." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dh-sub">
+                    <rect key="frame" x="60" y="74" width="180" height="15"/>
+                    <fontDescription key="fontDescription" type="system" weight="light" pointSize="12"/>
+                    <color key="textColor" red="0.39215686274509803" green="0.45490196078431372" blue="0.54509803921568623" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dh-bell">
+                    <rect key="frame" x="297" y="52" width="40" height="40"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="40" id="dh-bell-w"/>
+                        <constraint firstAttribute="height" constant="40" id="dh-bell-h"/>
+                    </constraints>
+                    <state key="normal" image="bell" catalog="system"/>
+                    <connections>
+                        <action selector="notificationsTapped:" destination="dh-root" eventType="touchUpInside" id="dh-bell-act"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="A" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dh-avatar">
+                    <rect key="frame" x="345" y="54" width="36" height="36"/>
+                    <color key="backgroundColor" red="0.92941176470588238" green="0.9137254901960784" blue="0.99607843137254903" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="36" id="dh-av-w"/>
+                        <constraint firstAttribute="height" constant="36" id="dh-av-h"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                    <color key="textColor" red="0.48627450980392156" green="0.22745098039215686" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                </label>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dh-div">
+                    <rect key="frame" x="0.0" y="87" width="393" height="1"/>
+                    <color key="backgroundColor" red="0.8862745098039215" green="0.90980392156862744" blue="0.94117647058823528" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="dh-div-h"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="dh-safe"/>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="dh-menu" firstAttribute="leading" secondItem="dh-root" secondAttribute="leading" constant="12" id="c1"/>
+                <constraint firstItem="dh-menu" firstAttribute="top" secondItem="dh-safe" secondAttribute="top" constant="12" id="c2"/>
+                <constraint firstItem="dh-welcome" firstAttribute="leading" secondItem="dh-menu" secondAttribute="trailing" constant="8" id="c3"/>
+                <constraint firstItem="dh-welcome" firstAttribute="top" secondItem="dh-menu" secondAttribute="top" id="c4"/>
+                <constraint firstItem="dh-sub" firstAttribute="leading" secondItem="dh-welcome" secondAttribute="leading" id="c5"/>
+                <constraint firstItem="dh-sub" firstAttribute="top" secondItem="dh-welcome" secondAttribute="bottom" constant="2" id="c6"/>
+                <constraint firstItem="dh-avatar" firstAttribute="trailing" secondItem="dh-root" secondAttribute="trailing" constant="-12" id="c7"/>
+                <constraint firstItem="dh-avatar" firstAttribute="centerY" secondItem="dh-menu" secondAttribute="centerY" id="c8"/>
+                <constraint firstItem="dh-bell" firstAttribute="trailing" secondItem="dh-avatar" secondAttribute="leading" constant="-8" id="c9"/>
+                <constraint firstItem="dh-bell" firstAttribute="centerY" secondItem="dh-menu" secondAttribute="centerY" id="c10"/>
+                <constraint firstItem="dh-div" firstAttribute="leading" secondItem="dh-root" secondAttribute="leading" id="c11"/>
+                <constraint firstItem="dh-div" firstAttribute="trailing" secondItem="dh-root" secondAttribute="trailing" id="c12"/>
+                <constraint firstItem="dh-div" firstAttribute="bottom" secondItem="dh-root" secondAttribute="bottom" id="c13"/>
+                <constraint firstItem="dh-div" firstAttribute="top" secondItem="dh-menu" secondAttribute="bottom" constant="14" id="c14"/>
+            </constraints>
+            <connections>
+                <outlet property="avatarLabel" destination="dh-avatar" id="o1"/>
+                <outlet property="menuButton" destination="dh-menu" id="o2"/>
+                <outlet property="notificationsButton" destination="dh-bell" id="o3"/>
+                <outlet property="subtitleLabel" destination="dh-sub" id="o4"/>
+                <outlet property="welcomeLabel" destination="dh-welcome" id="o5"/>
+            </connections>
+        </view>
+    </objects>
+    <resources>
+        <image name="bell" catalog="system" width="128" height="123"/>
+        <image name="line.3.horizontal" catalog="system" width="128" height="93"/>
+    </resources>
+</document>

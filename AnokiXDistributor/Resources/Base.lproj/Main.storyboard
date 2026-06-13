@@ -1,0 +1,767 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="splash-vc">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+    </dependencies>
+    <scenes>
+        <!-- Splash -->
+        <scene sceneID="splash-scene">
+            <objects>
+                <viewController storyboardIdentifier="SplashViewController" id="splash-vc" customClass="SplashViewController" customModule="AnokiXDistributor" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="splash-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="splash-gradient" customClass="BrandGradientView" customModule="AnokiXDistributor" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                            </view>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LogoWhite" translatesAutoresizingMaskIntoConstraints="NO" id="splash-logo">
+                                <rect key="frame" x="96.5" y="360" width="200" height="72"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="80" id="splash-logo-h"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Distributor App" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="splash-sub">
+                                <rect key="frame" x="96.5" y="448" width="200" height="19"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="splash-safe"/>
+                        <color key="backgroundColor" red="0.0" green="0.035294117647058823" blue="0.12549019607843137" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="splash-gradient" firstAttribute="top" secondItem="splash-view" secondAttribute="top" id="sg1"/>
+                            <constraint firstItem="splash-gradient" firstAttribute="leading" secondItem="splash-view" secondAttribute="leading" id="sg2"/>
+                            <constraint firstItem="splash-gradient" firstAttribute="trailing" secondItem="splash-view" secondAttribute="trailing" id="sg3"/>
+                            <constraint firstItem="splash-gradient" firstAttribute="bottom" secondItem="splash-view" secondAttribute="bottom" id="sg4"/>
+                            <constraint firstItem="splash-logo" firstAttribute="centerX" secondItem="splash-view" secondAttribute="centerX" id="sl1"/>
+                            <constraint firstItem="splash-logo" firstAttribute="centerY" secondItem="splash-view" secondAttribute="centerY" constant="-40" id="sl2"/>
+                            <constraint firstItem="splash-logo" firstAttribute="width" secondItem="splash-view" secondAttribute="width" multiplier="0.6" id="sl3"/>
+                            <constraint firstItem="splash-sub" firstAttribute="top" secondItem="splash-logo" secondAttribute="bottom" constant="16" id="sl4"/>
+                            <constraint firstItem="splash-sub" firstAttribute="centerX" secondItem="splash-view" secondAttribute="centerX" id="sl5"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="logoImageView" destination="splash-logo" id="so1"/>
+                        <outlet property="subtitleLabel" destination="splash-sub" id="so2"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="splash-fr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-900" y="0"/>
+        </scene>
+        <!-- Login Navigation -->
+        <scene sceneID="login-nav-scene">
+            <objects>
+                <navigationController storyboardIdentifier="LoginNavigationController" automaticallyAdjustsScrollViewInsets="NO" navigationBarHidden="YES" id="login-nav" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="login-nav-bar">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="login-vc" kind="relationship" relationship="rootViewController" id="login-root-seg"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="login-nav-fr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-400" y="0"/>
+        </scene>
+        <!-- Login -->
+        <scene sceneID="login-scene">
+            <objects>
+                <viewController storyboardIdentifier="LoginViewController" id="login-vc" customClass="LoginViewController" customModule="AnokiXDistributor" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="login-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="login-gradient" customClass="BrandGradientView" customModule="AnokiXDistributor" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                            </view>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LogoWhite" translatesAutoresizingMaskIntoConstraints="NO" id="login-logo">
+                                <rect key="frame" x="78.5" y="200" width="236" height="72"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="72" id="ll-h"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Distributor App" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="login-brand-sub">
+                                <rect key="frame" x="96.5" y="288" width="200" height="19"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="login-card">
+                                <rect key="frame" x="0.0" y="480" width="393" height="372"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="LOGIN" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="login-title">
+                                        <rect key="frame" x="24" y="28" width="52" height="19"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
+                                        <color key="textColor" red="0.058823529411764705" green="0.090196078431372548" blue="0.16470588235294117" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </label>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="login-tab-bg">
+                                        <rect key="frame" x="24" y="67" width="345" height="44"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tab-email">
+                                                <rect key="frame" x="4" y="4" width="168.5" height="36"/>
+                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                                                <state key="normal" title="Email">
+                                                    <color key="titleColor" red="0.48627450980392156" green="0.22745098039215686" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="selectEmailTapped:" destination="login-vc" eventType="touchUpInside" id="tab-email-act"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tab-phone">
+                                                <rect key="frame" x="172.5" y="4" width="168.5" height="36"/>
+                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                                                <state key="normal" title="Phone">
+                                                    <color key="titleColor" red="0.39215686274509803" green="0.45490196078431372" blue="0.54509803921568623" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="selectPhoneTapped:" destination="login-vc" eventType="touchUpInside" id="tab-phone-act"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" red="0.94509803921568625" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="44" id="ltb-h"/>
+                                            <constraint firstItem="tab-email" firstAttribute="leading" secondItem="login-tab-bg" secondAttribute="leading" constant="4" id="ltb1"/>
+                                            <constraint firstItem="tab-email" firstAttribute="top" secondItem="login-tab-bg" secondAttribute="top" constant="4" id="ltb2"/>
+                                            <constraint firstItem="tab-email" firstAttribute="bottom" secondItem="login-tab-bg" secondAttribute="bottom" constant="-4" id="ltb3"/>
+                                            <constraint firstItem="tab-phone" firstAttribute="leading" secondItem="tab-email" secondAttribute="trailing" id="ltb4"/>
+                                            <constraint firstItem="tab-phone" firstAttribute="top" secondItem="tab-email" secondAttribute="top" id="ltb5"/>
+                                            <constraint firstItem="tab-phone" firstAttribute="bottom" secondItem="tab-email" secondAttribute="bottom" id="ltb6"/>
+                                            <constraint firstItem="tab-phone" firstAttribute="trailing" secondItem="login-tab-bg" secondAttribute="trailing" constant="-4" id="ltb7"/>
+                                            <constraint firstItem="tab-email" firstAttribute="width" secondItem="tab-phone" secondAttribute="width" id="ltb8"/>
+                                        </constraints>
+                                    </view>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Email address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lbl-email">
+                                        <rect key="frame" x="24" y="131" width="90" height="16"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                    </label>
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="cong@anokix.co.za" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="field-email">
+                                        <rect key="frame" x="24" y="152" width="345" height="48"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="48" id="fe-h"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" keyboardType="emailAddress" autocapitalizationType="none" autocorrectionType="no"/>
+                                    </textField>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Password" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lbl-pass">
+                                        <rect key="frame" x="24" y="216" width="62" height="16"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                    </label>
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="••••••••" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="field-pass">
+                                        <rect key="frame" x="24" y="237" width="345" height="48"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="48" id="fp-h"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                                    </textField>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="trailing" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="btn-forgot">
+                                        <rect key="frame" x="24" y="295" width="345" height="30"/>
+                                        <state key="normal" title="Forgot password?">
+                                            <color key="titleColor" red="0.48627450980392156" green="0.22745098039215686" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="forgotTapped:" destination="login-vc" eventType="touchUpInside" id="bf-act"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="btn-login">
+                                        <rect key="frame" x="24" y="325" width="345" height="48"/>
+                                        <color key="backgroundColor" red="0.48627450980392156" green="0.22745098039215686" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="48" id="bl-h"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                        <state key="normal" title="Login">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <real key="value" value="10"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="loginTapped:" destination="login-vc" eventType="touchUpInside" id="bl-act"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="btn-join">
+                                        <rect key="frame" x="24" y="385" width="345" height="48"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="48" id="bj-h"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <state key="normal" title="Join Distributor App now">
+                                            <color key="titleColor" red="0.48627450980392156" green="0.22745098039215686" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <real key="value" value="10"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.borderWidth">
+                                                <real key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="layer.borderColor">
+                                                <color key="value" red="0.48627450980392156" green="0.22745098039215686" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="joinTapped:" destination="login-vc" eventType="touchUpInside" id="bj-act"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="btn-toggle-pass">
+                                        <rect key="frame" x="333" y="249" width="24" height="24"/>
+                                        <state key="normal" image="eye" catalog="system"/>
+                                        <connections>
+                                            <action selector="togglePasswordTapped:" destination="login-vc" eventType="touchUpInside" id="btp-act"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="login-title" firstAttribute="top" secondItem="login-card" secondAttribute="top" constant="28" id="lc1"/>
+                                    <constraint firstItem="login-title" firstAttribute="leading" secondItem="login-card" secondAttribute="leading" constant="24" id="lc2"/>
+                                    <constraint firstItem="login-tab-bg" firstAttribute="top" secondItem="login-title" secondAttribute="bottom" constant="20" id="lc3"/>
+                                    <constraint firstItem="login-tab-bg" firstAttribute="leading" secondItem="login-card" secondAttribute="leading" constant="24" id="lc4"/>
+                                    <constraint firstItem="login-tab-bg" firstAttribute="trailing" secondItem="login-card" secondAttribute="trailing" constant="-24" id="lc5"/>
+                                    <constraint firstItem="lbl-email" firstAttribute="top" secondItem="login-tab-bg" secondAttribute="bottom" constant="20" id="lc6"/>
+                                    <constraint firstItem="lbl-email" firstAttribute="leading" secondItem="login-card" secondAttribute="leading" constant="24" id="lc7"/>
+                                    <constraint firstItem="field-email" firstAttribute="top" secondItem="lbl-email" secondAttribute="bottom" constant="5" id="lc8"/>
+                                    <constraint firstItem="field-email" firstAttribute="leading" secondItem="login-card" secondAttribute="leading" constant="24" id="lc9"/>
+                                    <constraint firstItem="field-email" firstAttribute="trailing" secondItem="login-card" secondAttribute="trailing" constant="-24" id="lc10"/>
+                                    <constraint firstItem="lbl-pass" firstAttribute="top" secondItem="field-email" secondAttribute="bottom" constant="16" id="lc11"/>
+                                    <constraint firstItem="lbl-pass" firstAttribute="leading" secondItem="login-card" secondAttribute="leading" constant="24" id="lc12"/>
+                                    <constraint firstItem="field-pass" firstAttribute="top" secondItem="lbl-pass" secondAttribute="bottom" constant="5" id="lc13"/>
+                                    <constraint firstItem="field-pass" firstAttribute="leading" secondItem="login-card" secondAttribute="leading" constant="24" id="lc14"/>
+                                    <constraint firstItem="field-pass" firstAttribute="trailing" secondItem="login-card" secondAttribute="trailing" constant="-24" id="lc15"/>
+                                    <constraint firstItem="btn-toggle-pass" firstAttribute="trailing" secondItem="field-pass" secondAttribute="trailing" constant="-12" id="lc16"/>
+                                    <constraint firstItem="btn-toggle-pass" firstAttribute="centerY" secondItem="field-pass" secondAttribute="centerY" id="lc17"/>
+                                    <constraint firstItem="btn-forgot" firstAttribute="top" secondItem="field-pass" secondAttribute="bottom" constant="10" id="lc18"/>
+                                    <constraint firstItem="btn-forgot" firstAttribute="leading" secondItem="login-card" secondAttribute="leading" constant="24" id="lc19"/>
+                                    <constraint firstItem="btn-forgot" firstAttribute="trailing" secondItem="login-card" secondAttribute="trailing" constant="-24" id="lc20"/>
+                                    <constraint firstItem="btn-login" firstAttribute="top" secondItem="btn-forgot" secondAttribute="bottom" constant="20" id="lc21"/>
+                                    <constraint firstItem="btn-login" firstAttribute="leading" secondItem="login-card" secondAttribute="leading" constant="24" id="lc22"/>
+                                    <constraint firstItem="btn-login" firstAttribute="trailing" secondItem="login-card" secondAttribute="trailing" constant="-24" id="lc23"/>
+                                    <constraint firstItem="btn-join" firstAttribute="top" secondItem="btn-login" secondAttribute="bottom" constant="12" id="lc24"/>
+                                    <constraint firstItem="btn-join" firstAttribute="leading" secondItem="login-card" secondAttribute="leading" constant="24" id="lc25"/>
+                                    <constraint firstItem="btn-join" firstAttribute="trailing" secondItem="login-card" secondAttribute="trailing" constant="-24" id="lc26"/>
+                                    <constraint firstItem="btn-join" firstAttribute="bottom" secondItem="login-card" secondAttribute="bottom" constant="-32" id="lc27"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <real key="value" value="24"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.maskedCorners">
+                                        <integer key="value" value="3"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="login-safe"/>
+                        <color key="backgroundColor" red="0.0" green="0.035294117647058823" blue="0.12549019607843137" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="login-gradient" firstAttribute="top" secondItem="login-view" secondAttribute="top" id="lg1"/>
+                            <constraint firstItem="login-gradient" firstAttribute="leading" secondItem="login-view" secondAttribute="leading" id="lg2"/>
+                            <constraint firstItem="login-gradient" firstAttribute="trailing" secondItem="login-view" secondAttribute="trailing" id="lg3"/>
+                            <constraint firstItem="login-gradient" firstAttribute="bottom" secondItem="login-view" secondAttribute="bottom" id="lg4"/>
+                            <constraint firstItem="login-logo" firstAttribute="centerX" secondItem="login-view" secondAttribute="centerX" id="ll1"/>
+                            <constraint firstItem="login-logo" firstAttribute="width" secondItem="login-view" secondAttribute="width" multiplier="0.6" id="ll2"/>
+                            <constraint firstItem="login-brand-sub" firstAttribute="top" secondItem="login-logo" secondAttribute="bottom" constant="16" id="ll3"/>
+                            <constraint firstItem="login-brand-sub" firstAttribute="centerX" secondItem="login-view" secondAttribute="centerX" id="ll4"/>
+                            <constraint firstItem="login-card" firstAttribute="leading" secondItem="login-view" secondAttribute="leading" id="lcard1"/>
+                            <constraint firstItem="login-card" firstAttribute="trailing" secondItem="login-view" secondAttribute="trailing" id="lcard2"/>
+                            <constraint firstItem="login-card" firstAttribute="bottom" secondItem="login-view" secondAttribute="bottom" id="lcard3"/>
+                            <constraint firstItem="login-card" firstAttribute="top" secondItem="login-brand-sub" secondAttribute="bottom" constant="24" id="lcard4"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="emailField" destination="field-email" id="lo1"/>
+                        <outlet property="loginButton" destination="btn-login" id="lo2"/>
+                        <outlet property="passwordField" destination="field-pass" id="lo3"/>
+                        <outlet property="tabEmailButton" destination="tab-email" id="lo4"/>
+                        <outlet property="tabPhoneButton" destination="tab-phone" id="lo5"/>
+                        <outlet property="togglePasswordButton" destination="btn-toggle-pass" id="lo6"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="login-fr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="100" y="0"/>
+        </scene>
+        <!-- Main Tab Bar -->
+        <scene sceneID="tab-scene">
+            <objects>
+                <tabBarController storyboardIdentifier="MainTabBarController" id="main-tab" customClass="MainTabBarController" customModule="AnokiXDistributor" customModuleProvider="target" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="YES" id="main-tab-bar">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="dash-nav" kind="relationship" relationship="viewControllers" id="tab-seg-home"/>
+                        <segue destination="orders-nav" kind="relationship" relationship="viewControllers" id="tab-seg-orders"/>
+                        <segue destination="inv-nav" kind="relationship" relationship="viewControllers" id="tab-seg-inv"/>
+                        <segue destination="prod-nav" kind="relationship" relationship="viewControllers" id="tab-seg-prod"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="tab-fr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="700" y="0"/>
+        </scene>
+        <!-- Dashboard Nav -->
+        <scene sceneID="dash-nav-scene">
+            <objects>
+                <navigationController storyboardIdentifier="DashboardNavigationController" automaticallyAdjustsScrollViewInsets="NO" navigationBarHidden="YES" id="dash-nav" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Home" image="square.grid.2x2.fill" catalog="system" id="dash-tab-item"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="dash-nav-bar">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="dash-vc" kind="relationship" relationship="rootViewController" id="dash-root"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dash-nav-fr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="700" y="-400"/>
+        </scene>
+        <!-- Dashboard -->
+        <scene sceneID="dash-scene">
+            <objects>
+                <viewController id="dash-vc" customClass="DashboardViewController" customModule="AnokiXDistributor" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="dash-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="0" translatesAutoresizingMaskIntoConstraints="NO" id="dash-chrome">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="88"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dash-header-panel">
+                                        <rect key="frame" x="0.0" y="0.0" width="393" height="88"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dash-menu-btn">
+                                                <state key="normal" image="line.3.horizontal" catalog="system"/>
+                                                <connections>
+                                                    <action selector="menuTapped:" destination="dash-vc" eventType="touchUpInside" id="dash-menu-act"/>
+                                                </connections>
+                                            </button>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Welcome back" translatesAutoresizingMaskIntoConstraints="NO" id="dash-welcome-lbl">
+                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Here's what's happening today." translatesAutoresizingMaskIntoConstraints="NO" id="dash-sub-lbl">
+                                                <fontDescription key="fontDescription" type="system" weight="light" pointSize="12"/>
+                                                <color key="textColor" red="0.392" green="0.455" blue="0.545" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </label>
+                                            <button opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dash-bell-btn">
+                                                <state key="normal" image="bell" catalog="system"/>
+                                                <connections>
+                                                    <action selector="notificationsTapped:" destination="dash-vc" eventType="touchUpInside" id="dash-bell-act"/>
+                                                </connections>
+                                            </button>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="center" text="A" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="dash-avatar-lbl">
+                                                <color key="backgroundColor" red="0.929" green="0.914" blue="0.996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                                                <color key="textColor" red="0.486" green="0.227" blue="0.929" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </label>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dash-header-div">
+                                                <color key="backgroundColor" red="0.886" green="0.910" blue="0.941" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="1" id="dhd-h"/>
+                                                </constraints>
+                                            </view>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstItem="dash-menu-btn" firstAttribute="leading" secondItem="dash-header-panel" secondAttribute="leading" constant="12" id="dh1"/>
+                                            <constraint firstItem="dash-menu-btn" firstAttribute="top" secondItem="dash-header-panel" secondAttribute="top" constant="12" id="dh2"/>
+                                            <constraint firstItem="dash-menu-btn" firstAttribute="width" constant="40" id="dh3"/>
+                                            <constraint firstItem="dash-menu-btn" firstAttribute="height" constant="40" id="dh4"/>
+                                            <constraint firstItem="dash-welcome-lbl" firstAttribute="leading" secondItem="dash-menu-btn" secondAttribute="trailing" constant="8" id="dh5"/>
+                                            <constraint firstItem="dash-welcome-lbl" firstAttribute="top" secondItem="dash-menu-btn" secondAttribute="top" id="dh6"/>
+                                            <constraint firstItem="dash-sub-lbl" firstAttribute="leading" secondItem="dash-welcome-lbl" secondAttribute="leading" id="dh7"/>
+                                            <constraint firstItem="dash-sub-lbl" firstAttribute="top" secondItem="dash-welcome-lbl" secondAttribute="bottom" constant="2" id="dh8"/>
+                                            <constraint firstItem="dash-avatar-lbl" firstAttribute="trailing" secondItem="dash-header-panel" secondAttribute="trailing" constant="-12" id="dh9"/>
+                                            <constraint firstItem="dash-avatar-lbl" firstAttribute="centerY" secondItem="dash-menu-btn" secondAttribute="centerY" id="dh10"/>
+                                            <constraint firstItem="dash-avatar-lbl" firstAttribute="width" constant="36" id="dh11"/>
+                                            <constraint firstItem="dash-avatar-lbl" firstAttribute="height" constant="36" id="dh12"/>
+                                            <constraint firstItem="dash-bell-btn" firstAttribute="trailing" secondItem="dash-avatar-lbl" secondAttribute="leading" constant="-8" id="dh13"/>
+                                            <constraint firstItem="dash-bell-btn" firstAttribute="centerY" secondItem="dash-menu-btn" secondAttribute="centerY" id="dh14"/>
+                                            <constraint firstItem="dash-bell-btn" firstAttribute="width" constant="40" id="dh15"/>
+                                            <constraint firstItem="dash-bell-btn" firstAttribute="height" constant="40" id="dh16"/>
+                                            <constraint firstItem="dash-header-div" firstAttribute="leading" secondItem="dash-header-panel" secondAttribute="leading" id="dh17"/>
+                                            <constraint firstItem="dash-header-div" firstAttribute="trailing" secondItem="dash-header-panel" secondAttribute="trailing" id="dh18"/>
+                                            <constraint firstItem="dash-header-div" firstAttribute="bottom" secondItem="dash-header-panel" secondAttribute="bottom" id="dh19"/>
+                                            <constraint firstItem="dash-header-div" firstAttribute="top" secondItem="dash-menu-btn" secondAttribute="bottom" constant="14" id="dh20"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                            </stackView>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dash-scroll">
+                                <rect key="frame" x="0.0" y="88" width="393" height="681"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="dash-stack">
+                                        <rect key="frame" x="16" y="16" width="361" height="200"/>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="dash-stack" firstAttribute="top" secondItem="dash-scroll" secondAttribute="top" constant="16" id="ds1"/>
+                                    <constraint firstItem="dash-stack" firstAttribute="leading" secondItem="dash-scroll" secondAttribute="leading" constant="16" id="ds2"/>
+                                    <constraint firstItem="dash-stack" firstAttribute="trailing" secondItem="dash-scroll" secondAttribute="trailing" constant="-16" id="ds3"/>
+                                    <constraint firstItem="dash-stack" firstAttribute="bottom" secondItem="dash-scroll" secondAttribute="bottom" constant="-24" id="ds4"/>
+                                    <constraint firstItem="dash-stack" firstAttribute="width" secondItem="dash-scroll" secondAttribute="width" constant="-32" id="ds5"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="dash-safe"/>
+                        <color key="backgroundColor" red="0.945" green="0.961" blue="0.976" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="dash-chrome" firstAttribute="top" secondItem="dash-safe" secondAttribute="top" id="dv1"/>
+                            <constraint firstItem="dash-chrome" firstAttribute="leading" secondItem="dash-view" secondAttribute="leading" id="dv2"/>
+                            <constraint firstItem="dash-chrome" firstAttribute="trailing" secondItem="dash-view" secondAttribute="trailing" id="dv3"/>
+                            <constraint firstItem="dash-scroll" firstAttribute="top" secondItem="dash-chrome" secondAttribute="bottom" id="dv4"/>
+                            <constraint firstItem="dash-scroll" firstAttribute="leading" secondItem="dash-view" secondAttribute="leading" id="dv5"/>
+                            <constraint firstItem="dash-scroll" firstAttribute="trailing" secondItem="dash-view" secondAttribute="trailing" id="dv6"/>
+                            <constraint firstItem="dash-scroll" firstAttribute="bottom" secondItem="dash-safe" secondAttribute="bottom" id="dv7"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="avatarLabel" destination="dash-avatar-lbl" id="do-av"/>
+                        <outlet property="chromeStackView" destination="dash-chrome" id="do1"/>
+                        <outlet property="contentStackView" destination="dash-stack" id="do-stack"/>
+                        <outlet property="contentView" destination="dash-scroll" id="do2"/>
+                        <outlet property="dashboardSubtitleLabel" destination="dash-sub-lbl" id="do-sub"/>
+                        <outlet property="menuButton" destination="dash-menu-btn" id="do-menu"/>
+                        <outlet property="notificationsButton" destination="dash-bell-btn" id="do-bell"/>
+                        <outlet property="welcomeLabel" destination="dash-welcome-lbl" id="do-wel"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dash-fr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="700" y="-800"/>
+        </scene>
+        <!-- Orders Nav + VC (abbreviated - same chrome/content pattern) -->
+        <scene sceneID="orders-nav-scene">
+            <objects>
+                <navigationController storyboardIdentifier="OrdersNavigationController" automaticallyAdjustsScrollViewInsets="NO" navigationBarHidden="YES" id="orders-nav" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Orders" image="doc.text.fill" catalog="system" id="orders-tab-item"/>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="orders-vc" kind="relationship" relationship="rootViewController" id="orders-root"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="orders-nav-fr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1100" y="-400"/>
+        </scene>
+        <scene sceneID="orders-scene">
+            <objects>
+                <viewController id="orders-vc" customClass="OrdersViewController" customModule="AnokiXDistributor" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="orders-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="0" translatesAutoresizingMaskIntoConstraints="NO" id="orders-chrome">
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="orders-title-panel">
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Orders Queue" translatesAutoresizingMaskIntoConstraints="NO" id="orders-title-lbl">
+                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Manage and process incoming orders" translatesAutoresizingMaskIntoConstraints="NO" id="orders-sub-lbl">
+                                                <fontDescription key="fontDescription" type="system" weight="light" pointSize="12"/>
+                                                <color key="textColor" red="0.392" green="0.455" blue="0.545" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </label>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstItem="orders-title-lbl" firstAttribute="top" secondItem="orders-title-panel" secondAttribute="top" constant="12" id="ot1"/>
+                                            <constraint firstItem="orders-title-lbl" firstAttribute="leading" secondItem="orders-title-panel" secondAttribute="leading" constant="16" id="ot2"/>
+                                            <constraint firstItem="orders-sub-lbl" firstAttribute="leading" secondItem="orders-title-lbl" secondAttribute="leading" id="ot3"/>
+                                            <constraint firstItem="orders-sub-lbl" firstAttribute="top" secondItem="orders-title-lbl" secondAttribute="bottom" constant="2" id="ot4"/>
+                                            <constraint firstItem="orders-sub-lbl" firstAttribute="bottom" secondItem="orders-title-panel" secondAttribute="bottom" constant="-12" id="ot5"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                            </stackView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="orders-content">
+                                <color key="backgroundColor" red="0.94509803921568625" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="orders-safe"/>
+                        <color key="backgroundColor" red="0.94509803921568625" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="orders-chrome" firstAttribute="top" secondItem="orders-safe" secondAttribute="top" id="ov1"/>
+                            <constraint firstItem="orders-chrome" firstAttribute="leading" secondItem="orders-view" secondAttribute="leading" id="ov2"/>
+                            <constraint firstItem="orders-chrome" firstAttribute="trailing" secondItem="orders-view" secondAttribute="trailing" id="ov3"/>
+                            <constraint firstItem="orders-content" firstAttribute="top" secondItem="orders-chrome" secondAttribute="bottom" id="ov4"/>
+                            <constraint firstItem="orders-content" firstAttribute="leading" secondItem="orders-view" secondAttribute="leading" id="ov5"/>
+                            <constraint firstItem="orders-content" firstAttribute="trailing" secondItem="orders-view" secondAttribute="trailing" id="ov6"/>
+                            <constraint firstItem="orders-content" firstAttribute="bottom" secondItem="orders-safe" secondAttribute="bottom" id="ov7"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="chromeStackView" destination="orders-chrome" id="oo1"/>
+                        <outlet property="contentView" destination="orders-content" id="oo2"/>
+                        <outlet property="pageSubtitleLabel" destination="orders-sub-lbl" id="oo-sub"/>
+                        <outlet property="pageTitleLabel" destination="orders-title-lbl" id="oo-title"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="orders-fr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1100" y="-800"/>
+        </scene>
+        <!-- Inventory Nav + VC -->
+        <scene sceneID="inv-nav-scene">
+            <objects>
+                <navigationController storyboardIdentifier="InventoryNavigationController" automaticallyAdjustsScrollViewInsets="NO" navigationBarHidden="YES" id="inv-nav" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Inventory" image="shippingbox.fill" catalog="system" id="inv-tab-item"/>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="inv-vc" kind="relationship" relationship="rootViewController" id="inv-root"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="inv-nav-fr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1500" y="-400"/>
+        </scene>
+        <scene sceneID="inv-scene">
+            <objects>
+                <viewController id="inv-vc" customClass="InventoryViewController" customModule="AnokiXDistributor" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="inv-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="0" translatesAutoresizingMaskIntoConstraints="NO" id="inv-chrome">
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="inv-logo-panel">
+                                        <subviews>
+                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="LogoBlack" translatesAutoresizingMaskIntoConstraints="NO" id="inv-logo-img">
+                                                <constraints>
+                                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="28" id="il-h"/>
+                                                </constraints>
+                                            </imageView>
+                                            <label opaque="NO" text="Distributor App" translatesAutoresizingMaskIntoConstraints="NO" id="inv-logo-sub"/>
+                                            <button opaque="NO" translatesAutoresizingMaskIntoConstraints="NO" id="inv-bell-btn">
+                                                <state key="normal" image="bell" catalog="system"/>
+                                                <connections>
+                                                    <action selector="notificationsTapped:" destination="inv-vc" eventType="touchUpInside" id="inv-bell-act"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstItem="inv-logo-img" firstAttribute="leading" secondItem="inv-logo-panel" secondAttribute="leading" constant="16" id="il1"/>
+                                            <constraint firstItem="inv-logo-img" firstAttribute="top" secondItem="inv-logo-panel" secondAttribute="top" constant="12" id="il2"/>
+                                            <constraint firstItem="inv-logo-sub" firstAttribute="leading" secondItem="inv-logo-img" secondAttribute="leading" id="il3"/>
+                                            <constraint firstItem="inv-logo-sub" firstAttribute="top" secondItem="inv-logo-img" secondAttribute="bottom" constant="4" id="il4"/>
+                                            <constraint firstItem="inv-bell-btn" firstAttribute="trailing" secondItem="inv-logo-panel" secondAttribute="trailing" constant="-16" id="il5"/>
+                                            <constraint firstItem="inv-bell-btn" firstAttribute="centerY" secondItem="inv-logo-img" secondAttribute="centerY" id="il6"/>
+                                            <constraint firstItem="inv-logo-sub" firstAttribute="bottom" secondItem="inv-logo-panel" secondAttribute="bottom" constant="-8" id="il7"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="inv-title-panel">
+                                        <subviews>
+                                            <label opaque="NO" text="Inventory" translatesAutoresizingMaskIntoConstraints="NO" id="inv-title-lbl">
+                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
+                                            </label>
+                                            <label opaque="NO" text="Track stock levels and SKUs" translatesAutoresizingMaskIntoConstraints="NO" id="inv-sub-lbl">
+                                                <fontDescription key="fontDescription" type="system" weight="light" pointSize="12"/>
+                                            </label>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstItem="inv-title-lbl" firstAttribute="top" secondItem="inv-title-panel" secondAttribute="top" constant="12" id="it1"/>
+                                            <constraint firstItem="inv-title-lbl" firstAttribute="leading" secondItem="inv-title-panel" secondAttribute="leading" constant="16" id="it2"/>
+                                            <constraint firstItem="inv-sub-lbl" firstAttribute="leading" secondItem="inv-title-lbl" secondAttribute="leading" id="it3"/>
+                                            <constraint firstItem="inv-sub-lbl" firstAttribute="top" secondItem="inv-title-lbl" secondAttribute="bottom" constant="2" id="it4"/>
+                                            <constraint firstItem="inv-sub-lbl" firstAttribute="bottom" secondItem="inv-title-panel" secondAttribute="bottom" constant="-12" id="it5"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                            </stackView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="inv-content">
+                                <color key="backgroundColor" red="0.94509803921568625" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="inv-safe"/>
+                        <color key="backgroundColor" red="0.94509803921568625" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="inv-chrome" firstAttribute="top" secondItem="inv-safe" secondAttribute="top" id="iv1"/>
+                            <constraint firstItem="inv-chrome" firstAttribute="leading" secondItem="inv-view" secondAttribute="leading" id="iv2"/>
+                            <constraint firstItem="inv-chrome" firstAttribute="trailing" secondItem="inv-view" secondAttribute="trailing" id="iv3"/>
+                            <constraint firstItem="inv-content" firstAttribute="top" secondItem="inv-chrome" secondAttribute="bottom" id="iv4"/>
+                            <constraint firstItem="inv-content" firstAttribute="leading" secondItem="inv-view" secondAttribute="leading" id="iv5"/>
+                            <constraint firstItem="inv-content" firstAttribute="trailing" secondItem="inv-view" secondAttribute="trailing" id="iv6"/>
+                            <constraint firstItem="inv-content" firstAttribute="bottom" secondItem="inv-safe" secondAttribute="bottom" id="iv7"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="chromeStackView" destination="inv-chrome" id="io1"/>
+                        <outlet property="contentView" destination="inv-content" id="io2"/>
+                        <outlet property="logoImageView" destination="inv-logo-img" id="io-logo"/>
+                        <outlet property="logoSubtitleLabel" destination="inv-logo-sub" id="io-sub"/>
+                        <outlet property="pageSubtitleLabel" destination="inv-sub-lbl" id="io-psub"/>
+                        <outlet property="pageTitleLabel" destination="inv-title-lbl" id="io-title"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="inv-fr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1500" y="-800"/>
+        </scene>
+        <!-- Products Nav + VC -->
+        <scene sceneID="prod-nav-scene">
+            <objects>
+                <navigationController storyboardIdentifier="ProductsNavigationController" automaticallyAdjustsScrollViewInsets="NO" navigationBarHidden="YES" id="prod-nav" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Products" image="bag.fill" catalog="system" id="prod-tab-item"/>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="prod-vc" kind="relationship" relationship="rootViewController" id="prod-root"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="prod-nav-fr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1900" y="-400"/>
+        </scene>
+        <scene sceneID="prod-scene">
+            <objects>
+                <viewController id="prod-vc" customClass="ProductsTabViewController" customModule="AnokiXDistributor" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="prod-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="0" translatesAutoresizingMaskIntoConstraints="NO" id="prod-chrome">
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="prod-logo-panel">
+                                        <subviews>
+                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="LogoBlack" translatesAutoresizingMaskIntoConstraints="NO" id="prod-logo-img">
+                                                <constraints>
+                                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="28" id="pl-h"/>
+                                                </constraints>
+                                            </imageView>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Distributor App" translatesAutoresizingMaskIntoConstraints="NO" id="prod-logo-sub"/>
+                                            <button opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="prod-bell-btn">
+                                                <state key="normal" image="bell" catalog="system"/>
+                                                <connections>
+                                                    <action selector="notificationsTapped:" destination="prod-vc" eventType="touchUpInside" id="prod-bell-act"/>
+                                                </connections>
+                                            </button>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="prod-logo-div">
+                                                <color key="backgroundColor" red="0.886" green="0.910" blue="0.941" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <constraints><constraint firstAttribute="height" constant="1" id="pld-h"/></constraints>
+                                            </view>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstItem="prod-logo-img" firstAttribute="leading" secondItem="prod-logo-panel" secondAttribute="leading" constant="16" id="pl1"/>
+                                            <constraint firstItem="prod-logo-img" firstAttribute="top" secondItem="prod-logo-panel" secondAttribute="top" constant="12" id="pl2"/>
+                                            <constraint firstItem="prod-logo-sub" firstAttribute="leading" secondItem="prod-logo-img" secondAttribute="leading" id="pl3"/>
+                                            <constraint firstItem="prod-logo-sub" firstAttribute="top" secondItem="prod-logo-img" secondAttribute="bottom" constant="4" id="pl4"/>
+                                            <constraint firstItem="prod-bell-btn" firstAttribute="trailing" secondItem="prod-logo-panel" secondAttribute="trailing" constant="-16" id="pl5"/>
+                                            <constraint firstItem="prod-bell-btn" firstAttribute="centerY" secondItem="prod-logo-img" secondAttribute="centerY" id="pl6"/>
+                                            <constraint firstItem="prod-bell-btn" firstAttribute="width" constant="36" id="pl7"/>
+                                            <constraint firstItem="prod-bell-btn" firstAttribute="height" constant="36" id="pl8"/>
+                                            <constraint firstItem="prod-logo-div" firstAttribute="leading" secondItem="prod-logo-panel" secondAttribute="leading" id="pl9"/>
+                                            <constraint firstItem="prod-logo-div" firstAttribute="trailing" secondItem="prod-logo-panel" secondAttribute="trailing" id="pl10"/>
+                                            <constraint firstItem="prod-logo-div" firstAttribute="bottom" secondItem="prod-logo-panel" secondAttribute="bottom" id="pl11"/>
+                                            <constraint firstItem="prod-logo-div" firstAttribute="top" relation="greaterThanOrEqual" secondItem="prod-logo-sub" secondAttribute="bottom" constant="8" id="pl12"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="prod-title-panel">
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Products" translatesAutoresizingMaskIntoConstraints="NO" id="prod-title-lbl">
+                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
+                                            </label>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstItem="prod-title-lbl" firstAttribute="top" secondItem="prod-title-panel" secondAttribute="top" constant="16" id="pt1"/>
+                                            <constraint firstItem="prod-title-lbl" firstAttribute="leading" secondItem="prod-title-panel" secondAttribute="leading" constant="16" id="pt2"/>
+                                            <constraint firstItem="prod-title-lbl" firstAttribute="bottom" secondItem="prod-title-panel" secondAttribute="bottom" constant="-12" id="pt3"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                            </stackView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="prod-content">
+                                <subviews>
+                                    <textField opaque="NO" contentMode="scaleToFill" placeholder="Search products…" translatesAutoresizingMaskIntoConstraints="NO" id="prod-search">
+                                        <constraints><constraint firstAttribute="height" constant="42" id="ps-h"/></constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
+                                    <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="prod-table">
+                                        <color key="backgroundColor" red="0.945" green="0.961" blue="0.976" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="8" minimumInteritemSpacing="16" id="prod-cvlayout">
+                                            <size key="itemSize" width="160" height="96"/>
+                                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                            <inset key="sectionInset" minX="16" minY="0.0" maxX="16" maxY="8"/>
+                                        </collectionViewFlowLayout>
+                                    </collectionView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="prod-fab">
+                                        <state key="normal" title=" Add Product" image="plus" catalog="system"/>
+                                        <connections>
+                                            <action selector="addProductTapped:" destination="prod-vc" eventType="touchUpInside" id="prod-fab-act"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" red="0.945" green="0.961" blue="0.976" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstItem="prod-search" firstAttribute="top" secondItem="prod-content" secondAttribute="top" constant="12" id="pc1"/>
+                                    <constraint firstItem="prod-search" firstAttribute="leading" secondItem="prod-content" secondAttribute="leading" constant="16" id="pc2"/>
+                                    <constraint firstItem="prod-search" firstAttribute="trailing" secondItem="prod-content" secondAttribute="trailing" constant="-16" id="pc3"/>
+                                    <constraint firstItem="prod-table" firstAttribute="top" secondItem="prod-search" secondAttribute="bottom" constant="12" id="pc4"/>
+                                    <constraint firstItem="prod-table" firstAttribute="leading" secondItem="prod-content" secondAttribute="leading" id="pc5"/>
+                                    <constraint firstItem="prod-table" firstAttribute="trailing" secondItem="prod-content" secondAttribute="trailing" id="pc6"/>
+                                    <constraint firstItem="prod-table" firstAttribute="bottom" secondItem="prod-content" secondAttribute="bottom" id="pc7"/>
+                                    <constraint firstItem="prod-fab" firstAttribute="trailing" secondItem="prod-content" secondAttribute="trailing" constant="-16" id="pc8"/>
+                                    <constraint firstItem="prod-fab" firstAttribute="bottom" secondItem="prod-content" secondAttribute="bottom" constant="-16" id="pc9"/>
+                                    <constraint firstItem="prod-fab" firstAttribute="height" constant="48" id="pc10"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="prod-safe"/>
+                        <color key="backgroundColor" red="0.945" green="0.961" blue="0.976" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="prod-chrome" firstAttribute="top" secondItem="prod-safe" secondAttribute="top" id="pv1"/>
+                            <constraint firstItem="prod-chrome" firstAttribute="leading" secondItem="prod-view" secondAttribute="leading" id="pv2"/>
+                            <constraint firstItem="prod-chrome" firstAttribute="trailing" secondItem="prod-view" secondAttribute="trailing" id="pv3"/>
+                            <constraint firstItem="prod-content" firstAttribute="top" secondItem="prod-chrome" secondAttribute="bottom" id="pv4"/>
+                            <constraint firstItem="prod-content" firstAttribute="leading" secondItem="prod-view" secondAttribute="leading" id="pv5"/>
+                            <constraint firstItem="prod-content" firstAttribute="trailing" secondItem="prod-view" secondAttribute="trailing" id="pv6"/>
+                            <constraint firstItem="prod-content" firstAttribute="bottom" secondItem="prod-safe" secondAttribute="bottom" id="pv7"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="addProductButton" destination="prod-fab" id="po-fab"/>
+                        <outlet property="chromeStackView" destination="prod-chrome" id="po1"/>
+                        <outlet property="contentView" destination="prod-content" id="po2"/>
+                        <outlet property="logoImageView" destination="prod-logo-img" id="po-logo"/>
+                        <outlet property="logoSubtitleLabel" destination="prod-logo-sub" id="po-sub"/>
+                        <outlet property="pageTitleLabel" destination="prod-title-lbl" id="po-title"/>
+                        <outlet property="productsCollectionView" destination="prod-table" id="po-table"/>
+                        <outlet property="searchField" destination="prod-search" id="po-search"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="prod-fr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1900" y="-800"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="LogoBlack" width="128" height="128"/>
+        <image name="LogoWhite" width="128" height="128"/>
+        <image name="bag.fill" catalog="system" width="128" height="114"/>
+        <image name="bell" catalog="system" width="128" height="123"/>
+        <image name="doc.text.fill" catalog="system" width="128" height="121"/>
+        <image name="eye" catalog="system" width="128" height="87"/>
+        <image name="line.3.horizontal" catalog="system" width="128" height="93"/>
+        <image name="plus" catalog="system" width="128" height="113"/>
+        <image name="shippingbox.fill" catalog="system" width="128" height="112"/>
+        <image name="square.grid.2x2.fill" catalog="system" width="128" height="113"/>
+    </resources>
+</document>

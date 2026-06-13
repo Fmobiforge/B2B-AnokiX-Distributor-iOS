@@ -1,0 +1,32 @@
+name: AnokiXDistributor
+options:
+  bundleIdPrefix: com.anokix
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+
+targets:
+  AnokiXDistributor:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: AnokiXDistributor
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.anokix.distributor
+        PRODUCT_NAME: anokiX Distributor
+        PRODUCT_MODULE_NAME: AnokiXDistributor
+        INFOPLIST_FILE: AnokiXDistributor/Resources/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1,2"
+        UILaunchStoryboardName: LaunchScreen
