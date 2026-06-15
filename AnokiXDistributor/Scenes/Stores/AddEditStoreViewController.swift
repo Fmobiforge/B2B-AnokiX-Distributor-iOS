@@ -476,6 +476,8 @@ final class AddEditStoreViewController: BaseSecondaryViewController, GMSMapViewD
         step1.isHidden = index != 0
         step2.isHidden = index != 1
         stepperLabel.text = index == 0 ? "Step 1 of 2 — Store Information" : "Step 2 of 2 — Address & Shipping"
+        view.layoutIfNeeded()
+        formScrollView?.setContentOffset(.zero, animated: false)
     }
 
     @objc private func toggleCollect() { clickCollect.toggle(); applyFulfillment() }
