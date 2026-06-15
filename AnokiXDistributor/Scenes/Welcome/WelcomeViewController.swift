@@ -18,24 +18,15 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
     }
 
     private func buildLayout() {
-        let scroll = UIScrollView()
-        scroll.alwaysBounceVertical = false
-        scroll.showsVerticalScrollIndicator = false
-        scroll.forAutoLayout()
-        view.addSubview(scroll)
-        // Keep content inside the safe area so the bottom rows never fall under the
-        // home indicator (the dark view background still fills the whole screen).
-        scroll.pinEdges(to: view, useSafeArea: true)
-
+        // No scroll view: a single stack centred vertically in the safe area.
         let content = UIStackView.vertical(spacing: 0, alignment: .fill)
         content.forAutoLayout()
-        scroll.addSubview(content)
+        view.addSubview(content)
+        let guide = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
-            content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor),
-            content.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor),
-            content.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 24),
-            content.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -24),
-            content.heightAnchor.constraint(greaterThanOrEqualTo: scroll.frameLayoutGuide.heightAnchor)
+            content.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: 24),
+            content.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -24),
+            content.centerYAnchor.constraint(equalTo: guide.centerYAnchor)
         ])
 
         // Storefront illustration (added to the asset catalog as "welcome_storefront").
@@ -64,20 +55,14 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
         let signInRow = makeSignInRow()
         let supportRow = makeSupportRow()
 
-        [spacer(30),
-         storefront,
+        [storefront,
          spacer(20), title,
          spacer(12), tagline,
-         spacer(30),
+         spacer(40),
          loginButton,
          spacer(14), createButton,
-         spacer(20), signInRow,
-         spacer(10), supportRow,
-         spacer(16)].forEach { content.addArrangedSubview($0) }
-
-        // Small fixed top margin; the middle spacer absorbs the slack and floats the
-        // buttons to the bottom. Low hugging so it (not the fixed spacers) stretches.
-        
+         spacer(22), signInRow,
+         spacer(10), supportRow].forEach { content.addArrangedSubview($0) }
     }
 
     private func spacer(_ height: CGFloat) -> UIView {
