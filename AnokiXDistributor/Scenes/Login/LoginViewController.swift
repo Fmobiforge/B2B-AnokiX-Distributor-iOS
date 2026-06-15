@@ -21,6 +21,13 @@ final class LoginViewController: UIViewController {
         view.addGestureRecognizer(tap)
     }
 
+    override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setNeedsStatusBarAppearanceUpdate()
+    }
+
     private func styleTextFields() {
         [emailField, passwordField].forEach { field in
             field?.layer.cornerRadius = AppMetrics.radiusMD

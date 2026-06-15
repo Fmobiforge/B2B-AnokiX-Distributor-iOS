@@ -14,6 +14,13 @@ final class SplashViewController: UIViewController {
         subtitleLabel.textColor = .white
     }
 
+    override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setNeedsStatusBarAppearanceUpdate()
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
