@@ -3,6 +3,21 @@ import Foundation
 // Codable ports of network/dto/*.java. The shared decoder uses
 // `.convertFromSnakeCase`, so Swift camelCase properties map to the JSON snake_case keys.
 
+// MARK: - Flexible JSON helpers
+
+enum JSONDecoding {
+    static func flexString<K: CodingKey>(_ c: KeyedDecodingContainer<K>, key: K) -> String? {
+        if let value = try? c.decode(String.self, forKey: key) { return value }
+        if let value = try? c.decode(Int64.self, forKey: key) { return String(value) }
+        if let value = try? c.decode(Int.self, forKey: key) { return String(value) }
+        if let value = try? c.decode(Double.self, forKey: key) {
+            return value.truncatingRemainder(dividingBy: 1) == 0
+                ? String(Int(value)) : String(value)
+        }
+        return nil
+    }
+}
+
 // MARK: - Envelope
 
 struct ApiResponse<T: Decodable>: Decodable {
@@ -157,7 +172,37 @@ struct TradersData: Decodable {
         let status: String?
         let registrationStatus: String?
         let creditStatus: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            name = try c.decodeIfPresent(String.self, forKey: .name)
+            businessName = try c.decodeIfPresent(String.self, forKey: .businessName)
+            tradingName = try c.decodeIfPresent(String.self, forKey: .tradingName)
+            ownerFullName = try c.decodeIfPresent(String.self, forKey: .ownerFullName)
+            phoneNumber = JSONDecoding.flexString(c, key: .phoneNumber)
+                ?? JSONDecoding.flexString(c, key: .businessPhoneNumber)
+            countryCode = try c.decodeIfPresent(String.self, forKey: .countryCode)
+            email = try c.decodeIfPresent(String.self, forKey: .email)
+                ?? try c.decodeIfPresent(String.self, forKey: .businessEmail)
+            address = try c.decodeIfPresent(String.self, forKey: .address)
+            storeType = try c.decodeIfPresent(String.self, forKey: .storeType)
+                ?? try c.decodeIfPresent(String.self, forKey: .traderType)
+            traderCode = try c.decodeIfPresent(String.self, forKey: .traderCode)
+            status = try c.decodeIfPresent(String.self, forKey: .status)
+            registrationStatus = try c.decodeIfPresent(String.self, forKey: .registrationStatus)
+            creditStatus = try c.decodeIfPresent(String.self, forKey: .creditStatus)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, name, businessName, tradingName, ownerFullName
+            case phoneNumber, businessPhoneNumber, countryCode
+            case email, businessEmail, address
+            case storeType, traderType, traderCode, status
+            case registrationStatus, creditStatus
+        }
     }
+
     struct Summary: Decodable {
         let totalTraders: Int?
         let totalTradersMonthChangeLabel: String?
@@ -167,6 +212,8 @@ struct TradersData: Decodable {
         let newThisMonthChangeLabel: String?
         let highValueTraders: Int?
         let highValueTradersPercentLabel: String?
+        let pendingApprovalTraders: Int?
+        let pendingApprovalTradersPercentLabel: String?
     }
 }
 

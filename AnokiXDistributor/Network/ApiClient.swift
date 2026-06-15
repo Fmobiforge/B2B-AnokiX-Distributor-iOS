@@ -95,11 +95,14 @@ final class ApiClient {
                 let dataJson = envelope["data"]
                 if dataJson.type == .null {
                     result = .failure(ApiError(message: "Empty response from server"))
-                } else if let raw = try? dataJson.rawData(),
-                          let decoded = try? decoder.decode(T.self, from: raw) {
-                    result = .success(decoded)
+                } else if let raw = try? dataJson.rawData() {
+                    do {
+                        result = .success(try decoder.decode(T.self, from: raw))
+                    } catch {
+                        print("\(Http.tag): decode failed for \(T.self): \(error)")
+                        result = .failure(ApiError(message: "Unexpected response from server"))
+                    }
                 } else {
-                    print("\(Http.tag): decode failed for \(T.self)")
                     result = .failure(ApiError(message: "Unexpected response from server"))
                 }
             } else {

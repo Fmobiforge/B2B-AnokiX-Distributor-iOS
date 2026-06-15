@@ -28,20 +28,29 @@ enum ApiMapper {
     static func toTraderItems(_ data: TradersData?) -> [TraderItem] {
         guard let traders = data?.traders else { return [] }
         return traders.enumerated().map { index, t in
-            let name = !isEmpty(t.businessName) ? safe(t.businessName) : safe(t.name)
-            let phone = isEmpty(t.countryCode)
-                ? safe(t.phoneNumber)
-                : "+\(safe(t.countryCode)) \(safe(t.phoneNumber))"
+            let name = !isEmpty(t.businessName) ? safe(t.businessName)
+                : (!isEmpty(t.tradingName) ? safe(t.tradingName) : safe(t.name))
+            let phone = formatTraderPhone(countryCode: t.countryCode, phoneNumber: t.phoneNumber)
             return TraderItem(id: safe(t.id),
                               name: name,
                               location: safe(t.address),
-                              phone: phone.trimmingCharacters(in: .whitespaces),
+                              phone: phone,
                               segment: capitalize(t.storeType),
                               area: safe(t.address),
                               initials: initials(name),
                               avatarColor: avatarColors[index % avatarColors.count],
                               isNew: (t.status ?? "").caseInsensitiveCompare("New") == .orderedSame)
         }
+    }
+
+    private static func formatTraderPhone(countryCode: String?, phoneNumber: String?) -> String {
+        if isEmpty(countryCode) {
+            let raw = safe(phoneNumber).trimmingCharacters(in: .whitespaces)
+            if raw.hasPrefix("+") { return raw }
+            if raw.allSatisfy(\.isNumber), raw.hasPrefix("27") { return "+\(raw)" }
+            return raw
+        }
+        return "+\(safe(countryCode)) \(safe(phoneNumber))".trimmingCharacters(in: .whitespaces)
     }
 
     // MARK: Products
