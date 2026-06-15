@@ -65,21 +65,26 @@ class BaseMainViewController: UIViewController {
         configureLogoHeaderImage(imageView, in: panel)
     }
 
+    private static let notificationButtonId = "notificationButton"
+    private static let notificationBadgeTag = 9001
+
     func addNotificationBadge(to button: UIButton) {
+        button.accessibilityIdentifier = Self.notificationButtonId
         refreshNotificationBadge(on: button)
     }
 
     func refreshNotificationBadge(on button: UIButton) {
+        guard button.accessibilityIdentifier == Self.notificationButtonId else { return }
         let count = repository.getUnreadNotificationCount()
         let text = count > 99 ? "99+" : "\(count)"
-        if let badge = button.viewWithTag(9001) as? UILabel {
+        if let badge = button.viewWithTag(Self.notificationBadgeTag) as? UILabel {
             badge.text = text
             badge.isHidden = count == 0
             return
         }
         guard count > 0 else { return }
         let badge = UILabel()
-        badge.tag = 9001
+        badge.tag = Self.notificationBadgeTag
         badge.text = text
         badge.font = AppFonts.bold(9)
         badge.textColor = .white
@@ -113,7 +118,13 @@ class BaseMainViewController: UIViewController {
 
     func refreshNotificationBadgesInChrome() {
         guard let panel = chromeStackView?.arrangedSubviews.first else { return }
-        panel.subviews.compactMap { $0 as? UIButton }.forEach { refreshNotificationBadge(on: $0) }
+        panel.subviews.compactMap { $0 as? UIButton }.forEach { button in
+            if button.accessibilityIdentifier == Self.notificationButtonId {
+                refreshNotificationBadge(on: button)
+            } else {
+                button.viewWithTag(Self.notificationBadgeTag)?.removeFromSuperview()
+            }
+        }
     }
 
     func openDrawer() {
