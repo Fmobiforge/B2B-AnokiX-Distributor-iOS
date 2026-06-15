@@ -44,16 +44,10 @@ class BaseMainViewController: UIViewController {
         chrome.topAnchor.constraint(equalTo: safeGuide.topAnchor).isActive = true
     }
 
-    /// LogoBlack is 128×128 in assets — cap height to match LogoHeaderView.xib / Android header.
+    /// Sizes the wordmark to the 28pt header height with the correct aspect ratio so it
+    /// renders at the leading edge instead of off-screen (matches the Android header).
     func constrainLogoHeaderImage(_ imageView: UIImageView) {
-        imageView.contentMode = .scaleAspectFit
-        imageView.clipsToBounds = true
-        guard !imageView.constraints.contains(where: { $0.firstAttribute == .height }) else { return }
-        let height = imageView.heightAnchor.constraint(lessThanOrEqualToConstant: 28)
-        height.priority = .required
-        height.isActive = true
-        imageView.setContentHuggingPriority(.required, for: .vertical)
-        imageView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        imageView.applyBrandLogoSizing()
     }
 
     func addNotificationBadge(to button: UIButton) {

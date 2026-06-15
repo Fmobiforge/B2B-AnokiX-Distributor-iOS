@@ -23,7 +23,7 @@ final class SplashViewController: UIViewController {
 
     private func routeNext() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if SessionManager.shared.isLoggedIn {
+        if false && SessionManager.shared.isLoggedIn {
             let main = storyboard.instantiateViewController(withIdentifier: "MainTabBarController")
             SceneDelegate.setRoot(main)
         } else {

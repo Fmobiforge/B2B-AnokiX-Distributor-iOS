@@ -5,6 +5,29 @@ enum BrandAssets {
     static let logoBlack = UIImage(named: "LogoBlack")
 }
 
+extension UIImageView {
+    /// Sizes a wide brand wordmark to a fixed header height with the correct aspect ratio.
+    /// Without a width/aspect constraint the wordmark's huge intrinsic width (1200pt) makes
+    /// `scaleAspectFit` center the logo inside an oversized frame, pushing it off-screen.
+    func applyBrandLogoSizing(height: CGFloat = 28) {
+        contentMode = .scaleAspectFit
+        clipsToBounds = true
+        setContentHuggingPriority(.required, for: .horizontal)
+        setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        let heightConstraint = heightAnchor.constraint(equalToConstant: height)
+        heightConstraint.priority = UILayoutPriority(999)
+        heightConstraint.isActive = true
+
+        if let size = (image ?? BrandAssets.logoBlack)?.size, size.height > 0 {
+            let widthConstraint = widthAnchor.constraint(equalTo: heightAnchor,
+                                                         multiplier: size.width / size.height)
+            widthConstraint.priority = UILayoutPriority(999)
+            widthConstraint.isActive = true
+        }
+    }
+}
+
 /// Loads a view from a same-named XIB in the main bundle.
 protocol NibLoadable: UIView {
     static var nibName: String { get }
@@ -96,6 +119,7 @@ final class LogoHeaderView: UIView, NibLoadable {
         super.awakeFromNib()
         backgroundColor = AppColors.surface
         logoImageView.image = BrandAssets.logoBlack
+        logoImageView.applyBrandLogoSizing()
         subtitleLabel.text = S.loginSubtitle
         subtitleLabel.font = AppFonts.light(AppMetrics.textLabel)
         subtitleLabel.textColor = AppColors.textSecondary

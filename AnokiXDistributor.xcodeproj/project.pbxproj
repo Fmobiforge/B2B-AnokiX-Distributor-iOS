@@ -86,7 +86,7 @@
 		0F3D5E9791EB24D8F1F3A6DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		125658EC8F013F3987867C03 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LogoHeaderView.xib; sourceTree = "<group>"; };
 		177CB4D8B6817F51A7779D9C /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
-		1B262AFB48A1FF7D933DDA72 /* AnokiXDistributor.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AnokiXDistributor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B262AFB48A1FF7D933DDA72 /* anokiX Distributor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "anokiX Distributor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B81E3C641A84965906B404F /* DistributorRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributorRepository.swift; sourceTree = "<group>"; };
 		26E0F0B3E188B92EEC495C80 /* DrawerMenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawerMenuCell.swift; sourceTree = "<group>"; };
 		316B0CE12B5FD82B0AF1E08A /* ApiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiClient.swift; sourceTree = "<group>"; };
@@ -265,7 +265,6 @@
 				371C769F3151F413FC647E38 /* Notifications */,
 				CA8CF7DCA35C91EA38B2A183 /* Orders */,
 				42E6FBBE47E72281B1572CAA /* Products */,
-				46449E0863BD3DB5692C4C14 /* Promotions */,
 				06D461DBAD58A9508465AADA /* Reports */,
 				BB10D47DA6EBEE405E70045D /* Returns */,
 				3A60F821ED098BDED1BEE8CC /* Settings */,
@@ -297,6 +296,7 @@
 				C3BE86A57B8DB5241F851A0C /* ProductCell.swift */,
 				D23903BB1B9D1D0ACD3F9756 /* ProductsTabViewController.swift */,
 				EE1360C283782AA7BBE256EF /* ProductsViewController.swift */,
+				46449E0863BD3DB5692C4C14 /* Promotions */,
 			);
 			path = Products;
 			sourceTree = "<group>";
@@ -339,7 +339,7 @@
 		741E46C5CD830A5A114E8705 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1B262AFB48A1FF7D933DDA72 /* AnokiXDistributor.app */,
+				1B262AFB48A1FF7D933DDA72 /* anokiX Distributor.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -350,7 +350,6 @@
 				B2FC8E0D942FFF01F0B5414C /* Pods-AnokiXDistributor.debug.xcconfig */,
 				7EBDE1DA388F54961C67822D /* Pods-AnokiXDistributor.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -489,7 +488,7 @@
 			);
 			name = AnokiXDistributor;
 			productName = AnokiXDistributor;
-			productReference = 1B262AFB48A1FF7D933DDA72 /* AnokiXDistributor.app */;
+			productReference = 1B262AFB48A1FF7D933DDA72 /* anokiX Distributor.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -557,9 +556,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
