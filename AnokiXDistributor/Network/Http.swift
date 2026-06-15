@@ -15,8 +15,11 @@ enum Http {
 
     private static let session: Session = {
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 30
-        config.timeoutIntervalForResource = 30
+        // Per-packet idle timeout. Uploads (multipart KYC docs) can pause between
+        // chunks while the server stores files, so keep this generous.
+        config.timeoutIntervalForRequest = 60
+        // Total time allowed for the whole transfer — large for multi-image uploads.
+        config.timeoutIntervalForResource = 300
         return Session(configuration: config)
     }()
 

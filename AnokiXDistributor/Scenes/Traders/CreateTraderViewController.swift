@@ -663,7 +663,9 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         let suggested = provider.suggestedName ?? "photo"
         provider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
             guard let self = self, let image = object as? UIImage,
-                  let data = image.jpegData(compressionQuality: 0.85) else {
+                  // Downscale + compress so KYC photos upload quickly (avoids the
+                  // multipart request timing out on large full-resolution images).
+                  let data = Self.downscaledJpeg(image, maxDimension: 1600, quality: 0.7) else {
                 DispatchQueue.main.async { self?.pendingDocKey = nil }
                 return
             }
@@ -672,6 +674,19 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
                 self.pendingDocKey = nil
             }
         }
+    }
+
+    /// Resizes an image so its longest side is at most `maxDimension`, then JPEG-encodes it.
+    private static func downscaledJpeg(_ image: UIImage, maxDimension: CGFloat, quality: CGFloat) -> Data? {
+        let longest = max(image.size.width, image.size.height)
+        let scale = longest > maxDimension ? maxDimension / longest : 1
+        let target = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1
+        let resized = UIGraphicsImageRenderer(size: target, format: format).image { _ in
+            image.draw(in: CGRect(origin: .zero, size: target))
+        }
+        return resized.jpegData(compressionQuality: quality)
     }
 
     // Files (document picker)
@@ -913,10 +928,20 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
     }
 
     private func termRow(_ text: String) -> UIView {
-        let checkbox = UIButton(type: .system)
-        checkbox.setImage(UIImage(systemName: "square"), for: .normal)
-        checkbox.setImage(UIImage(systemName: "checkmark.square.fill"), for: .selected)
-        checkbox.tintColor = AppColors.purplePrimary
+        // .custom (not .system) so there's no tinted highlight background drawn
+        // around the box when selected — just the checkbox glyph itself. Per-state
+        // colours (alwaysOriginal): gray empty square / purple filled check (Android parity).
+        let checkbox = UIButton(type: .custom)
+        let symbol = UIImage.SymbolConfiguration(pointSize: 22, weight: .regular)
+        let empty = UIImage(systemName: "square", withConfiguration: symbol)?
+            .withTintColor(AppColors.textTertiary, renderingMode: .alwaysOriginal)
+        let checked = UIImage(systemName: "checkmark.square.fill", withConfiguration: symbol)?
+            .withTintColor(AppColors.purplePrimary, renderingMode: .alwaysOriginal)
+        checkbox.setImage(empty, for: .normal)
+        checkbox.setImage(checked, for: .selected)
+        checkbox.imageView?.contentMode = .scaleAspectFit
+        checkbox.setContentHuggingPriority(.required, for: .horizontal)
+        checkbox.setContentCompressionResistancePriority(.required, for: .horizontal)
         checkbox.constrainSize(24)
         checkbox.addAction(UIAction { _ in checkbox.isSelected.toggle() }, for: .touchUpInside)
         termCheckboxes.append(checkbox)
