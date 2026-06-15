@@ -47,11 +47,6 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
         let tagline = UILabel.make(S.welcomeTagline, font: AppFonts.regular(15),
                                    color: UIColor(hex: 0x8A93B2), align: .center, lines: 0)
 
-        // Fixed top margin keeps the illustration near the top; one flexible spacer
-        // pushes the buttons toward the bottom (Android: fixed top margin + Space weight=1).
-        let topSpacer = UIView()
-        let midSpacer = UIView()
-
         let loginButton = GradientButton(title: S.welcomeLogin)
         loginButton.constrainHeight(56)
         loginButton.addTarget(self, action: #selector(goToLogin), for: .touchUpInside)
@@ -69,11 +64,11 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
         let signInRow = makeSignInRow()
         let supportRow = makeSupportRow()
 
-        [topSpacer,
+        [spacer(30),
          storefront,
          spacer(20), title,
          spacer(12), tagline,
-         midSpacer,
+         spacer(30),
          loginButton,
          spacer(14), createButton,
          spacer(20), signInRow,
@@ -82,9 +77,7 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
 
         // Small fixed top margin; the middle spacer absorbs the slack and floats the
         // buttons to the bottom. Low hugging so it (not the fixed spacers) stretches.
-        topSpacer.heightAnchor.constraint(equalToConstant: 32).isActive = true
-        midSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 24).isActive = true
-        midSpacer.setContentHuggingPriority(.defaultLow, for: .vertical)
+        
     }
 
     private func spacer(_ height: CGFloat) -> UIView {
