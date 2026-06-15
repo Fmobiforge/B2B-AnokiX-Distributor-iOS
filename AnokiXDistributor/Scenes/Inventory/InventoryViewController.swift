@@ -22,8 +22,8 @@ final class InventoryViewController: BaseMainViewController {
     private var searchText = ""
 
     override func configureStoryboardChrome() {
-        constrainLogoHeaderImage(logoImageView)
         logoImageView.image = BrandAssets.logoBlack
+        configureLogoHeaderImage(logoImageView, in: chromeStackView.arrangedSubviews.first)
         logoSubtitleLabel.text = S.loginSubtitle
         logoSubtitleLabel.font = AppFonts.light(AppMetrics.textLabel)
         logoSubtitleLabel.textColor = AppColors.textSecondary

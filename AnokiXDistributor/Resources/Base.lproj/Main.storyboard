@@ -563,10 +563,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="393" height="557.33333333333337"/>
                                         <subviews>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="LogoBlack" translatesAutoresizingMaskIntoConstraints="NO" id="inv-logo-img">
-                                                <rect key="frame" x="16" y="12" width="1200" height="28"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="28" id="il-h"/>
-                                                </constraints>
+                                                <rect key="frame" x="16" y="12" width="144" height="28"/>
                                             </imageView>
                                             <label opaque="NO" contentMode="scaleToFill" text="Distributor App" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="inv-logo-sub">
                                                 <rect key="frame" x="16.000000000000007" y="43.999999999999972" width="115.66666666666669" height="505.33333333333326"/>
@@ -676,10 +673,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="393" height="567"/>
                                         <subviews>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="LogoBlack" translatesAutoresizingMaskIntoConstraints="NO" id="prod-logo-img">
-                                                <rect key="frame" x="16" y="12" width="1200" height="28"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="28" id="pl-h"/>
-                                                </constraints>
+                                                <rect key="frame" x="16" y="12" width="144" height="28"/>
                                             </imageView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Distributor App" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="prod-logo-sub">
                                                 <rect key="frame" x="16.000000000000007" y="44" width="115.66666666666669" height="514"/>

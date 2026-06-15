@@ -46,8 +46,23 @@ class BaseMainViewController: UIViewController {
 
     /// Sizes the wordmark to the 28pt header height with the correct aspect ratio so it
     /// renders at the leading edge instead of off-screen (matches the Android header).
-    func constrainLogoHeaderImage(_ imageView: UIImageView) {
+    func configureLogoHeaderImage(_ imageView: UIImageView, in panel: UIView? = nil) {
+        if imageView.image == nil {
+            imageView.image = BrandAssets.logoBlack
+        }
         imageView.applyBrandLogoSizing()
+        guard let panel else { return }
+        if let bell = panel.subviews.compactMap({ $0 as? UIButton }).first {
+            let trailing = imageView.trailingAnchor.constraint(lessThanOrEqualTo: bell.leadingAnchor, constant: -8)
+            trailing.priority = .required
+            trailing.isActive = true
+        }
+    }
+
+    /// Backward-compatible alias used by tab screens.
+    func constrainLogoHeaderImage(_ imageView: UIImageView) {
+        let panel = chromeStackView?.arrangedSubviews.first
+        configureLogoHeaderImage(imageView, in: panel)
     }
 
     func addNotificationBadge(to button: UIButton) {

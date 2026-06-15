@@ -6,25 +6,40 @@ enum BrandAssets {
 }
 
 extension UIImageView {
+    private static var brandLogoSizingKey: UInt8 = 0
+
     /// Sizes a wide brand wordmark to a fixed header height with the correct aspect ratio.
-    /// Without a width/aspect constraint the wordmark's huge intrinsic width (1200pt) makes
-    /// `scaleAspectFit` center the logo inside an oversized frame, pushing it off-screen.
+    /// Without an explicit width, `scaleAspectFit` centers the logo inside a ~1200pt-wide
+    /// intrinsic frame and it renders off the leading edge of the screen.
     func applyBrandLogoSizing(height: CGFloat = 28) {
         contentMode = .scaleAspectFit
         clipsToBounds = true
         setContentHuggingPriority(.required, for: .horizontal)
-        setContentCompressionResistancePriority(.required, for: .horizontal)
+        // Allow Auto Layout to shrink below the image's huge intrinsic width (~1200pt).
+        setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
 
-        let heightConstraint = heightAnchor.constraint(equalToConstant: height)
-        heightConstraint.priority = UILayoutPriority(999)
-        heightConstraint.isActive = true
-
-        if let size = (image ?? BrandAssets.logoBlack)?.size, size.height > 0 {
-            let widthConstraint = widthAnchor.constraint(equalTo: heightAnchor,
-                                                         multiplier: size.width / size.height)
-            widthConstraint.priority = UILayoutPriority(999)
-            widthConstraint.isActive = true
+        if objc_getAssociatedObject(self, &UIImageView.brandLogoSizingKey) as? Bool == true {
+            return
         }
+        objc_setAssociatedObject(self, &UIImageView.brandLogoSizingKey, true, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+
+        constraints.filter { constraint in
+            (constraint.firstItem as? UIView) === self || (constraint.secondItem as? UIView) === self
+        }.filter { constraint in
+            constraint.firstAttribute == .height || constraint.firstAttribute == .width
+                || constraint.secondAttribute == .height || constraint.secondAttribute == .width
+        }.forEach { $0.isActive = false }
+
+        let resolvedHeight = heightAnchor.constraint(equalToConstant: height)
+        resolvedHeight.priority = .required
+        resolvedHeight.isActive = true
+
+        guard let img = image ?? BrandAssets.logoBlack, img.size.height > 0 else { return }
+        let aspect = img.size.width / img.size.height
+        let resolvedWidth = widthAnchor.constraint(equalToConstant: height * aspect)
+        resolvedWidth.priority = .required
+        resolvedWidth.isActive = true
     }
 }
 
