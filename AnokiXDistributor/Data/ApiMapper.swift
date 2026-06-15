@@ -4,8 +4,9 @@ import UIKit
 /// Port of data/ApiMapper.java.
 enum ApiMapper {
 
+    // Same order as Android ApiMapper.AVATAR_COLORS so trader avatars match across platforms.
     private static let avatarColors: [UIColor] = [
-        AppColors.purplePrimary, AppColors.info, AppColors.success, AppColors.warning, AppColors.danger
+        AppColors.danger, AppColors.warning, AppColors.purplePrimary, AppColors.info, AppColors.success
     ]
 
     // MARK: Stores

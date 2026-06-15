@@ -49,6 +49,36 @@ enum Http {
             }
     }
 
+    /// One file part for a multipart upload (content already read into memory).
+    struct FilePart {
+        let field: String
+        let fileName: String
+        let mimeType: String
+        let data: Data
+    }
+
+    /// multipart/form-data POST with text fields and optional file parts.
+    static func postMultipart(baseUrl: String, path: String, form: [String: String],
+                              files: [FilePart], token: String?,
+                              completion: @escaping (Result) -> Void) {
+        guard let url = URL(string: baseUrl + path) else {
+            completion(Result(code: -1, body: nil))
+            return
+        }
+        session.upload(multipartFormData: { mp in
+            for (key, value) in form {
+                mp.append(Data(value.utf8), withName: key)
+            }
+            for file in files {
+                mp.append(file.data, withName: file.field,
+                          fileName: file.fileName, mimeType: file.mimeType)
+            }
+        }, to: url, method: .post, headers: headers(token: token))
+        .responseString { response in
+            completion(map(response))
+        }
+    }
+
     private static func headers(token: String?) -> HTTPHeaders {
         var h: HTTPHeaders = ["Accept": "application/json"]
         if let token = token, !token.isEmpty {

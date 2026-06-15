@@ -82,6 +82,10 @@ enum MockData {
     static let filterSegments = ["All Segments", "Spaza", "Reseller", "Trader"]
     static let filterDrivers = ["All Drivers", "Thabo M.", "Sipho N.", "John K.", "Peter S."]
 
+    // Traders list filters → API ?status= and ?registration_status= (Android parity).
+    static let filterStatus = ["All Status", "Active", "New", "Inactive", "Suspended", "Draft", "Pending Approval"]
+    static let filterRegistrationStatus = ["All Status", "Draft", "Pending Approval", "Approved", "Rejected", "Needs Information"]
+
     static func moreMenuItems() -> [MenuItem] {
         [
             MenuItem(key: "stores", title: "Stores", icon: "ic_stores"),

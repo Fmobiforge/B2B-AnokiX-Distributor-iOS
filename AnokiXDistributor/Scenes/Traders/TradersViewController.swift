@@ -1,35 +1,40 @@
 import UIKit
 
-/// Port of TradersActivity + activity_traders.xml. Search, area/segment filters, trader cards.
+/// Port of TradersActivity + activity_traders.xml. Search, status / registration-status
+/// filters (driven by the API), a trader card list, and an "+ Add New Trader" action
+/// that opens the 8-step Create Trader wizard.
 final class TradersViewController: BaseSecondaryViewController, UICollectionViewDataSource {
 
     override var screenTitle: String { S.traders }
+    override var trailingTitle: String? { S.addNewTraderButton }
 
     private let collectionView = UICollectionView(
         frame: .zero, collectionViewLayout: AdaptiveGridLayout.make(estimatedHeight: 84))
     private var allItems: [TraderItem] = []
     private var filtered: [TraderItem] = []
     private var search = ""
-    private var selectedArea = S.allAreas
-    private var selectedSegment = S.allSegments
-    private var areaPill: FilterPillButton!
-    private var segmentPill: FilterPillButton!
+
+    // Server-side filters: empty string means "no filter" (All Status).
+    private var selectedStatus = ""
+    private var selectedRegistrationStatus = ""
+    private var statusPill: FilterPillButton!
+    private var registrationPill: FilterPillButton!
 
     override func setupContent(in container: UIView) {
         let titleLabel = UILabel.make(S.traders, font: AppFonts.bold(AppMetrics.textHeadline), color: AppColors.textPrimary)
         let searchBar = SearchBarView(placeholder: S.searchTraders, height: 42)
         searchBar.onChange = { [weak self] text in self?.search = text; self?.applyFilters() }
 
-        areaPill = FilterPillButton(title: selectedArea)
-        areaPill.addTarget(self, action: #selector(pickArea), for: .touchUpInside)
-        segmentPill = FilterPillButton(title: selectedSegment)
-        segmentPill.addTarget(self, action: #selector(pickSegment), for: .touchUpInside)
+        statusPill = FilterPillButton(title: S.allStatus)
+        statusPill.addTarget(self, action: #selector(pickStatus), for: .touchUpInside)
+        registrationPill = FilterPillButton(title: S.allStatus)
+        registrationPill.addTarget(self, action: #selector(pickRegistration), for: .touchUpInside)
         let filterButton = FilterIconButton.make()
 
         let filterRow = UIStackView.horizontal(spacing: 6, alignment: .center)
         filterRow.distribution = .fill
-        filterRow.addArrangedSubview(areaPill)
-        filterRow.addArrangedSubview(segmentPill)
+        filterRow.addArrangedSubview(statusPill)
+        filterRow.addArrangedSubview(registrationPill)
         filterRow.addArrangedSubview(filterButton)
 
         let chrome = ListScreenLayout.surfaceSection(
@@ -48,7 +53,8 @@ final class TradersViewController: BaseSecondaryViewController, UICollectionView
     }
 
     override func loadData() {
-        ApiClient.shared.getTraders(search: "") { [weak self] result in
+        ApiClient.shared.getTraders(search: "", status: selectedStatus,
+                                    registrationStatus: selectedRegistrationStatus) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let data):
@@ -60,40 +66,46 @@ final class TradersViewController: BaseSecondaryViewController, UICollectionView
         }
     }
 
-    @objc private func pickArea() {
-        pick(from: MockData.filterAreas, current: selectedArea) { [weak self] value in
-            self?.selectedArea = value
-            self?.areaPill.setTitle(value)
-            self?.applyFilters()
+    /// "+ Add New Trader" in the header → open the wizard, refresh on success.
+    override func trailingTapped() {
+        let wizard = CreateTraderViewController()
+        wizard.onSaved = { [weak self] in self?.loadData() }
+        navigationController?.pushViewController(wizard, animated: true)
+    }
+
+    @objc private func pickStatus() {
+        pick(from: MockData.filterStatus, current: pillText(statusPill)) { [weak self] value in
+            self?.selectedStatus = (value == S.allStatus) ? "" : value
+            self?.statusPill.setTitle(value)
+            self?.loadData()
         }
     }
 
-    @objc private func pickSegment() {
-        pick(from: MockData.filterSegments, current: selectedSegment) { [weak self] value in
-            self?.selectedSegment = value
-            self?.segmentPill.setTitle(value)
-            self?.applyFilters()
+    @objc private func pickRegistration() {
+        pick(from: MockData.filterRegistrationStatus, current: pillText(registrationPill)) { [weak self] value in
+            self?.selectedRegistrationStatus = (value == S.allStatus) ? "" : value
+            self?.registrationPill.setTitle(value)
+            self?.loadData()
         }
     }
+
+    private func pillText(_ pill: FilterPillButton) -> String { pill.titleLabel.text ?? "" }
 
     private func pick(from options: [String], current: String, onPick: @escaping (String) -> Void) {
         let sheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         for option in options {
             sheet.addAction(UIAlertAction(title: option, style: .default) { _ in onPick(option) })
         }
-        sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        sheet.addAction(UIAlertAction(title: S.cancel, style: .cancel))
         present(sheet, animated: true)
     }
 
     private func applyFilters() {
         filtered = allItems.filter { item in
-            let matchesArea = selectedArea == S.allAreas || selectedArea == item.area
-            let matchesSegment = selectedSegment == S.allSegments
-                || item.segment.caseInsensitiveCompare(selectedSegment) == .orderedSame
-            let matchesSearch = search.isEmpty || item.name.localizedCaseInsensitiveContains(search)
+            search.isEmpty
+                || item.name.localizedCaseInsensitiveContains(search)
                 || item.location.localizedCaseInsensitiveContains(search)
                 || item.phone.localizedCaseInsensitiveContains(search)
-            return matchesArea && matchesSegment && matchesSearch
         }
         collectionView.reloadData()
     }

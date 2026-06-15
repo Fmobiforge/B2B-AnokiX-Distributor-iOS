@@ -96,4 +96,43 @@ enum S {
     static let cancel = "Cancel"
     static let filtersComingSoon = "Filters coming soon"
     static let reportsSubtitle = "Generate and download business reports"
+
+    // Traders filters
+    static let allStatus = "All Status"
+    static let filterStatusTitle = "Status"
+    static let filterRegistrationStatusTitle = "Registration Status"
+
+    // Welcome
+    static let welcomeTitle = "Welcome to anokiX"
+    static let welcomeTagline = "Africa's Commerce, Payments & Merchant Growth Ecosystem"
+    static let welcomeLogin = "Login"
+    static let welcomeCreateAccount = "Create Account"
+    static let welcomeHaveAccount = "Already have an account? "
+    static let welcomeSignIn = "Sign In"
+    static let welcomeNeedHelp = "Need Help? "
+    static let welcomeSupportCentre = "Support Centre"
+    static let supportEmail = "support@anokix.com"
+    static let supportSubject = "Support Request – anokiX Distributor"
+    static let distributorRegisterComingSoon = "Distributor registration coming soon"
+
+    // Create Trader
+    static let addNewTrader = "Add New Trader"
+    static let addNewTraderButton = "+ Add New Trader"
+    static let createTraderSubtitle = "Register a new trader in your network."
+    static let continueButton = "Continue"
+    static let registerButton = "Register"
+    static let traderCreatedMessage = "Trader registered successfully"
+    static let registering = "Registering…"
+
+    static let stepOwner = "Owner"
+    static let stepBusiness = "Business"
+    static let stepTrader = "Trader"
+    static let stepLocation = "Location"
+    static let stepVerify = "Verify"
+    static let stepDistributor = "Distributor"
+    static let stepWallet = "Wallet"
+    static let stepTerms = "Terms"
+    static let mobileNumber = "Mobile Number"
+    static let selectCategoriesHint = "Tap to select categories"
+    static let selectDistributorsHint = "Tap to select distributors"
 }

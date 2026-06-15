@@ -41,8 +41,42 @@ final class ApiClient {
     }
 
     func getTraders(search: String, completion: @escaping (Result<TradersData, ApiError>) -> Void) {
-        let q = ["search": search, "status": "", "registration_status": "", "credit_status": ""]
+        getTraders(search: search, status: "", registrationStatus: "", completion: completion)
+    }
+
+    func getTraders(search: String, status: String, registrationStatus: String,
+                    completion: @escaping (Result<TradersData, ApiError>) -> Void) {
+        let q = ["search": search, "status": status,
+                 "registration_status": registrationStatus, "credit_status": ""]
         getAuthed("api/distributor/traders", query: q, type: TradersData.self, completion: completion)
+    }
+
+    /// Lookup data for the Create Trader wizard (categories, distributors, trader types).
+    func getReference(completion: @escaping (Result<ReferenceData, ApiError>) -> Void) {
+        getAuthed("api/common/reference", query: nil, type: ReferenceData.self, completion: completion)
+    }
+
+    /// Google Places autocomplete (proxied) for the business address search.
+    func getAddressAutocomplete(keyword: String,
+                                completion: @escaping (Result<AutocompleteData, ApiError>) -> Void) {
+        let q = ["keyword": keyword, "str_countries": "country:ZA", "search_type": "address"]
+        getAuthed("api/common/google-auto-complete", query: q, type: AutocompleteData.self, completion: completion)
+    }
+
+    /// Resolve a place_id from autocomplete into latitude/longitude + formatted address.
+    func getCoordinateFromPlaceId(_ placeId: String,
+                                  completion: @escaping (Result<CoordinateData, ApiError>) -> Void) {
+        getAuthed("api/common/get-coordinate-from-placeid", query: ["place_id": placeId],
+                  type: CoordinateData.self, completion: completion)
+    }
+
+    /// Create a trader under the logged-in distributor (multipart, with KYC documents).
+    func createTrader(form: [String: String], files: [Http.FilePart],
+                      completion: @escaping (Result<CreateTraderData, ApiError>) -> Void) {
+        Http.postMultipart(baseUrl: Self.baseURL, path: "api/distributor/traders/create",
+                           form: form, files: files, token: session.token) { [weak self] r in
+            self?.deliver(r, type: CreateTraderData.self, completion: completion)
+        }
     }
 
     func getProducts(completion: @escaping (Result<ProductsData, ApiError>) -> Void) {

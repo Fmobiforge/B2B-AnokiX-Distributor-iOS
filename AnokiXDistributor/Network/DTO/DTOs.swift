@@ -354,6 +354,105 @@ struct StoreDetailData: Decodable {
     }
 }
 
+// MARK: - Reference data (Create Trader wizard lookups)
+
+struct ReferenceData: Decodable {
+    let productCategories: [ProductCategory]?
+    let distributors: [Distributor]?
+    let traderTypes: [TraderType]?
+
+    struct ProductCategory: Decodable {
+        let id: Int64
+        let title: String?
+        let slug: String?
+        let parentId: Int64?
+    }
+
+    struct Distributor: Decodable {
+        let id: Int64
+        let distributorCode: String?
+        let companyLegalName: String?
+        let tradingName: String?
+        let companyEmail: String?
+        let companyPhoneNumber: String?
+        let address: String?
+
+        /// Best label for a distributor in a picker.
+        var displayName: String {
+            if let t = tradingName, !t.trimmingCharacters(in: .whitespaces).isEmpty { return t }
+            return companyLegalName ?? distributorCode ?? "Distributor #\(id)"
+        }
+    }
+
+    struct TraderType: Decodable {
+        let id: Int64
+        let name: String?
+        let slug: String?
+        let icon: String?
+        let sortOrder: Int?
+    }
+}
+
+// MARK: - Create Trader
+
+struct CreateTraderData: Decodable {
+    let trader: Trader?
+
+    struct Trader: Decodable {
+        let id: String?
+        let businessName: String?
+        let tradingName: String?
+        let registrationStatus: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            businessName = try c.decodeIfPresent(String.self, forKey: .businessName)
+            tradingName = try c.decodeIfPresent(String.self, forKey: .tradingName)
+            registrationStatus = try c.decodeIfPresent(String.self, forKey: .registrationStatus)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, businessName, tradingName, registrationStatus
+        }
+    }
+}
+
+// MARK: - Address autocomplete (Google proxy)
+
+struct AutocompleteData: Decodable {
+    let status: String?
+    let predictions: [Prediction]?
+
+    struct Prediction: Decodable {
+        let description: String?
+        let placeId: String?
+    }
+}
+
+struct CoordinateData: Decodable {
+    let latitude: Double?
+    let longitude: Double?
+    let formattedAddress: String?
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        latitude = CoordinateData.flexDouble(c, .latitude)
+        longitude = CoordinateData.flexDouble(c, .longitude)
+        formattedAddress = try c.decodeIfPresent(String.self, forKey: .formattedAddress)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case latitude, longitude, formattedAddress
+    }
+
+    private static func flexDouble(_ c: KeyedDecodingContainer<CodingKeys>, _ key: CodingKeys) -> Double? {
+        if let v = try? c.decode(Double.self, forKey: key) { return v }
+        if let v = try? c.decode(String.self, forKey: key) { return Double(v) }
+        return nil
+    }
+}
+
 // MARK: - Base info (currencies + timezones)
 
 struct BaseInfoData: Decodable {

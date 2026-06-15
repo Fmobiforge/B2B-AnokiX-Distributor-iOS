@@ -29,13 +29,13 @@ final class SplashViewController: UIViewController {
     }
 
     private func routeNext() {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if false && SessionManager.shared.isLoggedIn {
+        // Already signed in → straight to the app; otherwise show the welcome screen.
+        if SessionManager.shared.isLoggedIn {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let main = storyboard.instantiateViewController(withIdentifier: "MainTabBarController")
             SceneDelegate.setRoot(main)
         } else {
-            let login = storyboard.instantiateViewController(withIdentifier: "LoginNavigationController")
-            SceneDelegate.setRoot(login)
+            SceneDelegate.setRoot(WelcomeViewController())
         }
     }
 }
