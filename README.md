@@ -17,7 +17,7 @@ data models, and visual design system.
 brew install xcodegen cocoapods   # one-time
 cd AnokiXDistributoriOS
 xcodegen generate                 # creates AnokiXDistributor.xcodeproj
-pod install                       # installs Alamofire + SwiftyJSON, creates .xcworkspace
+pod install                       # installs Alamofire, SwiftyJSON, GoogleMaps; creates .xcworkspace
 open AnokiXDistributor.xcworkspace
 ```
 
@@ -55,6 +55,7 @@ Then run `pod install` again (the `Podfile` post-install hook also restores perm
 |-----|---------|
 | **Alamofire** ~> 5.9 | HTTP client (`Network/Http.swift`) |
 | **SwiftyJSON** ~> 5.0 | API envelope parsing (`Network/ApiClient.swift`) |
+| **GoogleMaps** ~> 9.0 | Store address pin picker (`AddEditStoreViewController`) |
 
 Domain models still decode with `Codable`; SwiftyJSON handles the `{ status, message, data }` wrapper.
 
@@ -103,7 +104,7 @@ Each XIB holds **structure + Auto Layout + outlets**; the cell's `awakeFromNib()
 
 ### Notes
 
-- **Maps:** MapKit pin picker in `AddEditStoreViewController` (Android uses Google Maps).
+- **Maps:** Google Maps pin picker in `AddEditStoreViewController` (same API key as Android `google_maps_api.xml`). Enable **Maps SDK for iOS** on that key in Google Cloud Console if tiles do not load.
 - **Icons:** SF Symbols via `Theme/AppIcons.swift`; swap in asset catalog icons for pixel parity.
 - **Fonts:** system font by default; add Inter `.ttf` files and set `useInter = true` in `AppFonts.swift`.
 - **Live vs mock:** Dashboard, Stores, Traders, Products, Inventory summary use the real API; Orders list and most drawer screens use mock data (same as Android).

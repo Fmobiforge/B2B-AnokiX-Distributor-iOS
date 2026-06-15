@@ -1,14 +1,16 @@
 import UIKit
-import MapKit
+import GoogleMaps
 import CoreLocation
 
 /// Port of AddEditStoreActivity + activity_add_edit_store.xml. Two-step form:
 /// Step 1 (store info, fulfillment, tags, timezone/currency, trading days) and
-/// Step 2 (address search + MapKit pin picker + shipping fields). Wired to
+/// Step 2 (address search + Google Maps pin picker + shipping fields). Wired to
 /// /stores/create + /stores/update and prefilled from /stores in edit mode.
-final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDelegate {
+final class AddEditStoreViewController: BaseSecondaryViewController, GMSMapViewDelegate {
 
     var onSaved: (() -> Void)?
+
+    private weak var formScrollView: UIScrollView?
 
     private let storeId: String?
     private let storeName: String?
@@ -47,7 +49,8 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
 
     // Step 2 fields
     private let addressSearchField = UITextField()
-    private let mapView = MKMapView()
+    private let mapContainer = UIView()
+    private lazy var mapView: GMSMapView = makeMapView()
     private let street1Field = UITextField()
     private let street2Field = UITextField()
     private let suburbField = UITextField()
@@ -63,9 +66,10 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
     private var selectedTimezoneIndex = 0
     private var selectedCurrencyIndex = 0
     private var pickedCoordinate: CLLocationCoordinate2D?
-    private var marker: MKPointAnnotation?
+    private var storeMarker: GMSMarker?
     private var pendingTimeZone: String?
     private var pendingCurrencyId: String?
+    private var didWireMapScroll = false
 
     init(storeId: String?, storeName: String?, listItem: StoreItem? = nil) {
         self.storeId = storeId
@@ -76,7 +80,24 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     override func setupContent(in container: UIView) {
-        let stack = makeScrollStack(in: container)
+        let scroll = UIScrollView()
+        scroll.alwaysBounceVertical = true
+        scroll.showsVerticalScrollIndicator = false
+        scroll.forAutoLayout()
+        container.addSubview(scroll)
+        scroll.pinEdges(to: container)
+        formScrollView = scroll
+
+        let stack = UIStackView.vertical(spacing: 12, alignment: .fill)
+        stack.forAutoLayout()
+        scroll.addSubview(stack)
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 16),
+            stack.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 16),
+            stack.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -16),
+            stack.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -24),
+            stack.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -32)
+        ])
 
         // Stepper
         let stepperCard = UIView()
@@ -166,14 +187,15 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
                                               font: AppFonts.regular(12), color: AppColors.textSecondary))
         step2.addArrangedSubview(fieldGroup("Address of your store", addressSearchField))
 
-        mapView.delegate = self
-        mapView.layer.cornerRadius = AppMetrics.radiusMD
-        mapView.constrainHeight(200)
-        let tap = UITapGestureRecognizer(target: self, action: #selector(mapTapped(_:)))
-        mapView.addGestureRecognizer(tap)
-        let durban = CLLocationCoordinate2D(latitude: -29.8587, longitude: 31.0218)
-        mapView.setRegion(MKCoordinateRegion(center: durban, latitudinalMeters: 50000, longitudinalMeters: 50000), animated: false)
-        step2.addArrangedSubview(mapView)
+        mapContainer.forAutoLayout()
+        mapContainer.constrainHeight(AppMetrics.storeMapHeight)
+        mapContainer.setContentCompressionResistancePriority(.required, for: .vertical)
+        mapContainer.setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        mapView.forAutoLayout()
+        mapContainer.addSubview(mapView)
+        mapView.pinEdges(to: mapContainer)
+        step2.addArrangedSubview(mapContainer)
         step2.addArrangedSubview(UILabel.make("Tap the map to drop a pin, or drag the pin to set your store location.",
                                               font: AppFonts.light(10), color: AppColors.textSecondary))
 
@@ -207,6 +229,13 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
         prefillFromListItem()
         loadBaseInfo()
         if isEditMode, let id = storeId { loadStore(id) }
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        guard !didWireMapScroll else { return }
+        didWireMapScroll = true
+        wireMapScrollBehavior()
     }
 
     /// Show list-row data immediately while the detail API loads (matches Android UX).
@@ -292,14 +321,20 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
             selectedTimezoneIndex = idx
         }
         if !timezones.isEmpty {
-            timeZoneButton.setTitle(tzLabel(timezones[selectedTimezoneIndex]), for: .normal)
+            setPickerTitle(timeZoneButton, tzLabel(timezones[selectedTimezoneIndex]))
         }
         if let cid = pendingCurrencyId, let idx = currencies.firstIndex(where: { $0.id == cid }) {
             selectedCurrencyIndex = idx
         }
         if !currencies.isEmpty {
-            currencyButton.setTitle(currencyLabel(currencies[selectedCurrencyIndex]), for: .normal)
+            setPickerTitle(currencyButton, currencyLabel(currencies[selectedCurrencyIndex]))
         }
+    }
+
+    private func setPickerTitle(_ button: UIButton, _ title: String) {
+        guard var config = button.configuration else { return }
+        config.title = title
+        button.configuration = config
     }
 
     @objc private func submit() {
@@ -356,23 +391,65 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
                    : ApiClient.shared.createStore(form: form, completion: handler)
     }
 
-    // MARK: Map
+    // MARK: Map (Google Maps — same as Android AddEditStoreActivity)
 
-    @objc private func mapTapped(_ gesture: UITapGestureRecognizer) {
-        let point = gesture.location(in: mapView)
-        let coord = mapView.convert(point, toCoordinateFrom: mapView)
-        placePin(at: coord, zoom: false)
+    private func makeMapView() -> GMSMapView {
+        let durban = CLLocationCoordinate2D(latitude: -29.8587, longitude: 31.0218)
+        let camera = GMSCameraPosition.camera(withTarget: durban, zoom: 9)
+        let map = GMSMapView(frame: .zero, camera: camera)
+        map.delegate = self
+        map.layer.cornerRadius = AppMetrics.radiusMD
+        map.clipsToBounds = true
+        map.settings.zoomGestures = true
+        map.settings.scrollGestures = true
+        map.settings.rotateGestures = false
+        map.settings.tiltGestures = false
+        map.settings.compassButton = false
+        map.settings.myLocationButton = false
+        return map
+    }
+
+    /// Let the map pan/zoom without the form scroll view stealing the gesture (Android parity).
+    private func wireMapScrollBehavior() {
+        guard formScrollView != nil else { return }
+        mapView.isExclusiveTouch = true
+        for recognizer in mapView.gestureRecognizers ?? [] {
+            recognizer.cancelsTouchesInView = false
+            recognizer.addTarget(self, action: #selector(mapGestureChanged(_:)))
+        }
+    }
+
+    @objc private func mapGestureChanged(_ recognizer: UIGestureRecognizer) {
+        guard let scroll = formScrollView else { return }
+        switch recognizer.state {
+        case .began, .changed:
+            scroll.isScrollEnabled = false
+        default:
+            scroll.isScrollEnabled = true
+        }
+    }
+
+    func mapView(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) {
+        placePin(at: coordinate, zoom: false)
+    }
+
+    func mapView(_ mapView: GMSMapView, didEndDragging marker: GMSMarker) {
+        pickedCoordinate = marker.position
+        reverseGeocode(marker.position)
     }
 
     private func placePin(at coord: CLLocationCoordinate2D, zoom: Bool) {
         pickedCoordinate = coord
-        if let marker = marker { mapView.removeAnnotation(marker) }
-        let pin = MKPointAnnotation()
-        pin.coordinate = coord
-        mapView.addAnnotation(pin)
-        marker = pin
+        if storeMarker == nil {
+            let pin = GMSMarker(position: coord)
+            pin.isDraggable = true
+            pin.map = mapView
+            storeMarker = pin
+        } else {
+            storeMarker?.position = coord
+        }
         if zoom {
-            mapView.setRegion(MKCoordinateRegion(center: coord, latitudinalMeters: 4000, longitudinalMeters: 4000), animated: true)
+            mapView.animate(to: GMSCameraPosition.camera(withTarget: coord, zoom: 15))
         }
         reverseGeocode(coord)
     }
@@ -387,24 +464,6 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
             if let state = p.administrativeArea { self.stateField.text = state }
             if let country = p.country { self.countryField.text = country }
             if let postal = p.postalCode { self.postalField.text = postal }
-        }
-    }
-
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        guard !(annotation is MKUserLocation) else { return nil }
-        let id = "pin"
-        let view = mapView.dequeueReusableAnnotationView(withIdentifier: id) as? MKMarkerAnnotationView
-            ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: id)
-        view.markerTintColor = AppColors.purplePrimary
-        view.isDraggable = true
-        return view
-    }
-
-    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView,
-                 didChange newState: MKAnnotationView.DragState, fromOldState oldState: MKAnnotationView.DragState) {
-        if newState == .ending, let coord = view.annotation?.coordinate {
-            pickedCoordinate = coord
-            reverseGeocode(coord)
         }
     }
 
@@ -437,13 +496,13 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
     @objc private func pickTimezone() {
         presentPicker(title: "Time Zone", options: timezones.map { tzLabel($0) }) { [weak self] idx in
             self?.selectedTimezoneIndex = idx
-            self?.timeZoneButton.setTitle(self?.tzLabel(self!.timezones[idx]), for: .normal)
+            self?.setPickerTitle(self!.timeZoneButton, self!.tzLabel(self!.timezones[idx]))
         }
     }
     @objc private func pickCurrency() {
         presentPicker(title: "Currency", options: currencies.map { currencyLabel($0) }) { [weak self] idx in
             self?.selectedCurrencyIndex = idx
-            self?.currencyButton.setTitle(self?.currencyLabel(self!.currencies[idx]), for: .normal)
+            self?.setPickerTitle(self!.currencyButton, self!.currencyLabel(self!.currencies[idx]))
         }
     }
 
@@ -687,12 +746,21 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
         config.baseForegroundColor = AppColors.textPrimary
         config.background.strokeColor = AppColors.border
         config.background.backgroundColor = AppColors.surface
+        config.cornerStyle = .medium
         config.title = placeholder
         config.image = UIImage(systemName: "chevron.down")
         config.imagePlacement = .trailing
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(
+            pointSize: AppMetrics.textBodySM, weight: .regular)
         config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12)
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var outgoing = incoming
+            outgoing.font = AppFonts.regular(AppMetrics.textBody)
+            return outgoing
+        }
         button.configuration = config
         button.contentHorizontalAlignment = .leading
+        button.constrainHeight(48)
     }
 
     private func text(_ field: UITextField) -> String {
@@ -713,11 +781,15 @@ final class TradingRowViews {
     var isOn: Bool { checkbox.isSelected }
 
     init(day: String) {
-        checkbox.setImage(UIImage(systemName: "square"), for: .normal)
-        checkbox.tintColor = AppColors.textSecondary
+        var config = UIButton.Configuration.plain()
+        config.background.backgroundColor = .clear
+        config.contentInsets = .zero
+        checkbox.configuration = config
+        checkbox.constrainSize(22)
+        applyCheckboxAppearance(checked: false)
         checkbox.addAction(UIAction { [weak self] _ in
             guard let self = self else { return }
-            self.setChecked(!self.checkbox.isSelected)
+            self.applyCheckboxAppearance(checked: !self.checkbox.isSelected)
         }, for: .touchUpInside)
 
         let label = UILabel.make(day, font: AppFonts.regular(11), color: AppColors.textPrimary)
@@ -735,9 +807,15 @@ final class TradingRowViews {
     }
 
     func setChecked(_ on: Bool) {
-        checkbox.isSelected = on
-        checkbox.setImage(UIImage(systemName: on ? "checkmark.square.fill" : "square"), for: .normal)
-        checkbox.tintColor = on ? AppColors.purplePrimary : AppColors.textSecondary
+        applyCheckboxAppearance(checked: on)
+    }
+
+    private func applyCheckboxAppearance(checked: Bool) {
+        checkbox.isSelected = checked
+        let symbol = checked ? "checkmark.square" : "square"
+        let imageConfig = UIImage.SymbolConfiguration(pointSize: 18, weight: .regular)
+        checkbox.setImage(UIImage(systemName: symbol, withConfiguration: imageConfig), for: .normal)
+        checkbox.tintColor = checked ? AppColors.purplePrimary : AppColors.textSecondary
     }
 
     func text(_ field: UITextField) -> String {

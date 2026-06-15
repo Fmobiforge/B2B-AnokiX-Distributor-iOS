@@ -28,6 +28,8 @@ enum AppMetrics {
     static let headerIconSize: CGFloat = 36
     static let listItemPadding: CGFloat = 12
     static let cardMarginBottom: CGFloat = 8
+    /// activity_add_edit_store.xml — storeMap @ 200dp
+    static let storeMapHeight: CGFloat = 200
 
     // Typography sizes
     static let textDisplay: CGFloat = 18

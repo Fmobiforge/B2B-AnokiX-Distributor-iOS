@@ -5,6 +5,7 @@ inhibit_all_warnings!
 target 'AnokiXDistributor' do
   pod 'Alamofire', '~> 5.9'
   pod 'SwiftyJSON', '~> 5.0'
+  pod 'GoogleMaps', '~> 9.0'
 end
 
 post_install do |installer|
