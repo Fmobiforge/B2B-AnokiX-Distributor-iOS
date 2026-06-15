@@ -19,11 +19,13 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
 
     private func buildLayout() {
         let scroll = UIScrollView()
-        scroll.alwaysBounceVertical = true
+        scroll.alwaysBounceVertical = false
         scroll.showsVerticalScrollIndicator = false
         scroll.forAutoLayout()
         view.addSubview(scroll)
-        scroll.pinEdges(to: view)
+        // Keep content inside the safe area so the bottom rows never fall under the
+        // home indicator (the dark view background still fills the whole screen).
+        scroll.pinEdges(to: view, useSafeArea: true)
 
         let content = UIStackView.vertical(spacing: 0, alignment: .fill)
         content.forAutoLayout()
@@ -45,8 +47,8 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
         let tagline = UILabel.make(S.welcomeTagline, font: AppFonts.regular(15),
                                    color: UIColor(hex: 0x8A93B2), align: .center, lines: 0)
 
-        // Two equal flexible spacers vertically center the top block while keeping the
-        // buttons pinned toward the bottom (Android Space weight=1 parity).
+        // Fixed top margin keeps the illustration near the top; one flexible spacer
+        // pushes the buttons toward the bottom (Android: fixed top margin + Space weight=1).
         let topSpacer = UIView()
         let midSpacer = UIView()
 
@@ -76,11 +78,13 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
          spacer(14), createButton,
          spacer(20), signInRow,
          spacer(10), supportRow,
-         spacer(24)].forEach { content.addArrangedSubview($0) }
+         spacer(16)].forEach { content.addArrangedSubview($0) }
 
-        topSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 24).isActive = true
+        // Small fixed top margin; the middle spacer absorbs the slack and floats the
+        // buttons to the bottom. Low hugging so it (not the fixed spacers) stretches.
+        topSpacer.heightAnchor.constraint(equalToConstant: 32).isActive = true
         midSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 24).isActive = true
-        topSpacer.heightAnchor.constraint(equalTo: midSpacer.heightAnchor).isActive = true
+        midSpacer.setContentHuggingPriority(.defaultLow, for: .vertical)
     }
 
     private func spacer(_ height: CGFloat) -> UIView {
@@ -92,17 +96,12 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
     private func makeSignInRow() -> UIView {
         let prompt = UILabel.make(S.welcomeHaveAccount, font: AppFonts.regular(14), color: UIColor(hex: 0x8A93B2))
         let signIn = UILabel.make(S.welcomeSignIn, font: AppFonts.bold(14), color: UIColor(hex: 0x5B8DEF))
-        signIn.isUserInteractionEnabled = true
-        signIn.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(goToLogin)))
-        let row = UIStackView.horizontal(spacing: 0, alignment: .center)
-        row.distribution = .equalCentering
         let inner = UIStackView.horizontal(spacing: 2, alignment: .center)
         inner.addArrangedSubview(prompt)
         inner.addArrangedSubview(signIn)
-        row.addArrangedSubview(UIView())
-        row.addArrangedSubview(inner)
-        row.addArrangedSubview(UIView())
-        return row
+        inner.isUserInteractionEnabled = true
+        inner.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(goToLogin)))
+        return centeredRow(inner)
     }
 
     private func makeSupportRow() -> UIView {
@@ -112,20 +111,28 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
         icon.constrainSize(18)
         let prompt = UILabel.make(S.welcomeNeedHelp, font: AppFonts.regular(14), color: UIColor(hex: 0x8A93B2))
         let support = UILabel.make(S.welcomeSupportCentre, font: AppFonts.bold(14), color: UIColor(hex: 0x5B8DEF))
-
         let inner = UIStackView.horizontal(spacing: 6, alignment: .center)
         inner.addArrangedSubview(icon)
         inner.addArrangedSubview(prompt)
         inner.addArrangedSubview(support)
         inner.isUserInteractionEnabled = true
         inner.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openSupport)))
+        return centeredRow(inner)
+    }
 
-        let row = UIStackView.horizontal(spacing: 0, alignment: .center)
-        row.distribution = .equalCentering
-        row.addArrangedSubview(UIView())
-        row.addArrangedSubview(inner)
-        row.addArrangedSubview(UIView())
-        return row
+    /// Wraps a wrap-content row in a full-width container and centres it horizontally.
+    private func centeredRow(_ inner: UIView) -> UIView {
+        let container = UIView()
+        inner.forAutoLayout()
+        container.addSubview(inner)
+        NSLayoutConstraint.activate([
+            inner.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            inner.topAnchor.constraint(equalTo: container.topAnchor),
+            inner.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            inner.leadingAnchor.constraint(greaterThanOrEqualTo: container.leadingAnchor),
+            inner.trailingAnchor.constraint(lessThanOrEqualTo: container.trailingAnchor)
+        ])
+        return container
     }
 
     // MARK: - Actions
