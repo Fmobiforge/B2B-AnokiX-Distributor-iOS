@@ -34,7 +34,7 @@ final class TradersViewController: BaseSecondaryViewController, UICollectionView
         let chrome = ListScreenLayout.surfaceSection(
             [searchBar, filterRow],
             spacing: 10,
-            insets: UIEdgeInsets(top: 0, left: 16, bottom: 12, right: 16)
+            insets: UIEdgeInsets(top: 16, left: 16, bottom: 12, right: 16)
         )
 
         collectionView.dataSource = self

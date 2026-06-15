@@ -45,7 +45,7 @@ final class StoresViewController: BaseSecondaryViewController, UICollectionViewD
     }
 
     override func loadData() {
-        allItems = MockData.storeItems()
+        //allItems = MockData.storeItems()
         applyFilters()
         ApiClient.shared.getStores(keyword: "") { [weak self] result in
             guard let self = self, case .success(let data) = result else { return }
