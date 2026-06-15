@@ -58,10 +58,10 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
         [storefront,
          spacer(20), title,
          spacer(12), tagline,
-         spacer(40),
+         spacer(50),
          loginButton,
-         spacer(14), createButton,
-         spacer(22), signInRow,
+         spacer(20), createButton,
+         //spacer(22), signInRow,
          spacer(10), supportRow].forEach { content.addArrangedSubview($0) }
     }
 
