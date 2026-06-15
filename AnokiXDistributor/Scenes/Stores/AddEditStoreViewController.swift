@@ -12,6 +12,7 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
 
     private let storeId: String?
     private let storeName: String?
+    private let listItem: StoreItem?
     private var isEditMode: Bool { !(storeId ?? "").isEmpty }
 
     override var screenTitle: String {
@@ -66,9 +67,10 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
     private var pendingTimeZone: String?
     private var pendingCurrencyId: String?
 
-    init(storeId: String?, storeName: String?) {
+    init(storeId: String?, storeName: String?, listItem: StoreItem? = nil) {
         self.storeId = storeId
         self.storeName = storeName
+        self.listItem = listItem
         super.init(nibName: nil, bundle: nil)
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
@@ -202,8 +204,20 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
     }
 
     override func loadData() {
+        prefillFromListItem()
         loadBaseInfo()
         if isEditMode, let id = storeId { loadStore(id) }
+    }
+
+    /// Show list-row data immediately while the detail API loads (matches Android UX).
+    private func prefillFromListItem() {
+        guard let item = listItem else { return }
+        statsRow.isHidden = false
+        followerValue.text = "\(item.followerCount)"
+        reviewValue.text = "\(item.reviewCount)"
+        nameField.text = item.name
+        addressSearchField.text = item.address
+        header?.setTitle("Edit Store - \(item.name)")
     }
 
     // MARK: Networking
@@ -219,20 +233,32 @@ final class AddEditStoreViewController: BaseSecondaryViewController, MKMapViewDe
 
     private func loadStore(_ id: String) {
         ApiClient.shared.getStore(id: id) { [weak self] result in
-            guard let self = self, case .success(let data) = result, let s = data.store else { return }
-            self.prefill(s)
+            guard let self = self else { return }
+            switch result {
+            case .success(let data):
+                guard let store = data.store else {
+                    self.toast("Store details unavailable")
+                    return
+                }
+                self.prefill(store)
+            case .failure(let error):
+                self.toast(error.message)
+            }
         }
     }
 
     private func prefill(_ s: StoreDetailData.Store) {
+        if let name = s.name, !name.isEmpty {
+            header?.setTitle("Edit Store - \(name)")
+        }
         statsRow.isHidden = false
-        followerValue.text = "\(s.followerCount ?? 0)"
-        reviewValue.text = "\(s.reviewCount ?? 0)"
+        followerValue.text = "\(s.followerCount ?? listItem?.followerCount ?? 0)"
+        reviewValue.text = "\(s.reviewCount ?? listItem?.reviewCount ?? 0)"
         nameField.text = s.name
         buildingField.text = s.buildingNumber
         contactField.text = s.contactNumber
         vatField.text = s.vatNumber
-        descriptionView.text = s.description
+        descriptionView.text = s.storeDescription
         addressSearchField.text = s.street ?? s.address
         street1Field.text = s.addressStreet1
         street2Field.text = s.addressStreet2

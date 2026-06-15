@@ -28,7 +28,7 @@ final class ProductsViewController: BaseSecondaryViewController, UICollectionVie
         collectionView.dataSource = self
         collectionView.backgroundColor = AppColors.background
         collectionView.alwaysBounceVertical = true
-        collectionView.contentInset = UIEdgeInsets(top: 12, left: 16, bottom: 16, right: 16)
+        collectionView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 16, right: 0)
         collectionView.registerNib(ProductCell.self)
 
         _ = embedSecondaryListChrome(in: container, chrome: chrome, listView: collectionView)

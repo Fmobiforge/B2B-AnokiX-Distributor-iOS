@@ -192,6 +192,17 @@ struct StoresData: Decodable {
 struct StoreDetailData: Decodable {
     let store: Store?
 
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: RootKeys.self)
+        if container.contains(.store) {
+            store = try container.decodeIfPresent(Store.self, forKey: .store)
+        } else {
+            store = try Store(from: decoder)
+        }
+    }
+
+    private enum RootKeys: String, CodingKey { case store }
+
     struct Store: Decodable {
         let id: Int64?
         let name: String?
@@ -199,7 +210,7 @@ struct StoreDetailData: Decodable {
         let street: String?
         let tagList: String?
         let contactNumber: String?
-        let description: String?
+        let storeDescription: String?
         let buildingNumber: String?
         let vatNumber: String?
         let addressStreet1: String?
@@ -220,6 +231,81 @@ struct StoreDetailData: Decodable {
         let currencyId: String?
         let followerCount: Int?
         let reviewCount: Int?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = try c.decodeIfPresent(Int64.self, forKey: .id)
+            name = try c.decodeIfPresent(String.self, forKey: .name)
+            address = try c.decodeIfPresent(String.self, forKey: .address)
+            street = try c.decodeIfPresent(String.self, forKey: .street)
+            tagList = try c.decodeIfPresent(String.self, forKey: .tagList)
+            contactNumber = try c.decodeIfPresent(String.self, forKey: .contactNumber)
+            storeDescription = try c.decodeIfPresent(String.self, forKey: .storeDescription)
+            buildingNumber = try c.decodeIfPresent(String.self, forKey: .buildingNumber)
+            vatNumber = try c.decodeIfPresent(String.self, forKey: .vatNumber)
+            addressStreet1 = try c.decodeIfPresent(String.self, forKey: .addressStreet1)
+            addressStreet2 = try c.decodeIfPresent(String.self, forKey: .addressStreet2)
+            addressSuburb = try c.decodeIfPresent(String.self, forKey: .addressSuburb)
+            addressCity = try c.decodeIfPresent(String.self, forKey: .addressCity)
+            addressState = try c.decodeIfPresent(String.self, forKey: .addressState)
+            addressCountry = try c.decodeIfPresent(String.self, forKey: .addressCountry)
+            addressPostalCode = try c.decodeIfPresent(String.self, forKey: .addressPostalCode)
+            latitude = Self.decodeFlexibleDouble(c, .latitude)
+            longitude = Self.decodeFlexibleDouble(c, .longitude)
+            isClickCollect = Self.decodeFlexibleBool(c, .isClickCollect)
+            isClickDeliver = Self.decodeFlexibleBool(c, .isClickDeliver)
+            workingDays = try c.decodeIfPresent(String.self, forKey: .workingDays)
+            tradingTime = try c.decodeIfPresent(String.self, forKey: .tradingTime)
+            timeZone = try c.decodeIfPresent(String.self, forKey: .timeZone)
+            timeOffset = Self.decodeFlexibleInt64(c, .timeOffset)
+            currencyId = Self.decodeFlexibleString(c, .currencyId)
+            followerCount = Self.decodeFlexibleInt(c, .followerCount)
+            reviewCount = Self.decodeFlexibleInt(c, .reviewCount)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, name, address, street, tagList, contactNumber
+            case storeDescription = "description"
+            case buildingNumber, vatNumber
+            case addressStreet1, addressStreet2, addressSuburb, addressCity
+            case addressState, addressCountry, addressPostalCode
+            case latitude, longitude, isClickCollect, isClickDeliver
+            case workingDays, tradingTime, timeZone, timeOffset, currencyId
+            case followerCount, reviewCount
+        }
+
+        private static func decodeFlexibleBool(_ c: KeyedDecodingContainer<CodingKeys>, _ key: CodingKeys) -> Bool? {
+            if let value = try? c.decode(Bool.self, forKey: key) { return value }
+            if let value = try? c.decode(Int.self, forKey: key) { return value != 0 }
+            if let value = try? c.decode(String.self, forKey: key) {
+                return value == "1" || value.lowercased() == "true"
+            }
+            return nil
+        }
+
+        private static func decodeFlexibleString(_ c: KeyedDecodingContainer<CodingKeys>, _ key: CodingKeys) -> String? {
+            if let value = try? c.decode(String.self, forKey: key) { return value }
+            if let value = try? c.decode(Int64.self, forKey: key) { return String(value) }
+            return nil
+        }
+
+        private static func decodeFlexibleInt(_ c: KeyedDecodingContainer<CodingKeys>, _ key: CodingKeys) -> Int? {
+            if let value = try? c.decode(Int.self, forKey: key) { return value }
+            if let value = try? c.decode(String.self, forKey: key) { return Int(value) }
+            return nil
+        }
+
+        private static func decodeFlexibleInt64(_ c: KeyedDecodingContainer<CodingKeys>, _ key: CodingKeys) -> Int64? {
+            if let value = try? c.decode(Int64.self, forKey: key) { return value }
+            if let value = try? c.decode(String.self, forKey: key) { return Int64(value) }
+            return nil
+        }
+
+        private static func decodeFlexibleDouble(_ c: KeyedDecodingContainer<CodingKeys>, _ key: CodingKeys) -> Double? {
+            if let value = try? c.decode(Double.self, forKey: key) { return value }
+            if let value = try? c.decode(String.self, forKey: key) { return Double(value) }
+            return nil
+        }
     }
 }
 

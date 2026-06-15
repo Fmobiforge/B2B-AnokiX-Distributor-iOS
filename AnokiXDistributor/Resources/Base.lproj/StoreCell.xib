@@ -13,11 +13,11 @@
             <rect key="frame" x="0.0" y="0.0" width="361" height="96"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="cv">
-                <rect key="frame" x="0.0" y="0.0" width="393" height="104"/>
+                <rect key="frame" x="0.0" y="0.0" width="361" height="96"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="card">
-                        <rect key="frame" x="16" y="4" width="361" height="96"/>
+                        <rect key="frame" x="0.0" y="0.0" width="361" height="96"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="row">
                                 <rect key="frame" x="12" y="12" width="337" height="72"/>

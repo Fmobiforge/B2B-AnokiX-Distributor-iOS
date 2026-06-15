@@ -7,6 +7,9 @@ import UIKit
 ///
 /// Spacing that used to live inside each cell (16pt side margins, 8pt gap between
 /// cards) is provided here instead, so the same cell works at any column count.
+///
+/// Do **not** also set horizontal `UICollectionView.contentInset` — that stacks with
+/// `section.contentInsets` and produces uneven left/right margins on phone.
 enum AdaptiveGridLayout {
 
     /// Horizontal gap between the list and the screen edges (matches the old card inset).

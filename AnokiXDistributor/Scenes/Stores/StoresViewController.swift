@@ -37,7 +37,8 @@ final class StoresViewController: BaseSecondaryViewController, UICollectionViewD
         collectionView.delegate = self
         collectionView.backgroundColor = AppColors.surface
         collectionView.alwaysBounceVertical = true
-        collectionView.contentInset = UIEdgeInsets(top: 12, left: 16, bottom: 16, right: 16)
+        // Horizontal margins come from AdaptiveGridLayout.section.contentInsets only.
+        collectionView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 16, right: 0)
         collectionView.registerNib(StoreCell.self)
 
         _ = embedSecondaryListChrome(in: container, chrome: chrome, listView: collectionView)
@@ -55,8 +56,8 @@ final class StoresViewController: BaseSecondaryViewController, UICollectionViewD
 
     override func trailingTapped() { openEditor(storeId: nil, storeName: nil) }
 
-    private func openEditor(storeId: String?, storeName: String?) {
-        let editor = AddEditStoreViewController(storeId: storeId, storeName: storeName)
+    private func openEditor(storeId: String?, storeName: String?, listItem: StoreItem? = nil) {
+        let editor = AddEditStoreViewController(storeId: storeId, storeName: storeName, listItem: listItem)
         editor.onSaved = { [weak self] in self?.loadData() }
         navigationController?.pushViewController(editor, animated: true)
     }
@@ -92,6 +93,6 @@ final class StoresViewController: BaseSecondaryViewController, UICollectionViewD
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         let item = filtered[indexPath.row]
-        openEditor(storeId: item.id, storeName: item.name)
+        openEditor(storeId: item.id, storeName: item.name, listItem: item)
     }
 }

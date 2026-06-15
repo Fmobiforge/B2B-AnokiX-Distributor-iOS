@@ -17,6 +17,7 @@ final class StoreCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         backgroundColor = .clear
+        contentView.layoutMargins = .zero
 
         StyleKit.styleCard(cardView)
 
