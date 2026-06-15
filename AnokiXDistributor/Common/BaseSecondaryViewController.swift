@@ -76,6 +76,14 @@ class BaseSecondaryViewController: UIViewController {
         return listTop
     }
 
+    /// Purple header sits under the status bar — use white status bar content (Android windowLightStatusBar=false).
+    override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setNeedsStatusBarAppearanceUpdate()
+    }
+
     /// Subclass hooks.
     func setupContent(in container: UIView) {}
     func loadData() {}

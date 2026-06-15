@@ -11,12 +11,13 @@ final class TradersViewController: BaseSecondaryViewController, UICollectionView
     private var filtered: [TraderItem] = []
     private var search = ""
     private var selectedArea = S.allAreas
-    private var selectedSegment = "All Segments"
+    private var selectedSegment = S.allSegments
     private var areaPill: FilterPillButton!
     private var segmentPill: FilterPillButton!
 
     override func setupContent(in container: UIView) {
-        let searchBar = SearchBarView(placeholder: "Search traders…", height: 42)
+        let titleLabel = UILabel.make(S.traders, font: AppFonts.bold(AppMetrics.textHeadline), color: AppColors.textPrimary)
+        let searchBar = SearchBarView(placeholder: S.searchTraders, height: 42)
         searchBar.onChange = { [weak self] text in self?.search = text; self?.applyFilters() }
 
         areaPill = FilterPillButton(title: selectedArea)
@@ -32,7 +33,7 @@ final class TradersViewController: BaseSecondaryViewController, UICollectionView
         filterRow.addArrangedSubview(filterButton)
 
         let chrome = ListScreenLayout.surfaceSection(
-            [searchBar, filterRow],
+            [titleLabel, searchBar, filterRow],
             spacing: 10,
             insets: UIEdgeInsets(top: 16, left: 16, bottom: 12, right: 16)
         )
@@ -47,12 +48,15 @@ final class TradersViewController: BaseSecondaryViewController, UICollectionView
     }
 
     override func loadData() {
-        allItems = MockData.traderItems()
-        applyFilters()
         ApiClient.shared.getTraders(search: "") { [weak self] result in
-            guard let self = self, case .success(let data) = result else { return }
-            let mapped = ApiMapper.toTraderItems(data)
-            if !mapped.isEmpty { self.allItems = mapped; self.applyFilters() }
+            guard let self = self else { return }
+            switch result {
+            case .success(let data):
+                self.allItems = ApiMapper.toTraderItems(data)
+                self.applyFilters()
+            case .failure(let error):
+                self.toast(error.message)
+            }
         }
     }
 
@@ -65,8 +69,7 @@ final class TradersViewController: BaseSecondaryViewController, UICollectionView
     }
 
     @objc private func pickSegment() {
-        let segments = ["All Segments", "Spaza", "Wholesale", "Retail"]
-        pick(from: segments, current: selectedSegment) { [weak self] value in
+        pick(from: MockData.filterSegments, current: selectedSegment) { [weak self] value in
             self?.selectedSegment = value
             self?.segmentPill.setTitle(value)
             self?.applyFilters()
@@ -84,9 +87,12 @@ final class TradersViewController: BaseSecondaryViewController, UICollectionView
 
     private func applyFilters() {
         filtered = allItems.filter { item in
-            let matchesArea = selectedArea == S.allAreas || item.area == selectedArea
-            let matchesSegment = selectedSegment == "All Segments" || item.segment == selectedSegment
+            let matchesArea = selectedArea == S.allAreas || selectedArea == item.area
+            let matchesSegment = selectedSegment == S.allSegments
+                || item.segment.caseInsensitiveCompare(selectedSegment) == .orderedSame
             let matchesSearch = search.isEmpty || item.name.localizedCaseInsensitiveContains(search)
+                || item.location.localizedCaseInsensitiveContains(search)
+                || item.phone.localizedCaseInsensitiveContains(search)
             return matchesArea && matchesSegment && matchesSearch
         }
         collectionView.reloadData()

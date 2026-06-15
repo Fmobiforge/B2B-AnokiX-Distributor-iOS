@@ -51,6 +51,8 @@ enum S {
     static let active = "Active"
     static let inactive = "Inactive"
     static let allAreas = "All Areas"
+    static let allSegments = "All Segments"
+    static let searchTraders = "Search traders…"
     static let addStore = "Add Store"
     static let followersLabel = "Followers"
     static let reviewsLabel = "Reviews"

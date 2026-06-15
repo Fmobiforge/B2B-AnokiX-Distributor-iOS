@@ -111,8 +111,11 @@ class BaseMainViewController: UIViewController {
     func setupContent(in container: UIView) {}
     func loadData() {}
 
+    override var preferredStatusBarStyle: UIStatusBarStyle { .darkContent }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        setNeedsStatusBarAppearanceUpdate()
         refreshNotificationBadgesInChrome()
     }
 
