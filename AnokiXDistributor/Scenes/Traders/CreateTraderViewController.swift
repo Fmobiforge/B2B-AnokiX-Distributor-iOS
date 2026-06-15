@@ -2,6 +2,7 @@ import UIKit
 import GoogleMaps
 import CoreLocation
 import UniformTypeIdentifiers
+import PhotosUI
 
 /// Port of CreateTraderActivity — the 8-step "Add New Trader" wizard wired to
 /// /api/distributor/traders/create.
@@ -13,7 +14,7 @@ import UniformTypeIdentifiers
 /// its value when navigating back and forth. Lookup data comes from
 /// `ApiClient.getReference`; the map uses Google Maps (parity with AddEditStore).
 final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewDelegate,
-    UIDocumentPickerDelegate, UITableViewDataSource, UITableViewDelegate {
+    UIDocumentPickerDelegate, PHPickerViewControllerDelegate, UITableViewDataSource, UITableViewDelegate {
 
     var onSaved: (() -> Void)?
 
@@ -238,16 +239,21 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
             let circle = stepCircles[i]
             let title = stepTitles[i]
             if i < currentStep {
+                // Completed: purple fill, white check.
                 circle.backgroundColor = AppColors.purplePrimary
+                circle.textColor = .white
                 circle.text = "✓"
                 title.textColor = AppColors.textPrimary
                 title.font = AppFonts.regular(13)
             } else if i == currentStep {
+                // Current: purple fill, white number.
                 circle.backgroundColor = AppColors.purplePrimary
+                circle.textColor = .white
                 circle.text = "\(i + 1)"
                 title.textColor = AppColors.purplePrimary
                 title.font = AppFonts.bold(13)
             } else {
+                // Upcoming: white fill, gray number + border.
                 circle.backgroundColor = AppColors.surface
                 circle.layer.borderWidth = 1.5
                 circle.layer.borderColor = AppColors.border.cgColor
@@ -596,7 +602,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         upload.layer.borderWidth = 1
         upload.layer.borderColor = AppColors.border.cgColor
         upload.contentEdgeInsetsCompat(top: 9, left: 16, bottom: 9, right: 16)
-        upload.addAction(UIAction { [weak self] _ in self?.pickDocument(def.key) }, for: .touchUpInside)
+        upload.addAction(UIAction { [weak self] _ in self?.pickDocument(def.key, from: upload) }, for: .touchUpInside)
         upload.setContentHuggingPriority(.required, for: .horizontal)
         docButtons[def.key] = upload
 
@@ -610,25 +616,83 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         return card
     }
 
-    private func pickDocument(_ key: String) {
+    /// Let the user pick from the Photo Library (PHPicker) or Files (document picker).
+    /// The Simulator's Files app is usually empty, so Photo Library is the reliable
+    /// way to test uploads there.
+    private func pickDocument(_ key: String, from sourceView: UIView) {
         pendingDocKey = key
+        let sheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        sheet.addAction(UIAlertAction(title: "Photo Library", style: .default) { [weak self] _ in
+            self?.presentPhotoLibrary()
+        })
+        sheet.addAction(UIAlertAction(title: "Choose File", style: .default) { [weak self] _ in
+            self?.presentFilePicker()
+        })
+        sheet.addAction(UIAlertAction(title: S.cancel, style: .cancel) { [weak self] _ in
+            self?.pendingDocKey = nil
+        })
+        if let pop = sheet.popoverPresentationController {  // iPad anchor
+            pop.sourceView = sourceView
+            pop.sourceRect = sourceView.bounds
+        }
+        present(sheet, animated: true)
+    }
+
+    private func presentPhotoLibrary() {
+        var config = PHPickerConfiguration()
+        config.filter = .images
+        config.selectionLimit = 1
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+
+    private func presentFilePicker() {
         let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.image, .pdf])
         picker.delegate = self
         picker.allowsMultipleSelection = false
         present(picker, animated: true)
     }
 
+    // PHPicker (Photo Library)
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        guard let key = pendingDocKey, let result = results.first else { pendingDocKey = nil; return }
+        let provider = result.itemProvider
+        guard provider.canLoadObject(ofClass: UIImage.self) else { pendingDocKey = nil; return }
+        let suggested = provider.suggestedName ?? "photo"
+        provider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
+            guard let self = self, let image = object as? UIImage,
+                  let data = image.jpegData(compressionQuality: 0.85) else {
+                DispatchQueue.main.async { self?.pendingDocKey = nil }
+                return
+            }
+            DispatchQueue.main.async {
+                self.applyPickedFile(key: key, data: data, name: suggested + ".jpg", mime: "image/jpeg")
+                self.pendingDocKey = nil
+            }
+        }
+    }
+
+    // Files (document picker)
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         guard let url = urls.first, let key = pendingDocKey else { return }
         let access = url.startAccessingSecurityScopedResource()
         defer { if access { url.stopAccessingSecurityScopedResource() } }
         guard let data = try? Data(contentsOf: url) else { toast("Could not read file"); return }
-        let mime = mimeType(for: url)
-        docFiles[key] = (data, url.lastPathComponent, mime)
-        docSubtitleLabels[key]?.text = url.lastPathComponent
+        applyPickedFile(key: key, data: data, name: url.lastPathComponent, mime: mimeType(for: url))
+        pendingDocKey = nil
+    }
+
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+        pendingDocKey = nil
+    }
+
+    private func applyPickedFile(key: String, data: Data, name: String, mime: String) {
+        docFiles[key] = (data, name, mime)
+        docSubtitleLabels[key]?.text = name
         docSubtitleLabels[key]?.textColor = AppColors.success
         docButtons[key]?.setTitle("Change", for: .normal)
-        pendingDocKey = nil
     }
 
     private func mimeType(for url: URL) -> String {

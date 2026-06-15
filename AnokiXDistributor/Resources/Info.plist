@@ -63,5 +63,9 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>anokiX needs access to your photo library so you can upload trader verification documents and store photos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>anokiX needs access to your camera so you can capture trader store photos for verification.</string>
 </dict>
 </plist>
