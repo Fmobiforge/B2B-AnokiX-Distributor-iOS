@@ -216,6 +216,12 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
             circle.layer.cornerRadius = 14
             circle.layer.masksToBounds = true
             let title = UILabel.make(key, font: AppFonts.regular(13), color: AppColors.textSecondary)
+            // Single line + don't compress, so the stepper scrolls horizontally and
+            // shows each full step title instead of truncating ("O…", "Bu…").
+            title.numberOfLines = 1
+            title.lineBreakMode = .byClipping
+            title.setContentCompressionResistancePriority(.required, for: .horizontal)
+            title.setContentHuggingPriority(.required, for: .horizontal)
             let item = UIStackView.horizontal(spacing: 6, alignment: .center)
             item.isLayoutMarginsRelativeArrangement = true
             item.layoutMargins = UIEdgeInsets(top: 0, left: 6, bottom: 0, right: 6)

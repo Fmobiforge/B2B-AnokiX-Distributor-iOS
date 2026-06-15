@@ -71,9 +71,9 @@
                 <outlet property="avatarLabel" destination="avatar" id="o-av"/>
                 <outlet property="badgeLabel" destination="badge" id="o-bg"/>
                 <outlet property="cardView" destination="card" id="o-card"/>
-                <outlet property="locationLabel" destination="location" id="o-loc"/>
+                <outlet property="codeLabel" destination="location" id="o-loc"/>
                 <outlet property="nameLabel" destination="name" id="o-name"/>
-                <outlet property="phoneLabel" destination="phone" id="o-phone"/>
+                <outlet property="addressLabel" destination="phone" id="o-phone"/>
             </connections>
             <point key="canvasLocation" x="132" y="124"/>
         </collectionViewCell>

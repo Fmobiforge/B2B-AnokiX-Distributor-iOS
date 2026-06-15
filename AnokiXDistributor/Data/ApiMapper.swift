@@ -34,6 +34,7 @@ enum ApiMapper {
             let phone = formatTraderPhone(countryCode: t.countryCode, phoneNumber: t.phoneNumber)
             return TraderItem(id: safe(t.id),
                               name: name,
+                              traderCode: safe(t.traderCode),
                               location: safe(t.address),
                               phone: phone,
                               segment: capitalize(t.storeType),

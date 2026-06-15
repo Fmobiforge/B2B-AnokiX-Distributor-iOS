@@ -36,33 +36,17 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
             content.heightAnchor.constraint(greaterThanOrEqualTo: scroll.frameLayoutGuide.heightAnchor)
         ])
 
-        // Storefront illustration tile.
-        let iconTile = UIView()
-        iconTile.backgroundColor = UIColor.white.withAlphaComponent(0.06)
-        iconTile.layer.cornerRadius = 28
-        iconTile.constrainSize(140)
-        let storefront = UIImageView(image: UIImage(systemName: "storefront.fill")
-                                     ?? UIImage(systemName: "building.2.fill"))
-        storefront.tintColor = AppColors.purpleTextLight
+        // Storefront illustration (added to the asset catalog as "welcome_storefront").
+        let storefront = UIImageView(image: UIImage(named: "welcome_storefront"))
         storefront.contentMode = .scaleAspectFit
-        storefront.forAutoLayout()
-        iconTile.addSubview(storefront)
-        NSLayoutConstraint.activate([
-            storefront.centerXAnchor.constraint(equalTo: iconTile.centerXAnchor),
-            storefront.centerYAnchor.constraint(equalTo: iconTile.centerYAnchor),
-            storefront.widthAnchor.constraint(equalToConstant: 76),
-            storefront.heightAnchor.constraint(equalToConstant: 76)
-        ])
-        let iconRow = UIStackView.horizontal(spacing: 0, alignment: .center)
-        iconRow.distribution = .equalCentering
-        iconRow.addArrangedSubview(UIView())
-        iconRow.addArrangedSubview(iconTile)
-        iconRow.addArrangedSubview(UIView())
+        storefront.constrainHeight(150)
 
         let title = UILabel.make(S.welcomeTitle, font: AppFonts.bold(28), color: .white, align: .center)
         let tagline = UILabel.make(S.welcomeTagline, font: AppFonts.regular(15),
                                    color: UIColor(hex: 0x8A93B2), align: .center, lines: 0)
 
+        // Two equal flexible spacers vertically center the top block while keeping the
+        // buttons pinned toward the bottom (Android Space weight=1 parity).
         let topSpacer = UIView()
         let midSpacer = UIView()
 
@@ -84,19 +68,18 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
         let supportRow = makeSupportRow()
 
         [topSpacer,
-         iconRow,
-         spacer(24), title,
-         spacer(14), tagline,
+         storefront,
+         spacer(20), title,
+         spacer(12), tagline,
          midSpacer,
          loginButton,
          spacer(14), createButton,
-         spacer(22), signInRow,
+         spacer(20), signInRow,
          spacer(10), supportRow,
-         spacer(28)].forEach { content.addArrangedSubview($0) }
+         spacer(24)].forEach { content.addArrangedSubview($0) }
 
-        // Keep the buttons anchored toward the bottom like the Android layout.
-        topSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 60).isActive = true
-        midSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 40).isActive = true
+        topSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 24).isActive = true
+        midSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 24).isActive = true
         topSpacer.heightAnchor.constraint(equalTo: midSpacer.heightAnchor).isActive = true
     }
 

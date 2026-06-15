@@ -16,6 +16,7 @@ struct StoreItem {
 struct TraderItem {
     let id: String
     let name: String
+    let traderCode: String
     let location: String
     let phone: String
     let segment: String

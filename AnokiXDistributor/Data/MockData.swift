@@ -58,12 +58,12 @@ enum MockData {
 
     static func traderItems() -> [TraderItem] {
         [
-            TraderItem(id: "t1", name: "John Mokoena", location: "Mabopane, Pretoria", phone: "+27 82 123 4567", segment: "Spaza", area: "Gauteng", initials: "JM", avatarColor: AppColors.purplePrimary, isNew: true),
-            TraderItem(id: "t2", name: "Sarah Bhuda", location: "Emthombeni, Durban", phone: "+27 83 234 5678", segment: "Spaza", area: "KZN", initials: "SB", avatarColor: AppColors.success, isNew: false),
-            TraderItem(id: "t3", name: "Thabo Khumalo", location: "Rockingham, Durban", phone: "+27 84 345 6789", segment: "Spaza", area: "KZN", initials: "TK", avatarColor: AppColors.warning, isNew: true),
-            TraderItem(id: "t4", name: "Nomvula Phuphuthi", location: "Pinetown, Durban", phone: "+27 85 456 7890", segment: "Spaza", area: "KZN", initials: "NP", avatarColor: AppColors.info, isNew: false),
-            TraderItem(id: "t5", name: "Lunga Mthembu", location: "Soweto, Johannesburg", phone: "+27 86 567 8901", segment: "Spaza", area: "Gauteng", initials: "LM", avatarColor: AppColors.purpleDark, isNew: true),
-            TraderItem(id: "t6", name: "Peter Situngu", location: "Verulam, KZN", phone: "+27 87 678 9012", segment: "Spaza", area: "KZN", initials: "PS", avatarColor: AppColors.danger, isNew: false)
+            TraderItem(id: "t1", name: "John Mokoena", traderCode: "TRD000001", location: "Mabopane, Pretoria", phone: "+27 82 123 4567", segment: "Spaza", area: "Gauteng", initials: "JM", avatarColor: AppColors.purplePrimary, isNew: true),
+            TraderItem(id: "t2", name: "Sarah Bhuda", traderCode: "TRD000002", location: "Emthombeni, Durban", phone: "+27 83 234 5678", segment: "Spaza", area: "KZN", initials: "SB", avatarColor: AppColors.success, isNew: false),
+            TraderItem(id: "t3", name: "Thabo Khumalo", traderCode: "TRD000003", location: "Rockingham, Durban", phone: "+27 84 345 6789", segment: "Spaza", area: "KZN", initials: "TK", avatarColor: AppColors.warning, isNew: true),
+            TraderItem(id: "t4", name: "Nomvula Phuphuthi", traderCode: "TRD000004", location: "Pinetown, Durban", phone: "+27 85 456 7890", segment: "Spaza", area: "KZN", initials: "NP", avatarColor: AppColors.info, isNew: false),
+            TraderItem(id: "t5", name: "Lunga Mthembu", traderCode: "TRD000005", location: "Soweto, Johannesburg", phone: "+27 86 567 8901", segment: "Spaza", area: "Gauteng", initials: "LM", avatarColor: AppColors.purpleDark, isNew: true),
+            TraderItem(id: "t6", name: "Peter Situngu", traderCode: "TRD000006", location: "Verulam, KZN", phone: "+27 87 678 9012", segment: "Spaza", area: "KZN", initials: "PS", avatarColor: AppColors.danger, isNew: false)
         ]
     }
 
