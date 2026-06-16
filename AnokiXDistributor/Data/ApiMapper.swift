@@ -60,14 +60,13 @@ enum ApiMapper {
     static func toProductItems(_ data: ProductsData?) -> [ProductItem] {
         guard let products = data?.products else { return [] }
         return products.map { p in
-            let category = p.category.map { safe($0.title) } ?? ""
-            return ProductItem(id: safe(p.id),
-                               name: safe(p.name),
-                               sku: safe(p.sku),
-                               category: category,
-                               price: formatPrice(p.sellingPrice),
-                               stockStatus: stockStatus(p.stock),
-                               imageUrl: p.imageUrl)
+            ProductItem(id: safe(p.id),
+                        name: safe(p.name),
+                        sku: safe(p.sku),
+                        category: safe(p.categoryTitle),
+                        price: formatPrice(p.sellingPrice),
+                        stockStatus: stockStatus(p.stockValue),
+                        imageUrl: p.listImageUrl)
         }
     }
 

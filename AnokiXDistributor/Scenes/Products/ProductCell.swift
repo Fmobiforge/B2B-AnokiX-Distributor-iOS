@@ -51,7 +51,7 @@ final class ProductCell: UICollectionViewCell {
         placeholderIcon.contentMode = .scaleAspectFit
         placeholderIcon.translatesAutoresizingMaskIntoConstraints = false
 
-        thumbImageView.contentMode = .scaleAspectFill
+        thumbImageView.contentMode = .scaleAspectFit
         thumbImageView.layer.masksToBounds = true
         thumbImageView.isHidden = true
         thumbImageView.translatesAutoresizingMaskIntoConstraints = false

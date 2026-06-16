@@ -121,32 +121,54 @@ struct InventorySummaryData: Decodable {
 
 struct ProductsData: Decodable {
     let products: [Product]?
-    let totalProducts: Int?
-    let activeProducts: Int?
-    let outOfStock: Int?
-    let lowStock: Int?
+    let total: Int?
 
+    /// The list returns flat rows (category / brand / unit denormalised onto each
+    /// record as `*_title` / `*_name`), so values are decoded leniently.
     struct Product: Decodable {
         let id: String?
         let name: String?
         let sku: String?
         let barcode: String?
         let sellingPrice: String?
-        let unitCost: String?
         let stock: String?
+        let stockQuantity: String?
         let status: String?
-        let tagList: String?
+        let brandName: String?
+        let categoryTitle: String?
+        let parentCategoryTitle: String?
+        let unitName: String?
         let imageUrl: String?
-        let category: Category?
-        let brand: Brand?
-    }
-    struct Category: Decodable {
-        let id: Int64?
-        let title: String?
-    }
-    struct Brand: Decodable {
-        let id: Int64?
-        let name: String?
+        let primaryProductImageUrl: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            name = try c.decodeIfPresent(String.self, forKey: .name)
+            sku = try c.decodeIfPresent(String.self, forKey: .sku)
+            barcode = JSONDecoding.flexString(c, key: .barcode)
+            sellingPrice = JSONDecoding.flexString(c, key: .sellingPrice)
+            stock = JSONDecoding.flexString(c, key: .stock)
+            stockQuantity = JSONDecoding.flexString(c, key: .stockQuantity)
+            status = try c.decodeIfPresent(String.self, forKey: .status)
+            brandName = try c.decodeIfPresent(String.self, forKey: .brandName)
+            categoryTitle = try c.decodeIfPresent(String.self, forKey: .categoryTitle)
+            parentCategoryTitle = try c.decodeIfPresent(String.self, forKey: .parentCategoryTitle)
+            unitName = try c.decodeIfPresent(String.self, forKey: .unitName)
+            imageUrl = try c.decodeIfPresent(String.self, forKey: .imageUrl)
+            primaryProductImageUrl = try c.decodeIfPresent(String.self, forKey: .primaryProductImageUrl)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, name, sku, barcode, sellingPrice, stock, stockQuantity, status
+            case brandName, categoryTitle, parentCategoryTitle, unitName
+            case imageUrl, primaryProductImageUrl
+        }
+
+        /// Best available stock figure.
+        var stockValue: String? { stockQuantity ?? stock }
+        /// Best available list thumbnail URL.
+        var listImageUrl: String? { imageUrl ?? primaryProductImageUrl }
     }
 }
 
@@ -458,6 +480,9 @@ struct CoordinateData: Decodable {
 struct BaseInfoData: Decodable {
     let currencies: [Currency]?
     let timezones: [Timezone]?
+    let brands: [Brand]?
+    let productCategories: [ProductCategory]?
+    let productUnits: [ProductUnit]?
 
     struct Currency: Decodable {
         let id: String?
@@ -471,5 +496,128 @@ struct BaseInfoData: Decodable {
         let label: String?
         let timeZone: String?
         let timeOffset: Int64?
+    }
+    struct Brand: Decodable {
+        let id: Int64
+        let name: String?
+    }
+    struct ProductCategory: Decodable {
+        let id: Int64
+        let title: String?
+        let slug: String?
+        let parentId: Int64?
+    }
+    struct ProductUnit: Decodable {
+        let id: String?
+        let name: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            name = try c.decodeIfPresent(String.self, forKey: .name)
+        }
+        private enum CodingKeys: String, CodingKey { case id, name }
+    }
+}
+
+// MARK: - Product detail (get-by-id + create/update response)
+
+struct ProductDetailData: Decodable {
+    let product: Product?
+
+    struct Product: Decodable {
+        let id: String?
+        let name: String?
+        let brandId: String?
+        let parentCategoryId: String?
+        let categoryId: String?
+        let barcode: String?
+        let sku: String?
+        let productDescription: String?
+
+        let unitId: String?
+        let unitsPerCase: String?
+        let dimType: String?
+        let measurementsType: String?
+        let weight: String?
+        let dimWeight: String?
+        let dimLength: String?
+        let dimWidth: String?
+        let dimHeight: String?
+
+        let sellingPrice: String?
+        let costPrice: String?
+        let stock: String?
+        let stockQuantity: String?
+        let reorderLevel: String?
+        let promotionPrice: String?
+        let promotionStartDate: String?
+        let promotionEndDate: String?
+        let availableForOrdering: String?
+        let status: String?
+
+        let primaryProductImageUrl: String?
+        let imageUrl: String?
+        let productDatasheetUrl: String?
+        let additionalImages: [AdditionalImage]?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            name = try c.decodeIfPresent(String.self, forKey: .name)
+            brandId = JSONDecoding.flexString(c, key: .brandId)
+            parentCategoryId = JSONDecoding.flexString(c, key: .parentCategoryId)
+            categoryId = JSONDecoding.flexString(c, key: .categoryId)
+            barcode = JSONDecoding.flexString(c, key: .barcode)
+            sku = try c.decodeIfPresent(String.self, forKey: .sku)
+            productDescription = try c.decodeIfPresent(String.self, forKey: .productDescription)
+            unitId = JSONDecoding.flexString(c, key: .unitId)
+            unitsPerCase = JSONDecoding.flexString(c, key: .unitsPerCase)
+            dimType = try c.decodeIfPresent(String.self, forKey: .dimType)
+            measurementsType = try c.decodeIfPresent(String.self, forKey: .measurementsType)
+            weight = JSONDecoding.flexString(c, key: .weight)
+            dimWeight = JSONDecoding.flexString(c, key: .dimWeight)
+            dimLength = JSONDecoding.flexString(c, key: .dimLength)
+            dimWidth = JSONDecoding.flexString(c, key: .dimWidth)
+            dimHeight = JSONDecoding.flexString(c, key: .dimHeight)
+            sellingPrice = JSONDecoding.flexString(c, key: .sellingPrice)
+            costPrice = JSONDecoding.flexString(c, key: .costPrice)
+            stock = JSONDecoding.flexString(c, key: .stock)
+            stockQuantity = JSONDecoding.flexString(c, key: .stockQuantity)
+            reorderLevel = JSONDecoding.flexString(c, key: .reorderLevel)
+            promotionPrice = JSONDecoding.flexString(c, key: .promotionPrice)
+            promotionStartDate = try c.decodeIfPresent(String.self, forKey: .promotionStartDate)
+            promotionEndDate = try c.decodeIfPresent(String.self, forKey: .promotionEndDate)
+            availableForOrdering = JSONDecoding.flexString(c, key: .availableForOrdering)
+            status = try c.decodeIfPresent(String.self, forKey: .status)
+            primaryProductImageUrl = try c.decodeIfPresent(String.self, forKey: .primaryProductImageUrl)
+            imageUrl = try c.decodeIfPresent(String.self, forKey: .imageUrl)
+            productDatasheetUrl = try c.decodeIfPresent(String.self, forKey: .productDatasheetUrl)
+            additionalImages = try c.decodeIfPresent([AdditionalImage].self, forKey: .additionalImages)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, name, brandId, parentCategoryId, categoryId, barcode, sku
+            case productDescription = "description"
+            case unitId, unitsPerCase, dimType, measurementsType, weight, dimWeight
+            case dimLength, dimWidth, dimHeight
+            case sellingPrice, costPrice, stock, stockQuantity, reorderLevel
+            case promotionPrice, promotionStartDate, promotionEndDate, availableForOrdering, status
+            case primaryProductImageUrl, imageUrl, productDatasheetUrl, additionalImages
+        }
+    }
+
+    struct AdditionalImage: Decodable {
+        let id: String?
+        let fileUrl: String?
+        let originalName: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            fileUrl = try c.decodeIfPresent(String.self, forKey: .fileUrl)
+            originalName = try c.decodeIfPresent(String.self, forKey: .originalName)
+        }
+        private enum CodingKeys: String, CodingKey { case id, fileUrl, originalName }
     }
 }

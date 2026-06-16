@@ -83,6 +83,38 @@ final class ApiClient {
         getAuthed("api/distributor/products", query: nil, type: ProductsData.self, completion: completion)
     }
 
+    func getProductById(id: String, completion: @escaping (Result<ProductDetailData, ApiError>) -> Void) {
+        getAuthed("api/distributor/products/get-by-id", query: ["id": id],
+                  type: ProductDetailData.self, completion: completion)
+    }
+
+    /// Create a product (multipart: text fields + primary image, additional images, datasheet).
+    func createProduct(form: [String: String], files: [Http.FilePart],
+                       completion: @escaping (Result<ProductDetailData, ApiError>) -> Void) {
+        Http.postMultipart(baseUrl: Self.baseURL, path: "api/distributor/products/create",
+                           form: form, files: files, token: session.token) { [weak self] r in
+            self?.deliver(r, type: ProductDetailData.self, completion: completion)
+        }
+    }
+
+    /// Update an existing product (partial — only sent fields change).
+    func updateProduct(form: [String: String], files: [Http.FilePart],
+                       completion: @escaping (Result<ProductDetailData, ApiError>) -> Void) {
+        Http.postMultipart(baseUrl: Self.baseURL, path: "api/distributor/products/update",
+                           form: form, files: files, token: session.token) { [weak self] r in
+            self?.deliver(r, type: ProductDetailData.self, completion: completion)
+        }
+    }
+
+    func deleteProduct(id: String, completion: @escaping (Result<Void, ApiError>) -> Void) {
+        // The delete endpoint returns "data": [] (an empty array), so it must not be
+        // decoded into a ProductDetailData object — only status/message matter.
+        Http.postForm(baseUrl: Self.baseURL, path: "api/distributor/products/delete",
+                      form: ["id": id], token: session.token) { [weak self] r in
+            self?.deliverStatus(r, completion: completion)
+        }
+    }
+
     func getInventorySummary(completion: @escaping (Result<InventorySummaryData, ApiError>) -> Void) {
         getAuthed("api/distributor/inventory/summary", query: nil, type: InventorySummaryData.self, completion: completion)
     }
@@ -142,6 +174,24 @@ final class ApiClient {
             } else {
                 let message = envelope["message"].string ?? "Request failed"
                 result = .failure(ApiError(message: message))
+            }
+        } else {
+            result = .failure(ApiError(message: "Network error (HTTP \(r.code))"))
+        }
+        DispatchQueue.main.async { completion(result) }
+    }
+
+    /// Check only the `status`/`message` of an envelope, ignoring the shape of `data`.
+    /// Used by endpoints (e.g. products/delete) whose `data` block is not a typed
+    /// object — decoding it into one would fail and surface a false error.
+    private func deliverStatus(_ r: Http.Result, completion: @escaping (Result<Void, ApiError>) -> Void) {
+        var result: Result<Void, ApiError>
+        if let body = r.body, !body.isEmpty {
+            let envelope = JSON(parseJSON: body)
+            if envelope["status"].boolValue {
+                result = .success(())
+            } else {
+                result = .failure(ApiError(message: envelope["message"].string ?? "Request failed"))
             }
         } else {
             result = .failure(ApiError(message: "Network error (HTTP \(r.code))"))

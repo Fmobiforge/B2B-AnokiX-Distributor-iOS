@@ -1,7 +1,7 @@
 import UIKit
 
 /// Standalone Products list from the drawer — matches activity_products / fragment search row.
-final class ProductsViewController: BaseSecondaryViewController, UICollectionViewDataSource {
+final class ProductsViewController: BaseSecondaryViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
     override var screenTitle: String { S.products }
     override var screenSubtitle: String? { nil }
@@ -26,6 +26,7 @@ final class ProductsViewController: BaseSecondaryViewController, UICollectionVie
         )
 
         collectionView.dataSource = self
+        collectionView.delegate = self
         collectionView.backgroundColor = AppColors.background
         collectionView.alwaysBounceVertical = true
         collectionView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 16, right: 0)
@@ -50,5 +51,14 @@ final class ProductsViewController: BaseSecondaryViewController, UICollectionVie
         let cell = collectionView.dequeue(ProductCell.self, for: indexPath)
         cell.configure(filtered[indexPath.row])
         return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        guard indexPath.row < filtered.count else { return }
+        let wizard = CreateProductViewController()
+        wizard.productId = filtered[indexPath.row].id
+        wizard.onSaved = { [weak self] in self?.loadData() }
+        navigationController?.pushViewController(wizard, animated: true)
     }
 }

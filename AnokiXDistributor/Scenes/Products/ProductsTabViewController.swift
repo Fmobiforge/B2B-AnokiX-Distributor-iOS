@@ -1,7 +1,7 @@
 import UIKit
 
 /// Products tab — matches fragment_products.xml: logo header, title, search + filter, list, FAB.
-final class ProductsTabViewController: BaseMainViewController, UICollectionViewDataSource {
+final class ProductsTabViewController: BaseMainViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
     @IBOutlet private weak var logoImageView: UIImageView!
     @IBOutlet private weak var logoSubtitleLabel: UILabel!
@@ -41,6 +41,7 @@ final class ProductsTabViewController: BaseMainViewController, UICollectionViewD
         )
 
         productsCollectionView.dataSource = self
+        productsCollectionView.delegate = self
         productsCollectionView.backgroundColor = AppColors.background
         productsCollectionView.alwaysBounceVertical = true
         productsCollectionView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 80, right: 0)
@@ -85,7 +86,20 @@ final class ProductsTabViewController: BaseMainViewController, UICollectionViewD
     @IBAction private func notificationsTapped(_ sender: UIButton) { openNotifications() }
 
     @objc private func addProductTapped() {
-        toast("Add product coming soon")
+        let options = AddProductOptionsViewController()
+        options.onSaved = { [weak self] in self?.loadProducts() }
+        options.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(options, animated: true)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        guard indexPath.row < filtered.count else { return }
+        let wizard = CreateProductViewController()
+        wizard.productId = filtered[indexPath.row].id
+        wizard.onSaved = { [weak self] in self?.loadProducts() }
+        wizard.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(wizard, animated: true)
     }
 
     private func applyFilter() {
