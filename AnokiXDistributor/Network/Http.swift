@@ -23,6 +23,22 @@ enum Http {
         return Session(configuration: config)
     }()
 
+    /// Dedicated session for multipart uploads (Create Trader / Create Product).
+    ///
+    /// The backend never answers `Expect: 100-continue` with an interim `100 Continue`
+    /// response (verified against the live server). When CFNetwork attaches that header
+    /// it then waits for the 100 that never comes, so the connection stalls with no data
+    /// flowing and fails with -1001 "request timed out" — while curl and Android/OkHttp,
+    /// which don't block on 100-continue, succeed. We suppress the header here and send
+    /// the body inline via a data task so iOS uploads the same way Android does.
+    private static let multipartSession: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 120
+        config.timeoutIntervalForResource = 600
+        config.httpAdditionalHeaders = ["Expect": ""]
+        return URLSession(configuration: config)
+    }()
+
     static func get(baseUrl: String, path: String, query: [String: String]?, token: String?,
                     completion: @escaping (Result) -> Void) {
         var components = URLComponents(string: baseUrl + path)
@@ -62,12 +78,12 @@ enum Http {
 
     /// multipart/form-data POST with text fields and optional file parts.
     ///
-    /// Sent as the `httpBody` of a normal **data task** (`session.request`), not an
-    /// upload task. iOS upload tasks add an `Expect: 100-continue` header and wait
-    /// for the server to acknowledge before sending the body; servers that never
-    /// answer 100-continue make the request hang until it times out (-1001) on iOS
-    /// while OkHttp on Android succeeds. A data task with `httpBody` sends the body
-    /// inline with no 100-continue handshake.
+    /// Bypasses Alamofire and uses a raw `URLSession` **data task** with the body set as
+    /// `httpBody` (not an upload task / `httpBodyStream`). Combined with the `Expect: ""`
+    /// header on `multipartSession`, this stops CFNetwork from sending `Expect:
+    /// 100-continue` and waiting for a 100 the server never returns — the cause of the
+    /// -1001 timeouts on Create Trader / Create Product (Android/OkHttp never blocked on
+    /// it). The completion may fire off the main thread; ApiClient re-dispatches to main.
     static func postMultipart(baseUrl: String, path: String, form: [String: String],
                               files: [FilePart], token: String?,
                               completion: @escaping (Result) -> Void) {
@@ -83,12 +99,22 @@ enum Http {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        request.httpBody = multipartBody(form: form, files: files, boundary: boundary)
+        request.setValue("", forHTTPHeaderField: "Expect")
+        let body = multipartBody(form: form, files: files, boundary: boundary)
+        request.setValue("\(body.count)", forHTTPHeaderField: "Content-Length")
+        request.httpBody = body
 
-        session.request(request)
-            .responseString { response in
-                completion(map(response))
+        let task = multipartSession.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("\(tag): request failed: \(error.localizedDescription)")
+                completion(Result(code: -1, body: nil))
+                return
             }
+            let code = (response as? HTTPURLResponse)?.statusCode ?? -1
+            let text = data.flatMap { String(data: $0, encoding: .utf8) }
+            completion(Result(code: code, body: text))
+        }
+        task.resume()
     }
 
     private static func multipartBody(form: [String: String], files: [FilePart], boundary: String) -> Data {
