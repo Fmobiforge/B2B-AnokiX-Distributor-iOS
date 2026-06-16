@@ -61,13 +61,10 @@ final class AddProductOptionsViewController: BaseSecondaryViewController {
         continueButton.setTitle("Continue", for: .normal)
         continueButton.constrainHeight(48)
         continueButton.addTarget(self, action: #selector(continueTapped), for: .touchUpInside)
-        let buttonRow = UIStackView.horizontal(spacing: 0, alignment: .center)
-        buttonRow.addArrangedSubview(UIView())
-        buttonRow.addArrangedSubview(continueButton)
-        buttonRow.addArrangedSubview(UIView())
-        continueButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 220).isActive = true
+        // The content stack is alignment .fill, so adding the button directly makes it
+        // span the full width (matching the option cards above it).
         content.setCustomSpacing(28, after: content.arrangedSubviews.last!)
-        content.addArrangedSubview(buttonRow)
+        content.addArrangedSubview(continueButton)
 
         applySelection()
     }
