@@ -9,7 +9,7 @@ import UniformTypeIdentifiers
 ///        4 Pricing & Inventory · 5 Review & Submit. Mirrors the Android
 ///        CreateProductActivity and the iOS Create Trader wizard.
 final class CreateProductViewController: BaseSecondaryViewController,
-        PHPickerViewControllerDelegate, UIDocumentPickerDelegate {
+        PHPickerViewControllerDelegate, UIDocumentPickerDelegate, UITextFieldDelegate {
 
     /// Set to edit an existing product (loads get-by-id, switches to update/delete).
     var productId: String?
@@ -66,6 +66,14 @@ final class CreateProductViewController: BaseSecondaryViewController,
     private let promoPriceField = UITextField()
     private let promoStartField = UITextField()
     private let promoEndField = UITextField()
+    private let promoStartPicker = UIDatePicker()
+    private let promoEndPicker = UIDatePicker()
+    private let promoDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
     private let availableSwitch = UISwitch()
     private let reviewStack = UIStackView.vertical(spacing: 0, alignment: .fill)
 
@@ -293,6 +301,22 @@ final class CreateProductViewController: BaseSecondaryViewController,
         renderStepper()
         view.endEditing(true)
         formScroll.setContentOffset(.zero, animated: false)
+        scrollStepperToCurrent()
+    }
+
+    /// Keep the active step's number + title in view as the user advances (mirrors the
+    /// Android stepper's smoothScrollTo).
+    private func scrollStepperToCurrent() {
+        guard currentStep < stepCircles.count else { return }
+        DispatchQueue.main.async {
+            self.stepperStack.layoutIfNeeded()
+            let circleRect = self.stepCircles[self.currentStep]
+                .convert(self.stepCircles[self.currentStep].bounds, to: self.stepperScroll)
+            let titleRect = self.stepTitles[self.currentStep]
+                .convert(self.stepTitles[self.currentStep].bounds, to: self.stepperScroll)
+            let target = circleRect.union(titleRect).insetBy(dx: -24, dy: 0)
+            self.stepperScroll.scrollRectToVisible(target, animated: true)
+        }
     }
 
     // MARK: - Validation
@@ -483,9 +507,12 @@ final class CreateProductViewController: BaseSecondaryViewController,
             fieldGroup("Stock Quantity *", stockField, placeholder: "0", keyboard: .numberPad),
             fieldGroup("Reorder Level *", reorderField, placeholder: "0", keyboard: .numberPad)))
         stack.addArrangedSubview(fieldGroup("Promotion Price (R)", promoPriceField, placeholder: "0.00", keyboard: .decimalPad))
-        stack.addArrangedSubview(hPair(
+        let promoDateRow = hPair(
             fieldGroup("Promotion Start Date", promoStartField, placeholder: "YYYY-MM-DD"),
-            fieldGroup("Promotion End Date", promoEndField, placeholder: "YYYY-MM-DD")))
+            fieldGroup("Promotion End Date", promoEndField, placeholder: "YYYY-MM-DD"))
+        attachDatePicker(to: promoStartField, picker: promoStartPicker)
+        attachDatePicker(to: promoEndField, picker: promoEndPicker)
+        stack.addArrangedSubview(promoDateRow)
 
         let availLabel = UILabel.make("Available For Ordering", font: AppFonts.bold(15), color: AppColors.purpleDark)
         availableSwitch.isOn = true
@@ -604,6 +631,54 @@ final class CreateProductViewController: BaseSecondaryViewController,
         sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         if let pop = sheet.popoverPresentationController { pop.sourceView = view; pop.sourceRect = view.bounds }
         present(sheet, animated: true)
+    }
+
+    // MARK: - Promotion date pickers
+
+    /// Make a promotion date field pick-only via a wheel UIDatePicker (mirrors the
+    /// Android DatePickerDialog) with a Clear / Done toolbar. Value is stored as
+    /// yyyy-MM-dd, the format the API expects.
+    private func attachDatePicker(to field: UITextField, picker: UIDatePicker) {
+        picker.datePickerMode = .date
+        if #available(iOS 13.4, *) { picker.preferredDatePickerStyle = .wheels }
+        field.inputView = picker
+        field.tintColor = .clear        // pick-only — hide the text caret
+        field.delegate = self
+
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+        let clear = UIBarButtonItem(title: "Clear", style: .plain, target: self, action: #selector(clearPromoDate))
+        let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let done = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(commitPromoDate))
+        toolbar.setItems([clear, spacer, done], animated: false)
+        field.inputAccessoryView = toolbar
+    }
+
+    @objc private func commitPromoDate() {
+        if promoStartField.isFirstResponder {
+            promoStartField.text = promoDateFormatter.string(from: promoStartPicker.date)
+        } else if promoEndField.isFirstResponder {
+            promoEndField.text = promoDateFormatter.string(from: promoEndPicker.date)
+        }
+        view.endEditing(true)
+    }
+
+    @objc private func clearPromoDate() {
+        if promoStartField.isFirstResponder { promoStartField.text = "" }
+        else if promoEndField.isFirstResponder { promoEndField.text = "" }
+        view.endEditing(true)
+    }
+
+    /// Sync the wheel to the value already in the field (e.g. when editing a product).
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        let picker: UIDatePicker?
+        if textField == promoStartField { picker = promoStartPicker }
+        else if textField == promoEndField { picker = promoEndPicker }
+        else { picker = nil }
+        guard let picker = picker else { return }
+        if let text = textField.text, let date = promoDateFormatter.date(from: text) {
+            picker.date = date
+        }
     }
 
     // MARK: - Image / file pickers
