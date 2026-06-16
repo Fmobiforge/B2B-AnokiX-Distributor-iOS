@@ -115,6 +115,10 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         DocDef(key: "store_interior_photo", title: "Store Interior Photo", sub: "Inside view of your store", required: true),
         DocDef(key: "additional_documents", title: "Additional Documents", sub: "(If any)", required: false)
     ]
+    /// The total POST is capped at 40 MB by the server. With up to 6 documents
+    /// that means each file must stay under 5 MB (6 × 5 MB ≈ 30 MB, leaving room
+    /// for the form fields). Guard every picked file against this limit.
+    private static let maxUploadBytes = 5 * 1024 * 1024
     private var docFiles: [String: (data: Data, name: String, mime: String)] = [:]
     private var docSubtitleLabels: [String: UILabel] = [:]
     private var docButtons: [String: UIButton] = [:]
@@ -665,7 +669,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
             guard let self = self, let image = object as? UIImage,
                   // Downscale + compress so KYC photos upload quickly (avoids the
                   // multipart request timing out on large full-resolution images).
-                  let data = Self.downscaledJpeg(image, maxDimension: 1600, quality: 0.7) else {
+                  let data = Self.downscaledJpeg(image, maxDimension: 1440, quality: 0.6) else {
                 DispatchQueue.main.async { self?.pendingDocKey = nil }
                 return
             }
@@ -694,8 +698,25 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         guard let url = urls.first, let key = pendingDocKey else { return }
         let access = url.startAccessingSecurityScopedResource()
         defer { if access { url.stopAccessingSecurityScopedResource() } }
-        guard let data = try? Data(contentsOf: url) else { toast("Could not read file"); return }
-        applyPickedFile(key: key, data: data, name: url.lastPathComponent, mime: mimeType(for: url))
+        guard var data = try? Data(contentsOf: url) else { toast("Could not read file"); return }
+        var name = url.lastPathComponent
+        var mime = mimeType(for: url)
+
+        // Files picked here are uploaded as-is, so a full-resolution photo or scan
+        // can easily exceed the 40 MB cap. Re-encode images through the same
+        // downscale used for the photo library; PDFs/other types can't be shrunk
+        // here and are size-checked as-is.
+        if mime.hasPrefix("image/"), let image = UIImage(data: data),
+           let jpeg = Self.downscaledJpeg(image, maxDimension: 1440, quality: 0.6) {
+            data = jpeg
+            name = url.deletingPathExtension().lastPathComponent + ".jpg"
+            mime = "image/jpeg"
+        }
+        guard data.count <= Self.maxUploadBytes else {
+            toast("File is too large. Please choose a file under 5 MB.")
+            return
+        }
+        applyPickedFile(key: key, data: data, name: name, mime: mime)
         pendingDocKey = nil
     }
 
@@ -1000,13 +1021,9 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         if let payment = paymentMethodValue { form["payment_method"] = payment }
         form["create_wallet"] = createWalletNow ? "1" : "0"
 
-        // TEMP DEBUG: file upload disabled to isolate the traders/create failure.
-        // Submitting text fields only (no KYC document parts). Restore the block
-        // below once we confirm whether the multipart documents are the cause.
-        let files: [Http.FilePart] = []
-        // let files: [Http.FilePart] = docFiles.map { key, value in
-        //     Http.FilePart(field: key, fileName: value.name, mimeType: value.mime, data: value.data)
-        // }
+        let files: [Http.FilePart] = docFiles.map { key, value in
+            Http.FilePart(field: key, fileName: value.name, mimeType: value.mime, data: value.data)
+        }
 
         continueButton.isEnabled = false
         continueButton.setTitle(S.registering, for: .normal)
@@ -1014,7 +1031,8 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
             guard let self = self else { return }
             switch result {
             case .success:
-                self.toast(S.traderCreatedMessage)
+                // Pop straight back to the Traders list; it shows a non-blocking
+                // success banner once it reappears (see TradersViewController).
                 self.onSaved?()
                 self.navigationController?.popViewController(animated: true)
             case .failure(let error):

@@ -17,6 +17,9 @@ final class TradersViewController: BaseSecondaryViewController, UICollectionView
     // Server-side filters: empty string means "no filter" (All Status).
     private var selectedStatus = ""
     private var selectedRegistrationStatus = ""
+
+    // Set by the Create Trader wizard on success; shown as a banner once we reappear.
+    private var pendingSuccessBanner: String?
     private var statusPill: FilterPillButton!
     private var registrationPill: FilterPillButton!
 
@@ -69,8 +72,19 @@ final class TradersViewController: BaseSecondaryViewController, UICollectionView
     /// "+ Add New Trader" in the header → open the wizard, refresh on success.
     override func trailingTapped() {
         let wizard = CreateTraderViewController()
-        wizard.onSaved = { [weak self] in self?.loadData() }
+        wizard.onSaved = { [weak self] in
+            self?.loadData()
+            self?.pendingSuccessBanner = S.traderCreatedMessage
+        }
         navigationController?.pushViewController(wizard, animated: true)
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let message = pendingSuccessBanner {
+            pendingSuccessBanner = nil
+            successBanner(message)
+        }
     }
 
     @objc private func pickStatus() {

@@ -94,4 +94,57 @@ class BaseSecondaryViewController: UIViewController {
         present(alert, animated: true)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) { alert.dismiss(animated: true) }
     }
+
+    /// Non-blocking success banner: a green pill with a checkmark that slides in just
+    /// under the header, then fades out on its own. Used for confirmations where an
+    /// alert would be too heavy (e.g. returning to a list after a successful save).
+    func successBanner(_ message: String) {
+        let banner = UIView()
+        banner.backgroundColor = AppColors.success
+        banner.layer.cornerRadius = 10
+        banner.layer.shadowColor = UIColor.black.cgColor
+        banner.layer.shadowOpacity = 0.18
+        banner.layer.shadowRadius = 6
+        banner.layer.shadowOffset = CGSize(width: 0, height: 3)
+        banner.forAutoLayout()
+
+        let icon = UIImageView(image: UIImage(systemName: "checkmark.circle.fill"))
+        icon.tintColor = .white
+        icon.contentMode = .scaleAspectFit
+        icon.forAutoLayout()
+
+        let label = UILabel.make(message, font: AppFonts.bold(14), color: .white, lines: 2)
+        let row = UIStackView(arrangedSubviews: [icon, label])
+        row.axis = .horizontal
+        row.spacing = 8
+        row.alignment = .center
+        row.forAutoLayout()
+        banner.addSubview(row)
+        view.addSubview(banner)
+
+        NSLayoutConstraint.activate([
+            icon.widthAnchor.constraint(equalToConstant: 20),
+            icon.heightAnchor.constraint(equalToConstant: 20),
+            row.leadingAnchor.constraint(equalTo: banner.leadingAnchor, constant: 14),
+            row.trailingAnchor.constraint(equalTo: banner.trailingAnchor, constant: -14),
+            row.topAnchor.constraint(equalTo: banner.topAnchor, constant: 12),
+            row.bottomAnchor.constraint(equalTo: banner.bottomAnchor, constant: -12),
+            banner.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            banner.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            banner.topAnchor.constraint(equalTo: header.bottomAnchor, constant: 12)
+        ])
+
+        banner.alpha = 0
+        banner.transform = CGAffineTransform(translationX: 0, y: -16)
+        UIView.animate(withDuration: 0.3) {
+            banner.alpha = 1
+            banner.transform = .identity
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
+            UIView.animate(withDuration: 0.3, animations: {
+                banner.alpha = 0
+                banner.transform = CGAffineTransform(translationX: 0, y: -16)
+            }, completion: { _ in banner.removeFromSuperview() })
+        }
+    }
 }
