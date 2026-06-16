@@ -25,6 +25,7 @@ enum AppIcons {
         "ic_filter": "line.3.horizontal.decrease",
         "ic_tune": "slider.horizontal.3",
         "ic_add": "plus",
+        "ic_delete": "trash",
         "ic_close": "xmark",
         "ic_chevron_right": "chevron.right",
         "ic_hamburger": "line.3.horizontal",

@@ -17,6 +17,9 @@ final class CreateProductViewController: BaseSecondaryViewController,
     var onSaved: (() -> Void)?
 
     override var screenTitle: String { productId == nil ? "Create New Product" : "Edit Product" }
+    // When editing, show a trash action in the title bar (mirrors Android's header delete).
+    override var trailingIcon: String? { productId == nil ? nil : "ic_delete" }
+    override func trailingTapped() { confirmDelete() }
 
     // Measurement type → (dim_type value, weight unit, dimension unit)
     private let dimTypeValues = ["kilo_centi", "pound_inch"]
@@ -510,19 +513,7 @@ final class CreateProductViewController: BaseSecondaryViewController,
         card.addSubview(reviewStack)
         reviewStack.pinEdges(to: card)
         stack.addArrangedSubview(card)
-
-        if productId != nil {
-            let deleteButton = UIButton(type: .system)
-            deleteButton.setTitle("Delete Product", for: .normal)
-            deleteButton.setTitleColor(AppColors.danger, for: .normal)
-            deleteButton.titleLabel?.font = AppFonts.bold(15)
-            deleteButton.constrainHeight(46)
-            deleteButton.layer.cornerRadius = AppMetrics.radiusMD
-            deleteButton.layer.borderWidth = 1
-            deleteButton.layer.borderColor = AppColors.danger.cgColor
-            deleteButton.addTarget(self, action: #selector(confirmDelete), for: .touchUpInside)
-            stack.addArrangedSubview(deleteButton)
-        }
+        // Delete now lives in the title bar (see trailingIcon / trailingTapped).
         return stack
     }
 
@@ -775,6 +766,14 @@ final class CreateProductViewController: BaseSecondaryViewController,
         if let img = p.primaryProductImageUrl ?? p.imageUrl, !img.isEmpty {
             primaryProvided = true
             primaryPlaceholder.text = "Current image — tap to replace"
+            if let url = URL(string: img) {
+                ImageLoader.load(url) { [weak self] image in
+                    guard let self = self, let image = image else { return }
+                    self.primaryImageView.image = image
+                    self.primaryImageView.isHidden = false
+                    self.primaryPlaceholder.isHidden = true
+                }
+            }
         }
         existingAdditional = (p.additionalImages ?? []).compactMap { ai in
             guard let id = ai.id, let url = ai.fileUrl else { return nil }
@@ -969,15 +968,27 @@ final class CreateProductViewController: BaseSecondaryViewController,
         config.background.backgroundColor = AppColors.surface
         config.cornerStyle = .medium
         config.title = placeholder
-        config.image = UIImage(systemName: "chevron.down")
-        config.imagePlacement = .trailing
-        config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12)
+        // Leave room on the right for the trailing chevron accessory below.
+        config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 34)
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
             var out = incoming; out.font = AppFonts.regular(AppMetrics.textBody); return out
         }
         button.configuration = config
         button.contentHorizontalAlignment = .leading
         button.constrainHeight(48)
+
+        // A small chevron pinned to the right edge. (Using the configuration's own
+        // image places it right after the title and scales it with the body font —
+        // too large and mis-positioned, as seen in the design review.)
+        let chevron = UIImageView(image: UIImage(systemName: "chevron.down",
+            withConfiguration: UIImage.SymbolConfiguration(pointSize: 12, weight: .semibold)))
+        chevron.tintColor = AppColors.textSecondary
+        chevron.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(chevron)
+        NSLayoutConstraint.activate([
+            chevron.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: -12),
+            chevron.centerYAnchor.constraint(equalTo: button.centerYAnchor)
+        ])
     }
 
     private func setPickerTitle(_ button: UIButton, _ title: String) {
