@@ -62,11 +62,12 @@ enum Http {
 
     /// multipart/form-data POST with text fields and optional file parts.
     ///
-    /// The body is built in memory and sent as `Data` (not Alamofire's streamed
-    /// `multipartFormData`, which writes to a temp file and triggers an
-    /// `Expect: 100-continue` handshake). Some servers never answer 100-continue,
-    /// so the streamed path hangs until the request times out (-1001) on iOS while
-    /// OkHttp on Android succeeds. An in-memory data upload avoids that entirely.
+    /// Sent as the `httpBody` of a normal **data task** (`session.request`), not an
+    /// upload task. iOS upload tasks add an `Expect: 100-continue` header and wait
+    /// for the server to acknowledge before sending the body; servers that never
+    /// answer 100-continue make the request hang until it times out (-1001) on iOS
+    /// while OkHttp on Android succeeds. A data task with `httpBody` sends the body
+    /// inline with no 100-continue handshake.
     static func postMultipart(baseUrl: String, path: String, form: [String: String],
                               files: [FilePart], token: String?,
                               completion: @escaping (Result) -> Void) {
@@ -75,12 +76,16 @@ enum Http {
             return
         }
         let boundary = "AnokiXBoundary-\(UUID().uuidString)"
-        let body = multipartBody(form: form, files: files, boundary: boundary)
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        if let token = token, !token.isEmpty {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.httpBody = multipartBody(form: form, files: files, boundary: boundary)
 
-        var requestHeaders = headers(token: token)
-        requestHeaders.add(name: "Content-Type", value: "multipart/form-data; boundary=\(boundary)")
-
-        session.upload(body, to: url, method: .post, headers: requestHeaders)
+        session.request(request)
             .responseString { response in
                 completion(map(response))
             }
