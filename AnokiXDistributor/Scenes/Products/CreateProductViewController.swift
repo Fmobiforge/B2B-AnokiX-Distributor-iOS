@@ -673,15 +673,17 @@ final class CreateProductViewController: BaseSecondaryViewController,
         additionalChips.arrangedSubviews.forEach { $0.removeFromSuperview() }
         for (i, existing) in existingAdditional.enumerated() {
             let id = existing.id
-            additionalChips.addArrangedSubview(imageChip("Saved image \(i + 1)") { [weak self] in
+            additionalChips.addArrangedSubview(imageChip(url: existing.url, image: nil,
+                                                         title: "Saved image \(i + 1)") { [weak self] in
                 guard let self = self else { return }
                 self.existingAdditional.removeAll { $0.id == id }
                 self.removeAdditionalIds.append(id)
                 self.renderAdditionalChips()
             })
         }
-        for (i, _) in newAdditionalImages.enumerated() {
-            additionalChips.addArrangedSubview(imageChip("New image \(i + 1)") { [weak self] in
+        for (i, data) in newAdditionalImages.enumerated() {
+            additionalChips.addArrangedSubview(imageChip(url: nil, image: UIImage(data: data),
+                                                         title: "New image \(i + 1)") { [weak self] in
                 guard let self = self, i < self.newAdditionalImages.count else { return }
                 self.newAdditionalImages.remove(at: i)
                 self.renderAdditionalChips()
@@ -689,22 +691,41 @@ final class CreateProductViewController: BaseSecondaryViewController,
         }
     }
 
-    private func imageChip(_ title: String, onRemove: @escaping () -> Void) -> UIView {
+    /// One additional-image row: a thumbnail (loaded from `url` for saved images, or
+    /// built from `image` data for newly picked ones), a caption, and a remove button.
+    private func imageChip(url: String?, image: UIImage?, title: String,
+                           onRemove: @escaping () -> Void) -> UIView {
         let chip = UIView()
         chip.backgroundColor = AppColors.surfaceVariant
         chip.layer.cornerRadius = AppMetrics.radiusSM
         chip.layer.borderWidth = 1
         chip.layer.borderColor = AppColors.border.cgColor
+
+        let thumb = UIImageView()
+        thumb.contentMode = .scaleAspectFit
+        thumb.clipsToBounds = true
+        thumb.backgroundColor = AppColors.surface
+        thumb.layer.cornerRadius = AppMetrics.radiusSM
+        thumb.constrainSize(44)
+        if let image = image {
+            thumb.image = image
+        } else if let url = url, let u = URL(string: url) {
+            ImageLoader.load(u) { [weak thumb] loaded in thumb?.image = loaded }
+        }
+
         let label = UILabel.make(title, font: AppFonts.regular(13), color: AppColors.textPrimary)
+
         let remove = UIButton(type: .system)
-        remove.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
-        remove.tintColor = AppColors.textSecondary
+        remove.setImage(UIImage(systemName: "trash"), for: .normal)
+        remove.tintColor = AppColors.danger
         remove.constrainSize(22)
         remove.addAction(UIAction { _ in onRemove() }, for: .touchUpInside)
-        let row = UIStackView.horizontal(spacing: 8, alignment: .center)
+
+        let row = UIStackView.horizontal(spacing: 12, alignment: .center)
         row.isLayoutMarginsRelativeArrangement = true
-        row.layoutMargins = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 10)
+        row.layoutMargins = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 12)
         row.forAutoLayout()
+        row.addArrangedSubview(thumb)
         row.addArrangedSubview(label)
         row.addArrangedSubview(UIView())
         row.addArrangedSubview(remove)
