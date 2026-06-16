@@ -1021,6 +1021,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         if let payment = paymentMethodValue { form["payment_method"] = payment }
         form["create_wallet"] = createWalletNow ? "1" : "0"
 
+        //let files: [Http.FilePart] = []
         let files: [Http.FilePart] = docFiles.map { key, value in
             Http.FilePart(field: key, fileName: value.name, mimeType: value.mime, data: value.data)
         }
