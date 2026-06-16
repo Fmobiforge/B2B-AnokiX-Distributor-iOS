@@ -61,6 +61,12 @@ enum Http {
     }
 
     /// multipart/form-data POST with text fields and optional file parts.
+    ///
+    /// The body is built in memory and sent as `Data` (not Alamofire's streamed
+    /// `multipartFormData`, which writes to a temp file and triggers an
+    /// `Expect: 100-continue` handshake). Some servers never answer 100-continue,
+    /// so the streamed path hangs until the request times out (-1001) on iOS while
+    /// OkHttp on Android succeeds. An in-memory data upload avoids that entirely.
     static func postMultipart(baseUrl: String, path: String, form: [String: String],
                               files: [FilePart], token: String?,
                               completion: @escaping (Result) -> Void) {
@@ -68,18 +74,37 @@ enum Http {
             completion(Result(code: -1, body: nil))
             return
         }
-        session.upload(multipartFormData: { mp in
-            for (key, value) in form {
-                mp.append(Data(value.utf8), withName: key)
+        let boundary = "AnokiXBoundary-\(UUID().uuidString)"
+        let body = multipartBody(form: form, files: files, boundary: boundary)
+
+        var requestHeaders = headers(token: token)
+        requestHeaders.add(name: "Content-Type", value: "multipart/form-data; boundary=\(boundary)")
+
+        session.upload(body, to: url, method: .post, headers: requestHeaders)
+            .responseString { response in
+                completion(map(response))
             }
-            for file in files {
-                mp.append(file.data, withName: file.field,
-                          fileName: file.fileName, mimeType: file.mimeType)
-            }
-        }, to: url, method: .post, headers: headers(token: token))
-        .responseString { response in
-            completion(map(response))
+    }
+
+    private static func multipartBody(form: [String: String], files: [FilePart], boundary: String) -> Data {
+        var body = Data()
+        let crlf = "\r\n"
+        func append(_ string: String) { body.append(Data(string.utf8)) }
+
+        for (key, value) in form {
+            append("--\(boundary)\(crlf)")
+            append("Content-Disposition: form-data; name=\"\(key)\"\(crlf)\(crlf)")
+            append("\(value)\(crlf)")
         }
+        for file in files {
+            append("--\(boundary)\(crlf)")
+            append("Content-Disposition: form-data; name=\"\(file.field)\"; filename=\"\(file.fileName)\"\(crlf)")
+            append("Content-Type: \(file.mimeType)\(crlf)\(crlf)")
+            body.append(file.data)
+            append(crlf)
+        }
+        append("--\(boundary)--\(crlf)")
+        return body
     }
 
     private static func headers(token: String?) -> HTTPHeaders {
