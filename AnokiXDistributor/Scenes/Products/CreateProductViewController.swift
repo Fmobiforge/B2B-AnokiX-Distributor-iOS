@@ -706,7 +706,7 @@ final class CreateProductViewController: BaseSecondaryViewController,
         guard let provider = results.first?.itemProvider, provider.canLoadObject(ofClass: UIImage.self) else { return }
         provider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
             guard let self = self, let image = object as? UIImage,
-                  let data = Self.downscaledJpeg(image, maxDimension: 1440, quality: 0.6) else { return }
+                  let data = Self.downscaledJpeg(image, maxDimension: 1280, quality: 0.5) else { return }
             DispatchQueue.main.async {
                 if self.pendingImageTarget == .primary {
                     self.primaryImageData = data

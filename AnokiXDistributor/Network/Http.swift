@@ -25,17 +25,18 @@ enum Http {
 
     /// Dedicated session for multipart uploads (Create Trader / Create Product).
     ///
-    /// The backend never answers `Expect: 100-continue` with an interim `100 Continue`
-    /// response (verified against the live server). When CFNetwork attaches that header
-    /// it then waits for the 100 that never comes, so the connection stalls with no data
-    /// flowing and fails with -1001 "request timed out" — while curl and Android/OkHttp,
-    /// which don't block on 100-continue, succeed. We suppress the header here and send
-    /// the body inline via a data task so iOS uploads the same way Android does.
+    /// Uploads to this backend are slow (measured ~40s for 1MB against the live server),
+    /// and `timeoutIntervalForRequest` is an *idle* timer that only resets when data is
+    /// **received** — during a long upload nothing comes back, so a slow-but-progressing
+    /// upload trips -1001 "request timed out" on iOS even though it is still sending.
+    /// (Android/OkHttp reset their write timeout per chunk; curl has no idle timeout — so
+    /// they succeed where iOS fails.) We give the request a very generous idle window so
+    /// the body has time to finish, then the response arrives normally.
     private static let multipartSession: URLSession = {
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 120
+        config.timeoutIntervalForRequest = 300
         config.timeoutIntervalForResource = 600
-        config.httpAdditionalHeaders = ["Expect": ""]
+        config.waitsForConnectivity = true
         return URLSession(configuration: config)
     }()
 
@@ -79,11 +80,10 @@ enum Http {
     /// multipart/form-data POST with text fields and optional file parts.
     ///
     /// Bypasses Alamofire and uses a raw `URLSession` **data task** with the body set as
-    /// `httpBody` (not an upload task / `httpBodyStream`). Combined with the `Expect: ""`
-    /// header on `multipartSession`, this stops CFNetwork from sending `Expect:
-    /// 100-continue` and waiting for a 100 the server never returns — the cause of the
-    /// -1001 timeouts on Create Trader / Create Product (Android/OkHttp never blocked on
-    /// it). The completion may fire off the main thread; ApiClient re-dispatches to main.
+    /// `httpBody` (not an upload task / `httpBodyStream`), sent on `multipartSession` whose
+    /// generous `timeoutIntervalForRequest` (300s) keeps the slow upload to this backend
+    /// from tripping -1001 mid-transfer (see the session's note). The completion may fire
+    /// off the main thread; ApiClient re-dispatches to main.
     static func postMultipart(baseUrl: String, path: String, form: [String: String],
                               files: [FilePart], token: String?,
                               completion: @escaping (Result) -> Void) {
@@ -104,13 +104,18 @@ enum Http {
         request.setValue("\(body.count)", forHTTPHeaderField: "Content-Length")
         request.httpBody = body
 
+        let kb = body.count / 1024
+        let started = Date()
+        print("\(tag): multipart upload → \(path) (\(kb) KB)")
         let task = multipartSession.dataTask(with: request) { data, response, error in
+            let elapsed = String(format: "%.1f", Date().timeIntervalSince(started))
             if let error = error {
-                print("\(tag): request failed: \(error.localizedDescription)")
+                print("\(tag): multipart upload failed after \(elapsed)s: \(error.localizedDescription)")
                 completion(Result(code: -1, body: nil))
                 return
             }
             let code = (response as? HTTPURLResponse)?.statusCode ?? -1
+            print("\(tag): multipart upload done in \(elapsed)s → HTTP \(code)")
             let text = data.flatMap { String(data: $0, encoding: .utf8) }
             completion(Result(code: code, body: text))
         }
