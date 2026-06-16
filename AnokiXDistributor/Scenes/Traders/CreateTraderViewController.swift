@@ -1000,9 +1000,13 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         if let payment = paymentMethodValue { form["payment_method"] = payment }
         form["create_wallet"] = createWalletNow ? "1" : "0"
 
-        let files: [Http.FilePart] = docFiles.map { key, value in
-            Http.FilePart(field: key, fileName: value.name, mimeType: value.mime, data: value.data)
-        }
+        // TEMP DEBUG: file upload disabled to isolate the traders/create failure.
+        // Submitting text fields only (no KYC document parts). Restore the block
+        // below once we confirm whether the multipart documents are the cause.
+        let files: [Http.FilePart] = []
+        // let files: [Http.FilePart] = docFiles.map { key, value in
+        //     Http.FilePart(field: key, fileName: value.name, mimeType: value.mime, data: value.data)
+        // }
 
         continueButton.isEnabled = false
         continueButton.setTitle(S.registering, for: .normal)
