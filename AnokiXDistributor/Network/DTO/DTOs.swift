@@ -51,6 +51,7 @@ struct DashboardData: Decodable {
 
     struct Dashboard: Decodable {
         let meta: Meta?
+        let summaryCards: [SummaryCard]?
         let overview: [OverviewItem]?
         let revenueOverview: RevenueOverview?
         let topSellingCategories: TopCategories?
@@ -59,11 +60,29 @@ struct DashboardData: Decodable {
     struct Meta: Decodable {
         let dateRangeLabel: String?
         let comparePeriodLabel: String?
+        let currency: Currency?
+    }
+    struct Currency: Decodable {
+        let code: String?
+        let symbol: String?
+    }
+    struct SummaryCard: Decodable {
+        let key: String?
+        let label: String?
+        let value: Double?
+        let formattedValue: String?
+        let isMoney: Bool?
+        let trend: Trend?
+        let compareLabel: String?
+        let sparkline: [Double]?
+        let color: String?
     }
     struct OverviewItem: Decodable {
         let key: String?
         let label: String?
         let value: Int64?
+        let actionLabel: String?
+        let actionRoute: String?
     }
     struct RevenueOverview: Decodable {
         let formattedTotal: String?
@@ -82,9 +101,12 @@ struct DashboardData: Decodable {
     struct TopCategories: Decodable {
         let title: String?
         let items: [CategoryItem]?
+        let total: Double?
+        let formattedTotal: String?
     }
     struct CategoryItem: Decodable {
         let name: String?
+        let amount: Double?
         let formattedAmount: String?
         let percentage: Double?
         let color: String?
@@ -96,9 +118,12 @@ struct DashboardData: Decodable {
     struct RecentOrder: Decodable {
         let orderId: String?
         let trader: String?
+        let amount: Double?
         let formattedAmount: String?
+        let status: String?
         let statusLabel: String?
         let statusColor: String?
+        let date: String?
         let formattedDate: String?
     }
 }
@@ -619,5 +644,226 @@ struct ProductDetailData: Decodable {
             originalName = try c.decodeIfPresent(String.self, forKey: .originalName)
         }
         private enum CodingKeys: String, CodingKey { case id, fileUrl, originalName }
+    }
+}
+
+// MARK: - Arbitrary JSON (promotion trader_segments / selected_products)
+
+/// Holds a value of unknown JSON shape, mirroring Gson's `JsonElement` on Android.
+/// The promotion `trader_segments` and `selected_products` payloads vary across
+/// server builds (id arrays vs. objects, numbers vs. strings, or a JSON-encoded
+/// string), so the UI walks this defensively instead of decoding into a fixed type.
+indirect enum JSONValue: Decodable {
+    case string(String)
+    case number(Double)
+    case bool(Bool)
+    case object([String: JSONValue])
+    case array([JSONValue])
+    case null
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.singleValueContainer()
+        if c.decodeNil() { self = .null; return }
+        if let v = try? c.decode([String: JSONValue].self) { self = .object(v); return }
+        if let v = try? c.decode([JSONValue].self) { self = .array(v); return }
+        if let v = try? c.decode(Double.self) { self = .number(v); return }
+        if let v = try? c.decode(Bool.self) { self = .bool(v); return }
+        if let v = try? c.decode(String.self) { self = .string(v); return }
+        self = .null
+    }
+
+    /// Coerces scalars to a string (numbers lose a trailing ".0"), like reading a
+    /// Gson primitive `getAsString()`.
+    var stringValue: String? {
+        switch self {
+        case .string(let s): return s
+        case .number(let n): return n.truncatingRemainder(dividingBy: 1) == 0 ? String(Int(n)) : String(n)
+        case .bool(let b): return b ? "1" : "0"
+        default: return nil
+        }
+    }
+
+    var arrayValue: [JSONValue]? { if case .array(let a) = self { return a }; return nil }
+    var objectValue: [String: JSONValue]? { if case .object(let o) = self { return o }; return nil }
+
+    subscript(_ key: String) -> JSONValue? { objectValue?[key] }
+
+    /// Array under `key` (or empty), mirroring Android's `optArray`.
+    func array(_ key: String) -> [JSONValue] { self[key]?.arrayValue ?? [] }
+
+    /// String under `key` (or ""), mirroring Android's `jStr`.
+    func string(_ key: String) -> String { self[key]?.stringValue ?? "" }
+
+    /// A value sometimes arrives as a JSON-encoded string; parse it into its element
+    /// (Android's `unwrap`). Returns `self` when it is already structured JSON.
+    var unwrapped: JSONValue {
+        if case .string(let s) = self,
+           let data = s.data(using: .utf8),
+           let parsed = try? JSONDecoder().decode(JSONValue.self, from: data) {
+            return parsed
+        }
+        return self
+    }
+}
+
+// MARK: - Promotions list (+ KPI summary)
+
+/// data block of GET /api/distributor/promotions — the campaign list plus a
+/// `summary` block whose `summaryCards` feed the KPI cards at the top of the screen.
+struct PromotionsData: Decodable {
+    let promotions: [Promotion]?
+    let total: Int?
+    let summary: Summary?
+
+    struct Promotion: Decodable {
+        let id: String?
+        let status: String?
+        let campaignType: String?
+        let name: String?
+        let startDate: String?
+        let endDate: String?
+        let budget: Double?
+        let dailyBudget: Double?
+        let productsCost: Double?
+        let reach: Double?
+        let clicks: Double?
+        let revenue: Double?
+        let ctr: Double?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            status = try c.decodeIfPresent(String.self, forKey: .status)
+            campaignType = try c.decodeIfPresent(String.self, forKey: .campaignType)
+            name = try c.decodeIfPresent(String.self, forKey: .name)
+            startDate = try c.decodeIfPresent(String.self, forKey: .startDate)
+            endDate = try c.decodeIfPresent(String.self, forKey: .endDate)
+            budget = Self.flexDouble(c, .budget)
+            dailyBudget = Self.flexDouble(c, .dailyBudget)
+            productsCost = Self.flexDouble(c, .productsCost)
+            reach = Self.flexDouble(c, .reach)
+            clicks = Self.flexDouble(c, .clicks)
+            revenue = Self.flexDouble(c, .revenue)
+            ctr = Self.flexDouble(c, .ctr)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, status, campaignType, name, startDate, endDate
+            case budget, dailyBudget, productsCost, reach, clicks, revenue, ctr
+        }
+
+        private static func flexDouble(_ c: KeyedDecodingContainer<CodingKeys>, _ key: CodingKeys) -> Double? {
+            if let v = try? c.decode(Double.self, forKey: key) { return v }
+            if let v = try? c.decode(String.self, forKey: key) { return Double(v) }
+            return nil
+        }
+    }
+
+    struct Summary: Decodable {
+        let currency: Currency?
+        let summaryCards: [SummaryCard]?
+    }
+    struct Currency: Decodable {
+        let code: String?
+        let symbol: String?
+    }
+    struct SummaryCard: Decodable {
+        let key: String?
+        let label: String?
+        let formattedValue: String?
+        let isMoney: Bool?
+        let trend: Trend?
+    }
+    struct Trend: Decodable {
+        let direction: String?
+        let percentage: Double?
+        let label: String?
+    }
+}
+
+// MARK: - Promotion detail (create / get-by-id / update response)
+
+/// data block of the single-promotion endpoints, shaped as `data.promotion`.
+/// Scalar numerics are decoded leniently to strings so they prefill text fields
+/// whether the server emits `5000` or `"5000"`. `traderSegments` / `selectedProducts`
+/// are kept as raw `JSONValue` and parsed defensively by the wizard.
+struct PromotionDetailData: Decodable {
+    let promotion: Promotion?
+
+    struct Promotion: Decodable {
+        let id: String?
+        let name: String?
+        let campaignType: String?
+        let status: String?
+        let objective: String?
+        let promotionDescription: String?
+
+        let startDate: String?
+        let endDate: String?
+        let budget: String?
+        let dailyBudget: String?
+        let productsCost: String?
+
+        let address: String?
+        let placeId: String?
+        let lat: String?
+        let lng: String?
+
+        let bannerFile: Media?
+        let videoFile: Media?
+
+        let traderSegments: JSONValue?
+        let selectedProducts: JSONValue?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            name = try c.decodeIfPresent(String.self, forKey: .name)
+            campaignType = try c.decodeIfPresent(String.self, forKey: .campaignType)
+            status = try c.decodeIfPresent(String.self, forKey: .status)
+            objective = try c.decodeIfPresent(String.self, forKey: .objective)
+            promotionDescription = try c.decodeIfPresent(String.self, forKey: .promotionDescription)
+            startDate = try c.decodeIfPresent(String.self, forKey: .startDate)
+            endDate = try c.decodeIfPresent(String.self, forKey: .endDate)
+            budget = JSONDecoding.flexString(c, key: .budget)
+            dailyBudget = JSONDecoding.flexString(c, key: .dailyBudget)
+            productsCost = JSONDecoding.flexString(c, key: .productsCost)
+            address = try c.decodeIfPresent(String.self, forKey: .address)
+            placeId = try c.decodeIfPresent(String.self, forKey: .placeId)
+            lat = JSONDecoding.flexString(c, key: .lat)
+            lng = JSONDecoding.flexString(c, key: .lng)
+            bannerFile = try c.decodeIfPresent(Media.self, forKey: .bannerFile)
+            videoFile = try c.decodeIfPresent(Media.self, forKey: .videoFile)
+            traderSegments = try c.decodeIfPresent(JSONValue.self, forKey: .traderSegments)
+            selectedProducts = try c.decodeIfPresent(JSONValue.self, forKey: .selectedProducts)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, name, campaignType, status, objective
+            case promotionDescription = "description"
+            case startDate, endDate, budget, dailyBudget, productsCost
+            case address, placeId, lat, lng
+            case bannerFile, videoFile, traderSegments, selectedProducts
+        }
+    }
+
+    struct Media: Decodable {
+        let id: String?
+        let fileUrl: String?
+        let url: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            fileUrl = try c.decodeIfPresent(String.self, forKey: .fileUrl)
+            url = try c.decodeIfPresent(String.self, forKey: .url)
+        }
+        private enum CodingKeys: String, CodingKey { case id, fileUrl, url }
+
+        /// Best available URL for previewing the media.
+        var bestUrl: String? {
+            if let f = fileUrl, !f.isEmpty { return f }
+            return url
+        }
     }
 }

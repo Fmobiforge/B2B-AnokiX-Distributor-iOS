@@ -148,14 +148,19 @@ struct NotificationPreference {
     var enabled: Bool
 }
 
+/// UI model for a single campaign row on the Promotions screen. Port of model/PromotionItem.java.
 struct PromotionItem {
     let id: String
-    let title: String
-    let status: String
-    let impressions: String
-    let ctr: String
-    let bannerColor: UIColor
-    let bannerLabel: String
+    let name: String
+    let campaignType: String   // raw, e.g. "best_deal" (used by the local filter)
+    let typeLabel: String      // e.g. "Best Deal"
+    let status: String         // raw, e.g. "pending_approval" (used by the local filter)
+    let statusLabel: String    // e.g. "Pending Approval"
+    let dateRange: String      // e.g. "15 Jun – 30 Jun 2026"
+    let budget: String         // e.g. "R3,000"
+    let reach: String
+    let clicks: String
+    let ctr: String            // e.g. "0.0%"
 }
 
 struct ReturnItem {

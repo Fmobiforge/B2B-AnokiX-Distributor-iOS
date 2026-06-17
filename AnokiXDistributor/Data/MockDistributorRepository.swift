@@ -55,9 +55,9 @@ final class MockDistributorRepository: DistributorRepository {
 
     func getPromotions() -> [PromotionItem] {
         [
-            PromotionItem(id: "p1", title: "Boost Sales Campaign", status: "Active", impressions: "245,678", ctr: "3.45%", bannerColor: AppColors.purpleDark, bannerLabel: "BOOST SALES\nEARN MORE"),
-            PromotionItem(id: "p2", title: "Max Power Launch", status: "Active", impressions: "182,450", ctr: "2.87%", bannerColor: AppColors.purplePrimary, bannerLabel: "MAX POWER\nLAUNCH"),
-            PromotionItem(id: "p3", title: "Summer Mega Deals", status: "Paused", impressions: "81,203", ctr: "1.52%", bannerColor: AppColors.warning, bannerLabel: "SUMMER\nMEGA DEALS")
+            PromotionItem(id: "p1", name: "Boost Sales Campaign", campaignType: "best_deal", typeLabel: "Best Deal", status: "active", statusLabel: "Active", dateRange: "15 Jun – 30 Jun 2026", budget: "R3,000", reach: "245,678", clicks: "8,472", ctr: "3.45%"),
+            PromotionItem(id: "p2", name: "Max Power Launch", campaignType: "promotion", typeLabel: "Promotion", status: "active", statusLabel: "Active", dateRange: "10 Jun – 24 Jun 2026", budget: "R5,000", reach: "182,450", clicks: "5,237", ctr: "2.87%"),
+            PromotionItem(id: "p3", name: "Summer Mega Deals", campaignType: "exclusive_deal", typeLabel: "Exclusive Deal", status: "paused", statusLabel: "Paused", dateRange: "01 Jun – 14 Jun 2026", budget: "R2,200", reach: "81,203", clicks: "1,234", ctr: "1.52%")
         ]
     }
 

@@ -115,6 +115,57 @@ final class ApiClient {
         }
     }
 
+    // MARK: Promotions
+
+    /// Promotions/campaigns list + KPI summary. Pass "" for all campaign types.
+    func getPromotions(campaignType: String,
+                       completion: @escaping (Result<PromotionsData, ApiError>) -> Void) {
+        getAuthed("api/distributor/promotions", query: ["campaign_type": campaignType],
+                  type: PromotionsData.self, completion: completion)
+    }
+
+    /// Full campaign detail (+ selected_products, media) for the edit/view flow.
+    func getPromotionById(id: String,
+                          completion: @escaping (Result<PromotionDetailData, ApiError>) -> Void) {
+        getAuthed("api/distributor/promotions/get-by-id", query: ["id": id],
+                  type: PromotionDetailData.self, completion: completion)
+    }
+
+    /// Create a campaign (multipart: text fields; media goes through upload-media after).
+    func createPromotion(form: [String: String], files: [Http.FilePart],
+                         completion: @escaping (Result<PromotionDetailData, ApiError>) -> Void) {
+        Http.postMultipart(baseUrl: Self.baseURL, path: "api/distributor/promotions/create",
+                           form: form, files: files, token: session.token) { [weak self] r in
+            self?.deliver(r, type: PromotionDetailData.self, completion: completion)
+        }
+    }
+
+    /// Update an existing campaign (partial — only sent fields change).
+    func updatePromotion(form: [String: String], files: [Http.FilePart],
+                         completion: @escaping (Result<PromotionDetailData, ApiError>) -> Void) {
+        Http.postMultipart(baseUrl: Self.baseURL, path: "api/distributor/promotions/update",
+                           form: form, files: files, token: session.token) { [weak self] r in
+            self?.deliver(r, type: PromotionDetailData.self, completion: completion)
+        }
+    }
+
+    /// Upload / replace the banner and/or video for an existing campaign.
+    func uploadPromotionMedia(id: String, files: [Http.FilePart],
+                              completion: @escaping (Result<PromotionDetailData, ApiError>) -> Void) {
+        Http.postMultipart(baseUrl: Self.baseURL, path: "api/distributor/promotions/upload-media",
+                           form: ["id": id], files: files, token: session.token) { [weak self] r in
+            self?.deliver(r, type: PromotionDetailData.self, completion: completion)
+        }
+    }
+
+    func deletePromotion(id: String, completion: @escaping (Result<Void, ApiError>) -> Void) {
+        // The delete endpoint returns "data": [] (an empty array); only status/message matter.
+        Http.postForm(baseUrl: Self.baseURL, path: "api/distributor/promotions/delete",
+                      form: ["id": id], token: session.token) { [weak self] r in
+            self?.deliverStatus(r, completion: completion)
+        }
+    }
+
     func getInventorySummary(completion: @escaping (Result<InventorySummaryData, ApiError>) -> Void) {
         getAuthed("api/distributor/inventory/summary", query: nil, type: InventorySummaryData.self, completion: completion)
     }

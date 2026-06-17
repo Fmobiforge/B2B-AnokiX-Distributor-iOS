@@ -41,6 +41,7 @@ enum S {
     static let settings = "Settings"
 
     static let viewAll = "View all"
+    static let overview = "Overview"
     static let revenueOverview = "Revenue Overview"
     static let recentOrders = "Recent Orders"
     static let inventorySummary = "Inventory Summary"
@@ -135,4 +136,33 @@ enum S {
     static let mobileNumber = "Mobile Number"
     static let selectCategoriesHint = "Tap to select categories"
     static let selectDistributorsHint = "Tap to select distributors"
+
+    // Promotions / Create Ads & Promotion wizard
+    static let promotionsSubtitle = "Manage campaigns and track performance"
+    static let createPromotionTitle = "Create Ads & Promotion"
+    static let editPromotionTitle = "Edit Ads & Promotion"
+    static let createPromotionSubtitle = "Reach the right traders with targeted campaigns."
+    static let promoSubmit = "Submit for Approval"
+    static let promoSubmitting = "Submitting…"
+    static let promoSaveDraft = "Save as Draft"
+    static let promoCreatedMessage = "Campaign submitted successfully"
+    static let promoUpdatedMessage = "Campaign updated successfully"
+    static let promoDeletedMessage = "Campaign deleted"
+    static let promoTypeLocked = "The campaign type can't be changed when editing."
+    static let promoViewDetails = "View Details"
+    static let promoEdit = "Edit"
+    static let promoDelete = "Delete"
+    static let promoClose = "Close"
+    static let promoDone = "Done"
+    static let promoObjective = "Campaign Objective"
+    static let promoSearchProducts = "Search products…"
+    static let promoSellingPriceHint = "Campaign price"
+    static let promoBuyProducts = "Buy Products"
+    static let promoFreeProducts = "Free Products"
+    static let promoVideoUploaded = "Video uploaded"
+    static func promoDeal(_ n: Int) -> String { "Deal \(n)" }
+    static func promoMediaFailed(_ msg: String) -> String { "Campaign saved, but media upload failed: \(msg)" }
+
+    // Promotion list filters
+    static let allTypes = "All Types"
 }

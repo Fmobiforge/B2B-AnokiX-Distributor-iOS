@@ -9,7 +9,9 @@ final class DonutChartView: UIView {
         didSet { setNeedsDisplay() }
     }
 
-    private let strokeWidth: CGFloat = 16
+    var strokeWidth: CGFloat = 16 { didSet { setNeedsDisplay() } }
+    var centerMain: String? { didSet { setNeedsDisplay() } }
+    var centerSub: String? { didSet { setNeedsDisplay() } }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -25,6 +27,11 @@ final class DonutChartView: UIView {
         guard values.count == colors.count, !values.isEmpty else { return }
         self.values = values
         self.segmentColors = colors
+    }
+
+    func setCenterText(main: String?, sub: String?) {
+        self.centerMain = main
+        self.centerSub = sub
     }
 
     override func draw(_ rect: CGRect) {
@@ -58,6 +65,31 @@ final class DonutChartView: UIView {
             (segmentColors[safe: index] ?? AppColors.border).setStroke()
             path.stroke()
             startAngle += sweep
+        }
+
+        drawCenterText(in: arcRect)
+    }
+
+    private func drawCenterText(in arcRect: CGRect) {
+        guard let main = centerMain else { return }
+        let center = CGPoint(x: arcRect.midX, y: arcRect.midY)
+        let hasSub = (centerSub?.isEmpty == false)
+
+        let mainAttrs: [NSAttributedString.Key: Any] = [
+            .font: AppFonts.bold(13),
+            .foregroundColor: AppColors.textPrimary
+        ]
+        let mainSize = (main as NSString).size(withAttributes: mainAttrs)
+        let mainY = hasSub ? center.y - mainSize.height - 1 : center.y - mainSize.height / 2
+        (main as NSString).draw(at: CGPoint(x: center.x - mainSize.width / 2, y: mainY), withAttributes: mainAttrs)
+
+        if let sub = centerSub, hasSub {
+            let subAttrs: [NSAttributedString.Key: Any] = [
+                .font: AppFonts.regular(9),
+                .foregroundColor: AppColors.textSecondary
+            ]
+            let subSize = (sub as NSString).size(withAttributes: subAttrs)
+            (sub as NSString).draw(at: CGPoint(x: center.x - subSize.width / 2, y: center.y + 2), withAttributes: subAttrs)
         }
     }
 }

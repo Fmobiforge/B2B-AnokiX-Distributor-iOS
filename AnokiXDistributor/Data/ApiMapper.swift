@@ -70,6 +70,101 @@ enum ApiMapper {
         }
     }
 
+    // MARK: Promotions
+
+    static func toPromotionItems(_ data: PromotionsData?) -> [PromotionItem] {
+        guard let promotions = data?.promotions else { return [] }
+        let symbol = data?.summary?.currency?.symbol ?? "R"
+        return promotions.map { p in
+            PromotionItem(id: safe(p.id),
+                          name: safe(p.name),
+                          campaignType: safe(p.campaignType),
+                          typeLabel: campaignTypeLabel(p.campaignType),
+                          status: safe(p.status),
+                          statusLabel: prettify(p.status),
+                          dateRange: dateRange(p.startDate, p.endDate),
+                          budget: formatMoney(symbol, p.budget ?? 0),
+                          reach: formatCount(p.reach ?? 0),
+                          clicks: formatCount(p.clicks ?? 0),
+                          ctr: formatPercent(p.ctr ?? 0))
+        }
+    }
+
+    static func campaignTypeLabel(_ type: String?) -> String {
+        guard let type = type, !type.isEmpty else { return "" }
+        switch type {
+        case "best_deal": return "Best Deal"
+        case "cant_miss_deal": return "Can't Miss Deal"
+        case "exclusive_deal": return "Exclusive Deal"
+        case "featured_store": return "Featured Store"
+        case "promotion": return "Promotion"
+        case "post": return "Post"
+        case "story": return "Story"
+        default: return prettify(type)
+        }
+    }
+
+    /// "pending_approval" → "Pending Approval".
+    static func prettify(_ value: String?) -> String {
+        guard let value = value, !value.isEmpty else { return "" }
+        return value.split(whereSeparator: { $0 == "_" || $0 == " " })
+            .map { $0.prefix(1).uppercased() + $0.dropFirst() }
+            .joined(separator: " ")
+    }
+
+    private static let inDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
+
+    private static func dateFormatter(_ pattern: String) -> DateFormatter {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = pattern
+        return f
+    }
+
+    /// "2026-06-15" + "2026-06-30" → "15 Jun – 30 Jun 2026".
+    private static func dateRange(_ start: String?, _ end: String?) -> String {
+        guard let s = parseDate(start), let e = parseDate(end) else {
+            return "\(safe(start)) – \(safe(end))".trimmingCharacters(in: .whitespaces)
+        }
+        let dm = dateFormatter("d MMM")
+        let dmy = dateFormatter("d MMM yyyy")
+        let y = dateFormatter("yyyy")
+        if y.string(from: s) == y.string(from: e) {
+            return "\(dm.string(from: s)) – \(dmy.string(from: e))"
+        }
+        return "\(dmy.string(from: s)) – \(dmy.string(from: e))"
+    }
+
+    private static func parseDate(_ value: String?) -> Date? {
+        guard let value = value?.trimmingCharacters(in: .whitespaces), !value.isEmpty else { return nil }
+        return inDateFormatter.date(from: value)
+    }
+
+    private static func formatMoney(_ symbol: String, _ value: Double) -> String {
+        return symbol + (countFormatter.string(from: NSNumber(value: value)) ?? String(Int(value)))
+    }
+
+    private static let countFormatter: NumberFormatter = {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.groupingSeparator = ","
+        f.maximumFractionDigits = 0
+        return f
+    }()
+
+    private static func formatCount(_ value: Double) -> String {
+        return countFormatter.string(from: NSNumber(value: value)) ?? String(Int(value))
+    }
+
+    private static func formatPercent(_ value: Double) -> String {
+        return String(format: "%.1f%%", value)
+    }
+
     // MARK: Helpers
 
     private static let priceFormatter: NumberFormatter = {
