@@ -30,6 +30,7 @@ enum AppIcons {
         "ic_chevron_right": "chevron.right",
         "ic_hamburger": "line.3.horizontal",
         "ic_more": "ellipsis",
+        "ic_more_vert": "ellipsis",
         "ic_person": "person.fill",
         "ic_person_add": "person.badge.plus",
         "ic_briefcase": "briefcase.fill",
@@ -57,7 +58,15 @@ enum AppIcons {
     ]
 
     static func symbol(_ name: String) -> UIImage? {
+        if name == "ic_more_vert" { return moreVertIcon() }
         let symbolName = map[name] ?? name
         return UIImage(systemName: symbolName)
+    }
+
+    /// Android `ic_more_vert` — SF Symbols has no standalone vertical ellipsis; rotate `ellipsis` 90°.
+    private static func moreVertIcon() -> UIImage? {
+        guard let image = UIImage(systemName: "ellipsis"), let cgImage = image.cgImage else { return nil }
+        return UIImage(cgImage: cgImage, scale: image.scale, orientation: .right)
+            .withRenderingMode(.alwaysTemplate)
     }
 }

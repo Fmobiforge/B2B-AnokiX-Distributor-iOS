@@ -182,7 +182,8 @@ final class PromotionsViewController: BaseSecondaryViewController {
     private func makeCard(_ promo: PromotionItem) -> UIView {
         let card = StyleKit.cardView()
 
-        let banner = UIView()
+        // We will not use banner for now 
+        /*let banner = UIView()
         banner.backgroundColor = bannerColor(promo.campaignType)
         banner.layer.cornerRadius = AppMetrics.radiusMD
         banner.constrainHeight(72)
@@ -190,7 +191,7 @@ final class PromotionsViewController: BaseSecondaryViewController {
                                        font: AppFonts.bold(16), color: .white, align: .center, lines: 2)
         bannerLabel.forAutoLayout()
         banner.addSubview(bannerLabel)
-        bannerLabel.pinEdges(to: banner, insets: UIEdgeInsets(top: 10, left: 12, bottom: 10, right: 12))
+        bannerLabel.pinEdges(to: banner, insets: UIEdgeInsets(top: 10, left: 12, bottom: 10, right: 12))*/
 
         let title = UILabel.make(promo.name, font: AppFonts.bold(15), color: AppColors.textPrimary, lines: 2)
         let status = StyleKit.badgeLabel()
@@ -199,7 +200,7 @@ final class PromotionsViewController: BaseSecondaryViewController {
         status.setContentCompressionResistancePriority(.required, for: .horizontal)
 
         let menu = UIButton(type: .system)
-        menu.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+        menu.setImage(AppIcons.symbol("ic_more_vert"), for: .normal)
         menu.tintColor = AppColors.textSecondary
         menu.constrainSize(28)
         menu.setContentHuggingPriority(.required, for: .horizontal)
@@ -213,12 +214,16 @@ final class PromotionsViewController: BaseSecondaryViewController {
 
         let dateLabel = UILabel.make(promo.dateRange, font: AppFonts.regular(12), color: AppColors.textSecondary)
 
+        let metricsGroup = UIStackView.horizontal(spacing: 10, alignment: .fill)
+        metricsGroup.distribution = .fillEqually
+        metricsGroup.addArrangedSubview(metric("Budget", promo.budget))
+        metricsGroup.addArrangedSubview(metric("Reach", promo.reach))
+        metricsGroup.addArrangedSubview(metric("Clicks", promo.clicks))
+        metricsGroup.addArrangedSubview(metric("CTR", promo.ctr))
+        metricsGroup.setContentHuggingPriority(.defaultLow, for: .horizontal)
+
         let metrics = UIStackView.horizontal(spacing: 10, alignment: .fill)
-        metrics.distribution = .fillEqually
-        metrics.addArrangedSubview(metric("Reach", promo.reach))
-        metrics.addArrangedSubview(metric("Clicks", promo.clicks))
-        metrics.addArrangedSubview(metric("CTR", promo.ctr))
-        metrics.addArrangedSubview(metric("Budget", promo.budget))
+        metrics.addArrangedSubview(metricsGroup)
         metrics.addArrangedSubview(menu)
 
         let stack = UIStackView.vertical(spacing: 12, alignment: .fill)
