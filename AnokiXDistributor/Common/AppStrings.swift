@@ -142,6 +142,8 @@ enum S {
     static let createPromotionTitle = "Create Ads & Promotion"
     static let editPromotionTitle = "Edit Ads & Promotion"
     static let createPromotionSubtitle = "Reach the right traders with targeted campaigns."
+    static let promoStepTypeTitle = "Select Campaign Type"
+    static let promoStepTypeSub = "Choose the type of campaign you want to create."
     static let promoSubmit = "Submit for Approval"
     static let promoSubmitting = "Submitting…"
     static let promoSaveDraft = "Save as Draft"

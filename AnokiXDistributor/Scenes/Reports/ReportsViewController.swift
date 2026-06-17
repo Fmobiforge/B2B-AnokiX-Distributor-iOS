@@ -23,9 +23,10 @@ final class ReportsViewController: BaseSecondaryViewController {
         }
 
         let generate = UIButton(type: .system)
-        StyleKit.stylePrimaryButton(generate)
+        StyleKit.stylePrimaryButton(generate, fontSize: 13)
         generate.setTitle(S.generateReport, for: .normal)
         generate.setImage(UIImage(systemName: "doc.text"), for: .normal)
+        generate.configuration?.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 16, weight: .semibold)
         generate.tintColor = .white
         generate.addTarget(self, action: #selector(generateTapped), for: .touchUpInside)
         stack.addArrangedSubview(generate)

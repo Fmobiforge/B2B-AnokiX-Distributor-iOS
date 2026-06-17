@@ -47,9 +47,10 @@ final class ProductsTabViewController: BaseMainViewController, UICollectionViewD
         productsCollectionView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 80, right: 0)
         productsCollectionView.registerNib(ProductCell.self)
 
-        StyleKit.stylePrimaryButton(addProductButton)
+        StyleKit.stylePrimaryButton(addProductButton, fontSize: 13)
         addProductButton.setTitle("  Add Product", for: .normal)
         addProductButton.setImage(UIImage(systemName: "plus"), for: .normal)
+        addProductButton.configuration?.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
         addProductButton.addTarget(self, action: #selector(addProductTapped), for: .touchUpInside)
 
         let divider = ListScreenLayout.hairline()

@@ -135,14 +135,18 @@ final class ReturnsViewController: BaseSecondaryViewController {
         config.title = title
         config.image = UIImage(systemName: icon)
         config.imagePadding = 4
+        config.imagePlacement = .leading
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 11, weight: .semibold)
         config.baseForegroundColor = color
         config.background.strokeColor = color.withAlphaComponent(0.35)
         config.background.backgroundColor = color.withAlphaComponent(0.08)
         config.background.strokeWidth = 1
         config.cornerStyle = .medium
-        config.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
+        config.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10)
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var out = incoming; out.font = AppFonts.bold(11); return out
+        }
         let button = UIButton(configuration: config)
-        button.titleLabel?.font = AppFonts.bold(12)
         button.constrainHeight(34)
         return button
     }

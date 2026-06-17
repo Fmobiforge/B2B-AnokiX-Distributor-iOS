@@ -24,8 +24,11 @@ final class NotificationsViewController: BaseSecondaryViewController {
         config.background.backgroundColor = AppColors.purpleLight
         config.cornerStyle = .medium
         config.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 12, weight: .regular)
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var out = incoming; out.font = AppFonts.regular(11); return out
+        }
         markAllButton.configuration = config
-        markAllButton.titleLabel?.font = AppFonts.regular(AppMetrics.textBodySM)
         markAllButton.addTarget(self, action: #selector(markAllTapped), for: .touchUpInside)
 
         let headerRow = UIStackView.horizontal(spacing: 8, alignment: .center)

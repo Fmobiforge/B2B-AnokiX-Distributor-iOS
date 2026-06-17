@@ -83,26 +83,30 @@ enum StyleKit {
     }
 
     /// Primary filled purple button — bg_login_button_primary.
-    static func stylePrimaryButton(_ button: UIButton) {
+    static func stylePrimaryButton(_ button: UIButton, fontSize: CGFloat = 15) {
         var config = UIButton.Configuration.filled()
         config.baseBackgroundColor = AppColors.purplePrimary
         config.baseForegroundColor = .white
         config.cornerStyle = .medium
         config.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 16, bottom: 14, trailing: 16)
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var out = incoming; out.font = AppFonts.bold(fontSize); return out
+        }
         button.configuration = config
-        button.titleLabel?.font = AppFonts.bold(15)
     }
 
     /// Outlined purple button — bg_login_button_outlined.
-    static func styleOutlinedButton(_ button: UIButton) {
+    static func styleOutlinedButton(_ button: UIButton, fontSize: CGFloat = 15) {
         var config = UIButton.Configuration.plain()
         config.baseForegroundColor = AppColors.purplePrimary
         config.background.strokeColor = AppColors.purplePrimary
         config.background.strokeWidth = 1
         config.background.cornerRadius = AppMetrics.radiusMD
         config.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 16, bottom: 14, trailing: 16)
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var out = incoming; out.font = AppFonts.bold(fontSize); return out
+        }
         button.configuration = config
-        button.titleLabel?.font = AppFonts.bold(15)
     }
 }
 

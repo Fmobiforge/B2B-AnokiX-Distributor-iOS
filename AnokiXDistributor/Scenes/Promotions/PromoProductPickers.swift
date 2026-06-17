@@ -42,7 +42,7 @@ final class PromoProductPickerViewController: UIViewController, UITableViewDataS
         tableView.delegate = self
         tableView.rowHeight = 64
         tableView.separatorInset = .zero
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "row")
+        tableView.register(PromoProductPickerCell.self, forCellReuseIdentifier: PromoProductPickerCell.reuseId)
         tableView.forAutoLayout()
 
         view.addSubviews(hintLabel, searchBar, tableView)
@@ -76,20 +76,13 @@ final class PromoProductPickerViewController: UIViewController, UITableViewDataS
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { filtered.count }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "row", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: PromoProductPickerCell.reuseId, for: indexPath) as! PromoProductPickerCell
         let product = filtered[indexPath.row]
-        var content = cell.defaultContentConfiguration()
-        content.text = product.name
-        content.textProperties.font = AppFonts.bold(14)
-        content.secondaryText = [product.sku, product.categoryTitle].filter { !$0.isEmpty }.joined(separator: " • ")
-        content.secondaryTextProperties.font = AppFonts.regular(12)
-        content.secondaryTextProperties.color = AppColors.textSecondary
-        content.image = UIImage(systemName: "shippingbox")
-        content.imageProperties.tintColor = AppColors.textTertiary
-        content.imageProperties.maximumSize = CGSize(width: 28, height: 28)
-        cell.contentConfiguration = content
-        cell.accessoryType = selected.contains(where: { $0.id == product.id }) ? .checkmark : .none
-        cell.tintColor = AppColors.purplePrimary
+        cell.configure(
+            product: product,
+            selected: selected.contains(where: { $0.id == product.id }),
+            subtitle: PromoProductPickerCell.subtitle(for: product)
+        )
         return cell
     }
 
@@ -146,6 +139,14 @@ final class PromoB1G1PickerViewController: UIViewController, UITableViewDataSour
         hintLabel.forAutoLayout()
         segmented.selectedSegmentIndex = 0
         segmented.selectedSegmentTintColor = AppColors.purplePrimary
+        segmented.setTitleTextAttributes([
+            .foregroundColor: AppColors.textPrimary,
+            .font: AppFonts.regular(13)
+        ], for: .normal)
+        segmented.setTitleTextAttributes([
+            .foregroundColor: UIColor.white,
+            .font: AppFonts.bold(13)
+        ], for: .selected)
         segmented.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
         segmented.forAutoLayout()
         searchBar.forAutoLayout()
@@ -153,8 +154,8 @@ final class PromoB1G1PickerViewController: UIViewController, UITableViewDataSour
 
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.rowHeight = 56
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "row")
+        tableView.rowHeight = 64
+        tableView.register(PromoProductPickerCell.self, forCellReuseIdentifier: PromoProductPickerCell.reuseId)
         tableView.forAutoLayout()
 
         view.addSubviews(hintLabel, segmented, searchBar, tableView)
@@ -202,17 +203,13 @@ final class PromoB1G1PickerViewController: UIViewController, UITableViewDataSour
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { filtered.count }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "row", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: PromoProductPickerCell.reuseId, for: indexPath) as! PromoProductPickerCell
         let product = filtered[indexPath.row]
-        var content = cell.defaultContentConfiguration()
-        content.text = product.name
-        content.textProperties.font = AppFonts.regular(14)
-        content.secondaryText = product.sku
-        content.secondaryTextProperties.font = AppFonts.regular(11)
-        content.secondaryTextProperties.color = AppColors.textSecondary
-        cell.contentConfiguration = content
-        cell.accessoryType = current.contains(where: { $0.id == product.id }) ? .checkmark : .none
-        cell.tintColor = AppColors.purplePrimary
+        cell.configure(
+            product: product,
+            selected: current.contains(where: { $0.id == product.id }),
+            subtitle: PromoProductPickerCell.subtitle(for: product)
+        )
         return cell
     }
 
@@ -225,5 +222,87 @@ final class PromoB1G1PickerViewController: UIViewController, UITableViewDataSour
             if let idx = buy.firstIndex(where: { $0.id == product.id }) { buy.remove(at: idx) } else { buy.append(product) }
         }
         tableView.reloadRows(at: [indexPath], with: .none)
+    }
+}
+
+// MARK: - Shared picker row
+
+private final class PromoProductPickerCell: UITableViewCell {
+    static let reuseId = "PromoProductPickerCell"
+
+    private let thumbView = UIImageView()
+    private let titleLabel = UILabel()
+    private let subtitleLabel = UILabel()
+    private var imageProductId: String?
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        selectionStyle = .default
+        tintColor = AppColors.purplePrimary
+
+        thumbView.contentMode = .scaleAspectFill
+        thumbView.clipsToBounds = true
+        thumbView.backgroundColor = AppColors.surfaceVariant
+        thumbView.layer.cornerRadius = AppMetrics.radiusSM
+        thumbView.forAutoLayout()
+
+        titleLabel.font = AppFonts.bold(14)
+        titleLabel.textColor = AppColors.textPrimary
+        titleLabel.numberOfLines = 1
+
+        subtitleLabel.font = AppFonts.regular(12)
+        subtitleLabel.textColor = AppColors.textSecondary
+        subtitleLabel.numberOfLines = 1
+
+        let textStack = UIStackView.vertical(spacing: 2, alignment: .leading)
+        textStack.isUserInteractionEnabled = false
+        textStack.addArrangedSubview(titleLabel)
+        textStack.addArrangedSubview(subtitleLabel)
+
+        let row = UIStackView.horizontal(spacing: 12, alignment: .center)
+        row.isUserInteractionEnabled = false
+        row.forAutoLayout()
+        row.addArrangedSubview(thumbView)
+        row.addArrangedSubview(textStack)
+        contentView.addSubview(row)
+
+        NSLayoutConstraint.activate([
+            thumbView.widthAnchor.constraint(equalToConstant: 44),
+            thumbView.heightAnchor.constraint(equalToConstant: 44),
+            row.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            row.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -16),
+            row.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            row.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
+        ])
+    }
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        imageProductId = nil
+        thumbView.image = nil
+        thumbView.backgroundColor = AppColors.surfaceVariant
+        accessoryType = .none
+    }
+
+    static func subtitle(for product: PromoProduct) -> String {
+        [product.sku, product.categoryTitle].filter { !$0.isEmpty }.joined(separator: " • ")
+    }
+
+    func configure(product: PromoProduct, selected: Bool, subtitle: String) {
+        titleLabel.text = product.name
+        subtitleLabel.text = subtitle
+        accessoryType = selected ? .checkmark : .none
+
+        imageProductId = product.id
+        thumbView.image = nil
+        thumbView.backgroundColor = AppColors.surfaceVariant
+        guard let urlString = product.imageUrl, let url = URL(string: urlString) else { return }
+        let productId = product.id
+        ImageLoader.load(url) { [weak self] image in
+            guard let self = self, self.imageProductId == productId, let image = image else { return }
+            self.thumbView.image = image
+        }
     }
 }

@@ -48,6 +48,14 @@ final class CreatePromotionViewController: BaseSecondaryViewController, GMSMapVi
         "Discounts, bundles and special offers.",
         "Share news, updates and product highlights.",
         "Short, engaging stories that drive attention."]
+    private let typeIconSymbols = ["gift.fill", "flame.fill", "crown.fill", "storefront.fill",
+                                   "tag.fill", "doc.text.fill", "iphone"]
+    private let typeIconBgColors = [AppColors.dangerBg, AppColors.purpleLight, AppColors.purpleLight,
+                                    AppColors.successBg, AppColors.warningBg, AppColors.infoBg, AppColors.purpleLight]
+    private let typeIconTints = [AppColors.danger, AppColors.purplePrimary, AppColors.purplePrimary,
+                                 AppColors.success, AppColors.warning, AppColors.info, AppColors.purplePrimary]
+
+    private let typeCardTitleTag = 100
 
     private let objectiveValues = ["awareness", "traffic", "sales", "new_product_launch", "clear_inventory"]
     private let objectiveLabels = ["Awareness", "Traffic", "Sales", "New Product Launch", "Clear Inventory"]
@@ -309,7 +317,8 @@ final class CreatePromotionViewController: BaseSecondaryViewController, GMSMapVi
         backButton.addTarget(self, action: #selector(goBack), for: .touchUpInside)
 
         continueButton.constrainHeight(46)
-        continueButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 160).isActive = true
+        styleContinueButton()
+        continueButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 150).isActive = true
         continueButton.addTarget(self, action: #selector(goContinue), for: .touchUpInside)
 
         let row = UIStackView.horizontal(spacing: 12, alignment: .center)
@@ -331,6 +340,18 @@ final class CreatePromotionViewController: BaseSecondaryViewController, GMSMapVi
         return bar
     }
 
+    // MARK: - Bottom bar
+
+    /// Matches Android btnContinue — 14sp label with 20dp horizontal padding.
+    private func styleContinueButton() {
+        continueButton.titleLabel?.font = AppFonts.bold(14)
+        continueButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+    }
+
+    private func updateContinueButtonTitle(for step: Int) {
+        continueButton.setTitle(step == stepReview ? S.promoSubmit : S.continueButton, for: .normal)
+    }
+
     // MARK: - Navigation
 
     @objc private func goBack() {
@@ -347,7 +368,7 @@ final class CreatePromotionViewController: BaseSecondaryViewController, GMSMapVi
     private func showStep(_ index: Int) {
         currentStep = index
         for (i, step) in stepStacks.enumerated() { step.isHidden = i != index }
-        continueButton.setTitle(index == stepReview ? S.promoSubmit : S.continueButton, for: .normal)
+        updateContinueButtonTitle(for: index)
         if index == stepBudget { buildBudget() }
         else if index == stepReview { buildReview() }
         renderStepper()
@@ -397,47 +418,69 @@ final class CreatePromotionViewController: BaseSecondaryViewController, GMSMapVi
     // MARK: - Step 1: Type
 
     private func buildTypeStep() -> UIStackView {
-        let stack = UIStackView.vertical(spacing: 12, alignment: .fill)
-        stack.addArrangedSubview(sectionTitle("Campaign Type"))
-        stack.addArrangedSubview(subtitle("What kind of campaign do you want to run?"))
+        let stack = UIStackView.vertical(spacing: 4, alignment: .fill)
+        stack.addArrangedSubview(UILabel.make(S.promoStepTypeTitle, font: AppFonts.bold(16), color: AppColors.topTitle, lines: 0))
+        let sub = UILabel.make(S.promoStepTypeSub, font: AppFonts.regular(12), color: AppColors.textSecondary, lines: 0)
+        stack.addArrangedSubview(sub)
+        stack.setCustomSpacing(16, after: sub)
 
+        let grid = UIStackView.vertical(spacing: 10, alignment: .fill)
         var row: UIStackView?
         for (index, _) in typeValues.enumerated() {
             if index % 2 == 0 {
-                row = UIStackView.horizontal(spacing: 12, alignment: .fill)
+                row = UIStackView.horizontal(spacing: 10, alignment: .fill)
                 row?.distribution = .fillEqually
-                stack.addArrangedSubview(row!)
+                grid.addArrangedSubview(row!)
             }
             let card = typeCard(index)
             typeCards.append(card)
             row?.addArrangedSubview(card)
         }
         if typeValues.count % 2 == 1 { row?.addArrangedSubview(UIView()) }
+        stack.addArrangedSubview(grid)
         return stack
     }
 
     private func typeCard(_ index: Int) -> UIView {
         let card = UIView()
-        card.layer.cornerRadius = AppMetrics.radiusMD
+        card.layer.cornerRadius = AppMetrics.radiusLG
         card.layer.borderWidth = 1
         card.layer.borderColor = AppColors.border.cgColor
         card.backgroundColor = AppColors.surface
         card.isUserInteractionEnabled = true
         card.tag = index
+        card.forAutoLayout()
+        card.heightAnchor.constraint(greaterThanOrEqualToConstant: 148).isActive = true
 
-        let icon = UIImageView(image: UIImage(systemName: "megaphone.fill"))
+        let tile = StyleKit.iconTile(color: typeIconBgColors[index])
+        tile.constrainSize(40)
+        let icon = UIImageView(image: UIImage(systemName: typeIconSymbols[index]))
+        icon.tintColor = typeIconTints[index]
         icon.contentMode = .scaleAspectFit
-        icon.tintColor = AppColors.textPrimary
-        icon.constrainSize(24)
-        let title = UILabel.make(typeLabels[index], font: AppFonts.bold(13), color: AppColors.textPrimary, align: .center, lines: 2)
-        let desc = UILabel.make(typeDescs[index], font: AppFonts.regular(11), color: AppColors.textSecondary, align: .center, lines: 0)
-        let inner = UIStackView.vertical(spacing: 6, alignment: .center)
+        icon.forAutoLayout()
+        tile.addSubview(icon)
+        NSLayoutConstraint.activate([
+            icon.centerXAnchor.constraint(equalTo: tile.centerXAnchor),
+            icon.centerYAnchor.constraint(equalTo: tile.centerYAnchor),
+            icon.widthAnchor.constraint(equalToConstant: 22),
+            icon.heightAnchor.constraint(equalToConstant: 22)
+        ])
+
+        let title = UILabel.make(typeLabels[index], font: AppFonts.bold(AppMetrics.textTitle),
+                                 color: AppColors.topTitle, align: .center, lines: 2)
+        title.tag = typeCardTitleTag
+        let desc = UILabel.make(typeDescs[index], font: AppFonts.regular(AppMetrics.textLabel),
+                                color: AppColors.textSecondary, align: .center, lines: 0)
+
+        let inner = UIStackView.vertical(spacing: 0, alignment: .center)
         inner.forAutoLayout()
-        inner.addArrangedSubview(icon)
+        inner.addArrangedSubview(tile)
+        inner.setCustomSpacing(10, after: tile)
         inner.addArrangedSubview(title)
+        inner.setCustomSpacing(4, after: title)
         inner.addArrangedSubview(desc)
         card.addSubview(inner)
-        inner.pinEdges(to: card, insets: UIEdgeInsets(top: 16, left: 10, bottom: 16, right: 10))
+        inner.pinEdges(to: card, insets: UIEdgeInsets(top: 18, left: 12, bottom: 18, right: 12))
         card.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(typeTapped(_:))))
         return card
     }
@@ -456,10 +499,7 @@ final class CreatePromotionViewController: BaseSecondaryViewController, GMSMapVi
             card.layer.borderColor = (selected ? AppColors.purplePrimary : AppColors.border).cgColor
             card.layer.borderWidth = selected ? 1.5 : 1
             card.alpha = (typeLocked && !selected) ? 0.4 : 1
-            if let inner = card.subviews.first as? UIStackView {
-                (inner.arrangedSubviews.first as? UIImageView)?.tintColor = selected ? AppColors.purplePrimary : AppColors.textPrimary
-                (inner.arrangedSubviews[1] as? UILabel)?.textColor = selected ? AppColors.purplePrimary : AppColors.textPrimary
-            }
+            (card.viewWithTag(typeCardTitleTag) as? UILabel)?.textColor = selected ? AppColors.purplePrimary : AppColors.topTitle
         }
     }
 
@@ -1289,7 +1329,7 @@ final class CreatePromotionViewController: BaseSecondaryViewController, GMSMapVi
                 }
             case .failure(let error):
                 self.continueButton.isEnabled = true
-                self.continueButton.setTitle(self.currentStep == self.stepReview ? S.promoSubmit : S.continueButton, for: .normal)
+                self.updateContinueButtonTitle(for: self.currentStep)
                 self.toast(error.message)
             }
         }
@@ -1618,15 +1658,24 @@ final class CreatePromotionViewController: BaseSecondaryViewController, GMSMapVi
         config.background.backgroundColor = AppColors.surface
         config.cornerStyle = .medium
         config.title = placeholder
-        config.image = UIImage(systemName: "chevron.down")
-        config.imagePlacement = .trailing
-        config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12)
+        config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 34)
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
             var out = incoming; out.font = AppFonts.regular(AppMetrics.textBody); return out
         }
         button.configuration = config
         button.contentHorizontalAlignment = .leading
         button.constrainHeight(48)
+
+        let chevron = UIImageView(image: UIImage(systemName: "chevron.down",
+            withConfiguration: UIImage.SymbolConfiguration(pointSize: 12, weight: .semibold)))
+        chevron.tintColor = AppColors.textSecondary
+        chevron.isUserInteractionEnabled = false
+        chevron.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(chevron)
+        NSLayoutConstraint.activate([
+            chevron.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: -12),
+            chevron.centerYAnchor.constraint(equalTo: button.centerYAnchor)
+        ])
     }
 
     private func setPickerTitle(_ button: UIButton, _ title: String) {

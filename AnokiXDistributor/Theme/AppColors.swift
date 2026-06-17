@@ -5,6 +5,7 @@ enum AppColors {
 
     static let purplePrimary      = UIColor(hex: 0x7C3AED)
     static let purpleDark         = UIColor(hex: 0x5B21B6)
+    static let topTitle           = UIColor(hex: 0x1A237E)
     static let purpleLight        = UIColor(hex: 0xEDE9FE)
     static let purpleTextLight     = UIColor(hex: 0xC4B5FD)
     static let background          = UIColor(hex: 0xF1F5F9)
@@ -29,7 +30,7 @@ enum AppColors {
     static let drawerBg            = UIColor(hex: 0x000920)
     static let drawerItemSelected  = UIColor(hex: 0x7B61FF)
     static let drawerText          = UIColor(hex: 0xFFFFFF)
-    static let drawerTextMuted     = UIColor(hex: 0x94A3B8)
+    static let drawerTextMuted     = UIColor(hex: 0xB4C3D8)
     static let drawerBadgeBg       = UIColor(hex: 0x2E1065)
     static let drawerBadgeText     = UIColor(hex: 0xC4B5FD)
     static let statLowStock        = UIColor(hex: 0xEA580C)

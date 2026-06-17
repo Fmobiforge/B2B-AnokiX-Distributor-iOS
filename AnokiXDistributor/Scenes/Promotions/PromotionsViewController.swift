@@ -373,16 +373,23 @@ final class PromotionsViewController: BaseSecondaryViewController {
         config.background.backgroundColor = AppColors.surface
         config.cornerStyle = .medium
         config.title = title
-        config.image = UIImage(systemName: "chevron.down")
-        config.imagePlacement = .trailing
-        config.imagePadding = 6
-        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 10, weight: .regular)
-        config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12)
+        config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 34)
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
             var out = incoming; out.font = AppFonts.regular(13); return out
         }
         button.configuration = config
         button.contentHorizontalAlignment = .leading
+
+        let chevron = UIImageView(image: UIImage(systemName: "chevron.down",
+            withConfiguration: UIImage.SymbolConfiguration(pointSize: 12, weight: .semibold)))
+        chevron.tintColor = AppColors.textSecondary
+        chevron.isUserInteractionEnabled = false
+        chevron.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(chevron)
+        NSLayoutConstraint.activate([
+            chevron.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: -12),
+            chevron.centerYAnchor.constraint(equalTo: button.centerYAnchor)
+        ])
     }
 
     private func setFilterTitle(_ button: UIButton, _ title: String) {
