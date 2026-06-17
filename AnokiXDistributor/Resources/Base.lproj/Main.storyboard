@@ -216,7 +216,7 @@
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="btn-toggle-pass">
                                         <rect key="frame" x="330.66666666666669" y="250" width="26.333333333333314" height="22"/>
-                                        <color key="tintColor" red="0.0" green="0.035294117647058823" blue="0.12549019607843137" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <state key="normal" image="eye" catalog="system"/>
                                         <connections>
                                             <action selector="togglePasswordTapped:" destination="login-vc" eventType="touchUpInside" id="btp-act"/>
@@ -557,20 +557,20 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="inv-chrome">
-                                <rect key="frame" x="0.0" y="118.00000000000001" width="393" height="59.666666666666671"/>
+                                <rect key="frame" x="0.0" y="118" width="393" height="617"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="inv-logo-panel">
                                         <rect key="frame" x="0.0" y="0.0" width="393" height="557.33333333333337"/>
                                         <subviews>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="LogoBlack" translatesAutoresizingMaskIntoConstraints="NO" id="inv-logo-img">
-                                                <rect key="frame" x="16" y="12" width="144" height="28"/>
+                                                <rect key="frame" x="16" y="12" width="1200" height="233"/>
                                             </imageView>
                                             <label opaque="NO" contentMode="scaleToFill" text="Distributor App" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="inv-logo-sub">
-                                                <rect key="frame" x="16.000000000000007" y="43.999999999999972" width="115.66666666666669" height="505.33333333333326"/>
+                                                <rect key="frame" x="16.000000000000007" y="248.99999999999997" width="115.66666666666669" height="300.33333333333326"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             </label>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="inv-bell-btn">
-                                                <rect key="frame" x="358" y="15" width="19" height="22"/>
+                                                <rect key="frame" x="358" y="117.66666666666666" width="19" height="22"/>
                                                 <state key="normal" image="bell" catalog="system"/>
                                                 <connections>
                                                     <action selector="notificationsTapped:" destination="inv-vc" eventType="touchUpInside" id="inv-bell-act"/>
@@ -589,14 +589,14 @@
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="inv-title-panel">
-                                        <rect key="frame" x="0.0" y="0.0" width="393" height="59.666666666666686"/>
+                                        <rect key="frame" x="0.0" y="557.33333333333337" width="393" height="59.666666666666629"/>
                                         <subviews>
                                             <label opaque="NO" contentMode="scaleToFill" text="Inventory" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="inv-title-lbl">
                                                 <rect key="frame" x="16" y="11.999999999999998" width="74" height="19.333333333333329"/>
                                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
                                             </label>
                                             <label opaque="NO" contentMode="scaleToFill" text="Track stock levels and SKUs" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="inv-sub-lbl">
-                                                <rect key="frame" x="16" y="33.333333333333343" width="157" height="14.333333333333336"/>
+                                                <rect key="frame" x="16" y="33.333333333333258" width="157" height="14.333333333333336"/>
                                                 <fontDescription key="fontDescription" type="system" weight="light" pointSize="12"/>
                                             </label>
                                         </subviews>
@@ -612,7 +612,7 @@
                                 </subviews>
                             </stackView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="inv-content">
-                                <rect key="frame" x="0.0" y="177.66666666666674" width="393" height="557.33333333333326"/>
+                                <rect key="frame" x="0.0" y="735" width="393" height="0.0"/>
                                 <color key="backgroundColor" red="0.94509803921568625" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                         </subviews>
@@ -673,14 +673,14 @@
                                         <rect key="frame" x="0.0" y="0.0" width="393" height="567"/>
                                         <subviews>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="LogoBlack" translatesAutoresizingMaskIntoConstraints="NO" id="prod-logo-img">
-                                                <rect key="frame" x="16" y="12" width="144" height="28"/>
+                                                <rect key="frame" x="16" y="12" width="1200" height="521.66666666666663"/>
                                             </imageView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Distributor App" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="prod-logo-sub">
-                                                <rect key="frame" x="16.000000000000007" y="44" width="115.66666666666669" height="514"/>
+                                                <rect key="frame" x="16.000000000000007" y="537.66666666666663" width="115.66666666666669" height="20.333333333333371"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             </label>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="prod-bell-btn">
-                                                <rect key="frame" x="341" y="8" width="36" height="36"/>
+                                                <rect key="frame" x="341" y="255" width="36" height="36"/>
                                                 <state key="normal" image="bell" catalog="system"/>
                                                 <connections>
                                                     <action selector="notificationsTapped:" destination="prod-vc" eventType="touchUpInside" id="prod-bell-act"/>
@@ -714,7 +714,7 @@
                                         <rect key="frame" x="0.0" y="567" width="393" height="50"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Products" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="prod-title-lbl">
-                                                <rect key="frame" x="16" y="16" width="70.666666666666671" height="21.999999999999993"/>
+                                                <rect key="frame" x="16" y="16" width="70.666666666666671" height="22"/>
                                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
                                             </label>
                                         </subviews>

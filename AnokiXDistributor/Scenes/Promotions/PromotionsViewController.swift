@@ -209,7 +209,7 @@ final class PromotionsViewController: BaseSecondaryViewController {
         titleRow.addArrangedSubview(title)
         titleRow.addArrangedSubview(UIView())
         titleRow.addArrangedSubview(status)
-        titleRow.addArrangedSubview(menu)
+        //titleRow.addArrangedSubview(menu)
 
         let dateLabel = UILabel.make(promo.dateRange, font: AppFonts.regular(12), color: AppColors.textSecondary)
 
@@ -219,10 +219,11 @@ final class PromotionsViewController: BaseSecondaryViewController {
         metrics.addArrangedSubview(metric("Clicks", promo.clicks))
         metrics.addArrangedSubview(metric("CTR", promo.ctr))
         metrics.addArrangedSubview(metric("Budget", promo.budget))
+        metrics.addArrangedSubview(menu)
 
         let stack = UIStackView.vertical(spacing: 12, alignment: .fill)
         stack.forAutoLayout()
-        [banner, titleRow, dateLabel, metrics].forEach { stack.addArrangedSubview($0) }
+        [/*banner, */titleRow, dateLabel, metrics].forEach { stack.addArrangedSubview($0) }
         card.addSubview(stack)
         stack.pinEdges(to: card, insets: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12))
         return card
