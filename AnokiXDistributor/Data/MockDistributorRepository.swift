@@ -19,10 +19,22 @@ final class MockDistributorRepository: DistributorRepository {
     ]
 
     private var preferences: [NotificationPreference] = [
-        NotificationPreference(key: "order_alerts", title: "Order Alerts", subtitle: "Get notified about new orders", enabled: true),
-        NotificationPreference(key: "low_stock", title: "Low Stock", subtitle: "Get notified when stock is low", enabled: true),
-        NotificationPreference(key: "delivery_updates", title: "Delivery Updates", subtitle: "Get notified about delivery status", enabled: true)
+        NotificationPreference(key: "order_alerts", title: "Order Alerts", subtitle: "Get notified when new orders are placed.", enabled: true),
+        NotificationPreference(key: "low_stock", title: "Low Stock Alerts", subtitle: "Receive alerts when products fall below minimum stock.", enabled: true),
+        NotificationPreference(key: "delivery_updates", title: "Delivery Updates", subtitle: "Track delivery status changes and delays.", enabled: true),
+        NotificationPreference(key: "finance_reminders", title: "Finance Reminders", subtitle: "Reminders for overdue invoices and payments.", enabled: true),
+        NotificationPreference(key: "report_ready", title: "Report Ready", subtitle: "Notify when scheduled reports are generated.", enabled: false)
     ]
+
+    private var profileSettings = ProfileSettings(
+        firstName: "Chang", lastName: "CongCong", email: "test@gmail.com", phone: "", companyName: "comp1")
+    private var businessSettings = BusinessSettings(
+        businessName: "comp1", registrationNumber: "", vatNumber: "ca",
+        address: "Beştepe, AŞTİ, Yenimahalle/Ankara, Türkiye", city: "",
+        latitude: 39.9306, longitude: 32.7439)
+    private var appPreferences = AppPreferences(
+        language: "English", currency: "South African Rand (ZAR)",
+        timezone: "Africa/Johannesburg", dateFormat: "19 May 2024")
 
     func getReturns(statusFilter: String) -> [ReturnItem] {
         if statusFilter == "all" { return returns }
@@ -127,6 +139,31 @@ final class MockDistributorRepository: DistributorRepository {
             SettingsMenuEntry(key: "preferences", title: "Preferences", subtitle: "", icon: "ic_tune")
         ]
     }
+
+    func getProfileSettings() -> ProfileSettings { profileSettings }
+
+    func saveProfileSettings(_ settings: ProfileSettings) { profileSettings = settings }
+
+    func getBusinessSettings() -> BusinessSettings { businessSettings }
+
+    func saveBusinessSettings(_ settings: BusinessSettings) { businessSettings = settings }
+
+    func changePassword(current: String, newPassword: String, confirm: String) -> String? {
+        if current.trimmingCharacters(in: .whitespaces).isEmpty {
+            return "Please enter your current password."
+        }
+        if newPassword.count < 8 {
+            return "New password must be at least 8 characters."
+        }
+        if newPassword != confirm {
+            return "New passwords do not match."
+        }
+        return nil
+    }
+
+    func getAppPreferences() -> AppPreferences { appPreferences }
+
+    func saveAppPreferences(_ preferences: AppPreferences) { appPreferences = preferences }
 
     func getNotificationPreferences() -> [NotificationPreference] { preferences }
 

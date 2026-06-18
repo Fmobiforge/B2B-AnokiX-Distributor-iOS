@@ -199,3 +199,28 @@ struct SettingsProfile {
     let initials: String
     let verified: Bool
 }
+
+struct ProfileSettings {
+    let firstName: String
+    let lastName: String
+    let email: String
+    let phone: String
+    let companyName: String
+}
+
+struct BusinessSettings {
+    let businessName: String
+    let registrationNumber: String
+    let vatNumber: String
+    let address: String
+    let city: String
+    let latitude: Double?
+    let longitude: Double?
+}
+
+struct AppPreferences {
+    let language: String
+    let currency: String
+    let timezone: String
+    let dateFormat: String
+}

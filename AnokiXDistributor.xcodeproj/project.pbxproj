@@ -30,6 +30,12 @@
 		3C887340B75868F4696F8320 /* PageTitleSectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4411E86573F39CF5B1EE45B0 /* PageTitleSectionView.xib */; };
 		3E5543EF447B9395A8FA36A2 /* InventoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A72DDF0CD936A09436CC31 /* InventoryViewController.swift */; };
 		40BB07BC9E17691AF9AF833E /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177CB4D8B6817F51A7779D9C /* SettingsViewController.swift */; };
+		A1B2C3D4E5F60100000002 /* BaseSettingsFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60100000001 /* BaseSettingsFormViewController.swift */; };
+		A1B2C3D4E5F60100000004 /* SettingsProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60100000003 /* SettingsProfileViewController.swift */; };
+		A1B2C3D4E5F60100000006 /* SettingsBusinessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60100000005 /* SettingsBusinessViewController.swift */; };
+		A1B2C3D4E5F60100000008 /* SettingsNotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60100000007 /* SettingsNotificationsViewController.swift */; };
+		A1B2C3D4E5F6010000000A /* SettingsSecurityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60100000009 /* SettingsSecurityViewController.swift */; };
+		A1B2C3D4E5F6010000000C /* SettingsPreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010000000B /* SettingsPreferencesViewController.swift */; };
 		4194AF26022FAB032346DC64 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432E7E4E99F004AE59774CF2 /* WelcomeViewController.swift */; };
 		45E49BEFA3433085988E1814 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C853752B0FC8035E9BEEFE2B /* Models.swift */; };
 		4AEA6269EBBB27A5C73E506D /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDE657DFBAF6C3C26A0C627 /* SessionManager.swift */; };
@@ -97,6 +103,12 @@
 		0F3D5E9791EB24D8F1F3A6DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		125658EC8F013F3987867C03 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LogoHeaderView.xib; sourceTree = "<group>"; };
 		177CB4D8B6817F51A7779D9C /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60100000001 /* BaseSettingsFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseSettingsFormViewController.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60100000003 /* SettingsProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsProfileViewController.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60100000005 /* SettingsBusinessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsBusinessViewController.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60100000007 /* SettingsNotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsNotificationsViewController.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60100000009 /* SettingsSecurityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSecurityViewController.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010000000B /* SettingsPreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPreferencesViewController.swift; sourceTree = "<group>"; };
 		1B262AFB48A1FF7D933DDA72 /* AnokiXDistributor.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AnokiXDistributor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B81E3C641A84965906B404F /* DistributorRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributorRepository.swift; sourceTree = "<group>"; };
 		1CDA6C338D22242462AE5674 /* AddProductOptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProductOptionsViewController.swift; sourceTree = "<group>"; };
@@ -307,7 +319,13 @@
 		3A60F821ED098BDED1BEE8CC /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				A1B2C3D4E5F60100000001 /* BaseSettingsFormViewController.swift */,
 				177CB4D8B6817F51A7779D9C /* SettingsViewController.swift */,
+				A1B2C3D4E5F60100000003 /* SettingsProfileViewController.swift */,
+				A1B2C3D4E5F60100000005 /* SettingsBusinessViewController.swift */,
+				A1B2C3D4E5F60100000007 /* SettingsNotificationsViewController.swift */,
+				A1B2C3D4E5F60100000009 /* SettingsSecurityViewController.swift */,
+				A1B2C3D4E5F6010000000B /* SettingsPreferencesViewController.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -706,6 +724,12 @@
 				B630E90E597604F6CBFC61AF /* SceneDelegate.swift in Sources */,
 				4AEA6269EBBB27A5C73E506D /* SessionManager.swift in Sources */,
 				40BB07BC9E17691AF9AF833E /* SettingsViewController.swift in Sources */,
+				A1B2C3D4E5F60100000002 /* BaseSettingsFormViewController.swift in Sources */,
+				A1B2C3D4E5F60100000004 /* SettingsProfileViewController.swift in Sources */,
+				A1B2C3D4E5F60100000006 /* SettingsBusinessViewController.swift in Sources */,
+				A1B2C3D4E5F60100000008 /* SettingsNotificationsViewController.swift in Sources */,
+				A1B2C3D4E5F6010000000A /* SettingsSecurityViewController.swift in Sources */,
+				A1B2C3D4E5F6010000000C /* SettingsPreferencesViewController.swift in Sources */,
 				AD40532A2789E9D59DAB99BF /* SparklineView.swift in Sources */,
 				69C06145291554FE07973D1D /* SplashViewController.swift in Sources */,
 				7C876CA9CCBA8D731904BEF9 /* StoreCell.swift in Sources */,

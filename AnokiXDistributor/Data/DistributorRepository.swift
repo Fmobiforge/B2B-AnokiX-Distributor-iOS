@@ -16,6 +16,13 @@ protocol DistributorRepository {
     func getDeliveries(statusFilter: String) -> [DeliveryItem]
     func getSettingsProfile() -> SettingsProfile
     func getSettingsMenuEntries() -> [SettingsMenuEntry]
+    func getProfileSettings() -> ProfileSettings
+    func saveProfileSettings(_ settings: ProfileSettings)
+    func getBusinessSettings() -> BusinessSettings
+    func saveBusinessSettings(_ settings: BusinessSettings)
+    func changePassword(current: String, newPassword: String, confirm: String) -> String?
+    func getAppPreferences() -> AppPreferences
+    func saveAppPreferences(_ preferences: AppPreferences)
     func getNotificationPreferences() -> [NotificationPreference]
     func saveNotificationPreferences(_ preferences: [NotificationPreference])
 }

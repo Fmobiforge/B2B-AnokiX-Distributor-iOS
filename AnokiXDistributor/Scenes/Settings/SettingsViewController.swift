@@ -1,50 +1,39 @@
 import UIKit
 
-/// Port of SettingsActivity. Profile card (session-aware), settings menu, notification toggles, Save.
+/// Main settings hub: profile summary + static menu rows (no inline notification toggles).
 final class SettingsViewController: BaseSecondaryViewController {
 
     override var screenTitle: String { S.settings }
 
-    private var preferences: [NotificationPreference] = []
+    private let avatarLabel = UILabel()
+    private let nameLabel = UILabel()
+    private let emailLabel = UILabel()
+    private let verifiedBadge = UIView()
 
     override func setupContent(in container: UIView) {
         let stack = makeScrollStack(in: container)
-
-        stack.addArrangedSubview(buildProfileCard(mergedProfile()))
-
-        let menuCard = StyleKit.cardView()
-        let menuStack = UIStackView.vertical(spacing: 0, alignment: .fill)
-        menuStack.forAutoLayout()
-        let entries = repository.getSettingsMenuEntries()
-        for (i, entry) in entries.enumerated() {
-            menuStack.addArrangedSubview(menuRow(entry))
-            if i < entries.count - 1 { menuStack.addArrangedSubview(divider()) }
-        }
-        menuCard.addSubview(menuStack)
-        menuStack.pinEdges(to: menuCard, insets: UIEdgeInsets(top: 4, left: 12, bottom: 4, right: 12))
-        stack.addArrangedSubview(menuCard)
-
-        stack.addArrangedSubview(UILabel.title("Notification Preferences"))
-        preferences = repository.getNotificationPreferences()
-        let prefCard = StyleKit.cardView()
-        let prefStack = UIStackView.vertical(spacing: 0, alignment: .fill)
-        prefStack.forAutoLayout()
-        for (i, pref) in preferences.enumerated() {
-            prefStack.addArrangedSubview(preferenceRow(pref, index: i))
-            if i < preferences.count - 1 { prefStack.addArrangedSubview(divider()) }
-        }
-        prefCard.addSubview(prefStack)
-        prefStack.pinEdges(to: prefCard, insets: UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12))
-        stack.addArrangedSubview(prefCard)
-
-        let save = UIButton(type: .system)
-        StyleKit.stylePrimaryButton(save)
-        save.setTitle(S.saveChanges, for: .normal)
-        save.addTarget(self, action: #selector(saveTapped), for: .touchUpInside)
-        stack.addArrangedSubview(save)
+        stack.addArrangedSubview(buildProfileCard())
+        stack.addArrangedSubview(buildMenuCard())
+        stack.addArrangedSubview(UILabel.make(S.settingsFooterHint, font: AppFonts.regular(11),
+                                                color: AppColors.textSecondary, align: .center, lines: 0))
     }
 
-    override func loadData() {}
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        refreshProfileHeader()
+    }
+
+    override func loadData() {
+        refreshProfileHeader()
+    }
+
+    private func refreshProfileHeader() {
+        let profile = mergedProfile()
+        avatarLabel.text = profile.initials
+        nameLabel.text = profile.name
+        emailLabel.text = profile.email
+        verifiedBadge.isHidden = !profile.verified
+    }
 
     private func mergedProfile() -> SettingsProfile {
         let fallback = repository.getSettingsProfile()
@@ -64,112 +53,125 @@ final class SettingsViewController: BaseSecondaryViewController {
         return result.isEmpty ? fallback : result.uppercased()
     }
 
-    private func buildProfileCard(_ profile: SettingsProfile) -> UIView {
-        let card = StyleKit.cardView()
-        let avatar = UILabel()
-        avatar.text = profile.initials
-        avatar.font = AppFonts.bold(22)
-        avatar.textColor = AppColors.purplePrimary
-        avatar.textAlignment = .center
-        avatar.backgroundColor = AppColors.purpleLight
-        avatar.layer.cornerRadius = 28
-        avatar.layer.masksToBounds = true
-        avatar.constrainSize(56)
+    private func buildProfileCard() -> UIView {
+        avatarLabel.font = AppFonts.bold(22)
+        avatarLabel.textColor = AppColors.purplePrimary
+        avatarLabel.textAlignment = .center
+        avatarLabel.backgroundColor = AppColors.purpleLight
+        avatarLabel.layer.cornerRadius = 28
+        avatarLabel.layer.masksToBounds = true
+        avatarLabel.constrainSize(56)
 
-        let name = UILabel.make(profile.name, font: AppFonts.bold(16), color: AppColors.textPrimary)
-        let email = UILabel.make(profile.email, font: AppFonts.regular(12), color: AppColors.textSecondary)
+        nameLabel.font = AppFonts.bold(14)
+        nameLabel.textColor = AppColors.textPrimary
+        emailLabel.font = AppFonts.regular(12)
+        emailLabel.textColor = AppColors.textSecondary
+
+        let badge = StyleKit.badgeLabel()
+        badge.text = S.verifiedDistributor
+        badge.textColor = AppColors.purplePrimary
+        badge.backgroundColor = AppColors.purpleLight
+        let shield = UIImageView(image: UIImage(systemName: "checkmark.shield.fill"))
+        shield.tintColor = AppColors.purplePrimary
+        shield.contentMode = .scaleAspectFit
+        shield.constrainSize(14)
+        let badgeRow = UIStackView.horizontal(spacing: 6, alignment: .center)
+        badgeRow.addArrangedSubview(shield)
+        badgeRow.addArrangedSubview(badge)
+        verifiedBadge.addSubview(badgeRow)
+        badgeRow.pinEdges(to: verifiedBadge)
+
         let textStack = UIStackView.vertical(spacing: 2, alignment: .leading)
-        textStack.addArrangedSubview(name)
-        textStack.addArrangedSubview(email)
-        if profile.verified {
-            let badge = StyleKit.badgeLabel()
-            badge.text = S.verifiedDistributor
-            badge.textColor = AppColors.purplePrimary
-            badge.backgroundColor = AppColors.purpleLight
-            let shield = UIImageView(image: UIImage(systemName: "checkmark.shield.fill"))
-            shield.tintColor = AppColors.purplePrimary
-            shield.contentMode = .scaleAspectFit
-            shield.constrainSize(14)
-            let badgeRow = UIStackView.horizontal(spacing: 6, alignment: .center)
-            badgeRow.addArrangedSubview(shield)
-            badgeRow.addArrangedSubview(badge)
-            textStack.addArrangedSubview(badgeRow)
-        }
+        textStack.addArrangedSubview(nameLabel)
+        textStack.addArrangedSubview(emailLabel)
+        textStack.addArrangedSubview(verifiedBadge)
 
         let row = UIStackView.horizontal(spacing: 12, alignment: .center)
-        row.forAutoLayout()
-        row.addArrangedSubview(avatar)
+        row.addArrangedSubview(avatarLabel)
         row.addArrangedSubview(textStack)
+
+        let card = StyleKit.cardView()
         card.addSubview(row)
         row.pinEdges(to: card, insets: UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16))
         return card
     }
 
-    private func menuRow(_ entry: SettingsMenuEntry) -> UIView {
-        let icon = UIImageView(image: AppIcons.symbol(entry.icon))
-        icon.tintColor = AppColors.purplePrimary
-        icon.contentMode = .scaleAspectFit
-        icon.constrainSize(22)
-        let title = UILabel.make(entry.title, font: AppFonts.medium(14), color: AppColors.textPrimary)
+    private func buildMenuCard() -> UIView {
+        let menuCard = StyleKit.cardView()
+        let menuStack = UIStackView.vertical(spacing: 0, alignment: .fill)
+        menuStack.forAutoLayout()
+
+        let items: [(String, String, Selector)] = [
+            (S.settingsMenuProfile, "ic_person", #selector(openProfile)),
+            (S.settingsMenuBusiness, "ic_briefcase", #selector(openBusiness)),
+            (S.notifications, "ic_notifications", #selector(openNotifications)),
+            (S.settingsMenuSecurity, "ic_shield", #selector(openSecurity)),
+            (S.settingsMenuPreferences, "ic_tune", #selector(openPreferences))
+        ]
+
+        for (index, item) in items.enumerated() {
+            menuStack.addArrangedSubview(menuRow(title: item.0, icon: item.1, action: item.2))
+            if index < items.count - 1 { menuStack.addArrangedSubview(divider()) }
+        }
+
+        menuCard.addSubview(menuStack)
+        menuStack.pinEdges(to: menuCard, insets: UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0))
+        return menuCard
+    }
+
+    private func menuRow(title: String, icon: String, action: Selector) -> UIView {
+        let iconView = UIImageView(image: AppIcons.symbol(icon))
+        iconView.tintColor = AppColors.textSecondary
+        iconView.contentMode = .scaleAspectFit
+        iconView.constrainSize(20)
+
+        let titleLabel = UILabel.make(title, font: AppFonts.regular(12), color: AppColors.textPrimary)
         let chevron = UIImageView(image: UIImage(systemName: "chevron.right"))
-        chevron.tintColor = AppColors.textTertiary
+        chevron.tintColor = AppColors.textSecondary
         chevron.contentMode = .scaleAspectFit
         chevron.constrainSize(16)
-        let row = UIStackView.horizontal(spacing: 12, alignment: .center)
-        [icon, title, UIView(), chevron].forEach { row.addArrangedSubview($0) }
+
+        let row = UIStackView.horizontal(spacing: 14, alignment: .center)
+        row.layoutMargins = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        row.isLayoutMarginsRelativeArrangement = true
+        row.addArrangedSubview(iconView)
+        row.addArrangedSubview(titleLabel)
+        row.addArrangedSubview(UIView())
+        row.addArrangedSubview(chevron)
+
         let wrapper = UIView()
-        wrapper.forAutoLayout()
-        wrapper.constrainHeight(48)
-        row.forAutoLayout()
         wrapper.addSubview(row)
         row.pinEdges(to: wrapper)
-        wrapper.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(menuTapped(_:))))
+        wrapper.addGestureRecognizer(UITapGestureRecognizer(target: self, action: action))
         wrapper.isUserInteractionEnabled = true
-        wrapper.accessibilityLabel = entry.title
         return wrapper
     }
 
-    @objc private func menuTapped(_ gesture: UITapGestureRecognizer) {
-        guard let title = gesture.view?.accessibilityLabel else { return }
-        toast(title)
+    @objc private func openProfile() {
+        navigationController?.pushViewController(SettingsProfileViewController(), animated: true)
     }
 
-    private func preferenceRow(_ pref: NotificationPreference, index: Int) -> UIView {
-        let title = UILabel.make(pref.title, font: AppFonts.medium(14), color: AppColors.textPrimary)
-        let subtitle = UILabel.make(pref.subtitle, font: AppFonts.regular(11), color: AppColors.textSecondary)
-        let textStack = UIStackView.vertical(spacing: 2, alignment: .leading)
-        textStack.addArrangedSubview(title)
-        textStack.addArrangedSubview(subtitle)
-
-        let toggle = UISwitch()
-        toggle.isOn = pref.enabled
-        toggle.onTintColor = AppColors.purplePrimary
-        toggle.tag = index
-        toggle.addTarget(self, action: #selector(preferenceToggled(_:)), for: .valueChanged)
-
-        let row = UIStackView.horizontal(spacing: 12, alignment: .center)
-        row.forAutoLayout()
-        [textStack, UIView(), toggle].forEach { row.addArrangedSubview($0) }
-        let wrapper = UIView()
-        wrapper.addSubview(row)
-        row.pinEdges(to: wrapper, insets: UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
-        return wrapper
+    @objc private func openBusiness() {
+        navigationController?.pushViewController(SettingsBusinessViewController(), animated: true)
     }
 
-    @objc private func preferenceToggled(_ sender: UISwitch) {
-        guard preferences.indices.contains(sender.tag) else { return }
-        preferences[sender.tag].enabled = sender.isOn
+    @objc private func openNotifications() {
+        navigationController?.pushViewController(SettingsNotificationsViewController(), animated: true)
+    }
+
+    @objc private func openSecurity() {
+        navigationController?.pushViewController(SettingsSecurityViewController(), animated: true)
+    }
+
+    @objc private func openPreferences() {
+        navigationController?.pushViewController(SettingsPreferencesViewController(), animated: true)
     }
 
     private func divider() -> UIView {
         let line = UIView()
         line.backgroundColor = AppColors.divider
         line.constrainHeight(1)
+        line.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         return line
-    }
-
-    @objc private func saveTapped() {
-        repository.saveNotificationPreferences(preferences)
-        toast(S.saveChanges)
     }
 }
