@@ -408,7 +408,8 @@ final class ViewPromotionViewController: BaseSecondaryViewController {
     }
 
     private func makeStockLogRow(_ log: PromotionDetailData.StockLog) -> UIView {
-        let product = firstNonEmpty(log.productName, log.productId, "—")
+        let resolved = firstNonEmpty(log.productName, log.productId)
+        let product = resolved.isEmpty ? "—" : resolved
         let row = UIStackView.vertical(spacing: 4, alignment: .leading)
         row.addArrangedSubview(UILabel.make(product, font: AppFonts.bold(14), color: AppColors.textPrimary))
         let detail = UIStackView.horizontal(spacing: 8, alignment: .center)
@@ -570,8 +571,11 @@ final class ViewPromotionViewController: BaseSecondaryViewController {
         return outF.string(from: date)
     }
 
-    private func firstNonEmpty(_ values: String...) -> String {
-        values.first { !$0.isEmpty } ?? ""
+    private func firstNonEmpty(_ values: String?...) -> String {
+        for case let value? in values where !value.isEmpty {
+            return value
+        }
+        return ""
     }
 }
 
