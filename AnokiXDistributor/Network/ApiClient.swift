@@ -127,8 +127,10 @@ final class ApiClient {
     /// Full campaign detail (+ selected_products, media) for the edit/view flow.
     func getPromotionById(id: String,
                           completion: @escaping (Result<PromotionDetailData, ApiError>) -> Void) {
-        getAuthed("api/distributor/promotions/get-by-id", query: ["id": id],
-                  type: PromotionDetailData.self, completion: completion)
+        Http.get(baseUrl: Self.baseURL, path: "api/distributor/promotions/get-by-id",
+                 query: ["id": id], token: session.token) { [weak self] r in
+            self?.deliverPromotionDetail(r, completion: completion)
+        }
     }
 
     /// Create a campaign (multipart: text fields; media goes through upload-media after).
@@ -230,6 +232,122 @@ final class ApiClient {
             result = .failure(ApiError(message: "Network error (HTTP \(r.code))"))
         }
         DispatchQueue.main.async { completion(result) }
+    }
+
+    /// Parses promotion detail and back-fills stock logs from SwiftyJSON when Codable misses them.
+    private func deliverPromotionDetail(_ r: Http.Result,
+                                        completion: @escaping (Result<PromotionDetailData, ApiError>) -> Void) {
+        var result: Result<PromotionDetailData, ApiError>
+        if let body = r.body, !body.isEmpty {
+            let envelope = JSON(parseJSON: body)
+            if envelope["status"].boolValue {
+                let dataJson = envelope["data"]
+                if dataJson.type == .null {
+                    result = .failure(ApiError(message: "Empty response from server"))
+                } else if let raw = try? dataJson.rawData() {
+                    do {
+                        var data = try decoder.decode(PromotionDetailData.self, from: raw)
+                        if data.resolvedStockLogs().isEmpty {
+                            data.enrichedStockLogs = Self.parseStockLogsFromEnvelope(dataJson)
+                        }
+                        result = .success(data)
+                    } catch {
+                        print("\(Http.tag): decode failed for PromotionDetailData: \(error)")
+                        result = .failure(ApiError(message: "Unexpected response from server"))
+                    }
+                } else {
+                    result = .failure(ApiError(message: "Unexpected response from server"))
+                }
+            } else {
+                result = .failure(ApiError(message: envelope["message"].string ?? "Request failed"))
+            }
+        } else {
+            result = .failure(ApiError(message: "Network error (HTTP \(r.code))"))
+        }
+        DispatchQueue.main.async { completion(result) }
+    }
+
+    /// Reads `stock_logs` directly from the envelope (mirrors Android Gson raw parsing).
+    private static func parseStockLogsFromEnvelope(_ dataJson: JSON) -> [PromotionDetailData.StockLog] {
+        let sources: [JSON] = [
+            dataJson["promotion"]["stock_logs"],
+            dataJson["promotion"]["promotion_stock_logs"],
+            dataJson["stock_logs"],
+            dataJson["promotion_stock_logs"]
+        ]
+        for source in sources {
+            let logs = parseStockLogsFromSwiftyJSON(unwrapSwiftyJSON(source))
+            if !logs.isEmpty { return logs }
+        }
+        return []
+    }
+
+    /// A JSON-encoded string payload is sometimes returned instead of a structured array.
+    private static func unwrapSwiftyJSON(_ json: JSON) -> JSON {
+        if json.type == .string, let text = json.string {
+            let parsed = JSON(parseJSON: text)
+            if parsed.type != .null { return parsed }
+        }
+        return json
+    }
+
+    private static func parseStockLogsFromSwiftyJSON(_ json: JSON) -> [PromotionDetailData.StockLog] {
+        guard json.type == .array else {
+            if json.type == .dictionary {
+                if json["items"].type == .array {
+                    return parseStockLogsFromSwiftyJSON(json["items"])
+                }
+                if json["data"].type == .array {
+                    return parseStockLogsFromSwiftyJSON(json["data"])
+                }
+                return [stockLogFromSwiftyJSON(json)].compactMap { $0 }
+            }
+            return []
+        }
+        return json.arrayValue.compactMap { stockLogFromSwiftyJSON($0) }
+    }
+
+    private static func stockLogFromSwiftyJSON(_ item: JSON) -> PromotionDetailData.StockLog? {
+        guard item.type == .dictionary else { return nil }
+        let productName = firstNonEmpty(
+            item["product_name"].string,
+            item["name"].string,
+            item["product_title"].string,
+            item["product"]["name"].string,
+            item["product_id"].string,
+            item["id"].string,
+            item["product"]["id"].string
+        )
+        let productId = firstNonEmpty(
+            item["product_id"].string,
+            item["id"].string,
+            item["product"]["id"].string
+        )
+        let action = item["action"].string
+        let quantity: String? = {
+            if let q = item["quantity"].string { return q }
+            if item["quantity"].exists() { return item["quantity"].stringValue }
+            return nil
+        }()
+        let createdAt = firstNonEmpty(
+            item["created_at"].string,
+            item["date"].string,
+            item["logged_at"].string
+        )
+        return PromotionDetailData.StockLog(
+            productName: productName,
+            productId: productId,
+            action: action,
+            quantity: quantity,
+            createdAt: createdAt
+        )
+    }
+
+    private static func firstNonEmpty(_ values: String?...) -> String? {
+        for v in values {
+            if let v = v, !v.isEmpty { return v }
+        }
+        return nil
     }
 
     /// Check only the `status`/`message` of an envelope, ignoring the shape of `data`.

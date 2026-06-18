@@ -694,6 +694,21 @@ indirect enum JSONValue: Decodable {
     /// String under `key` (or ""), mirroring Android's `jStr`.
     func string(_ key: String) -> String { self[key]?.stringValue ?? "" }
 
+    /// Looks up `key` and its camelCase form (handles mixed server / decoder key shapes).
+    func flexString(_ key: String) -> String {
+        let direct = string(key)
+        if !direct.isEmpty { return direct }
+        return string(Self.snakeToCamel(key))
+    }
+
+    private static func snakeToCamel(_ key: String) -> String {
+        let parts = key.split(separator: "_")
+        guard parts.count > 1 else { return key }
+        return parts.enumerated().map { index, part in
+            index == 0 ? String(part) : part.capitalized
+        }.joined()
+    }
+
     /// A value sometimes arrives as a JSON-encoded string; parse it into its element
     /// (Android's `unwrap`). Returns `self` when it is already structured JSON.
     var unwrapped: JSONValue {
@@ -789,26 +804,28 @@ struct PromotionsData: Decodable {
 /// are kept as raw `JSONValue` and parsed defensively by the wizard.
 struct PromotionDetailData: Decodable {
     let promotion: Promotion?
-    /// Raw `stock_logs` at the data root.
-    let stockLogsJson: JSONValue?
+    /// Raw `stock_logs` at the data root (same pattern as `selectedProducts`).
+    let stockLogs: JSONValue?
     /// Alternate key used by some API builds (`promotion_stock_logs` table name).
-    let promotionStockLogsJson: JSONValue?
+    let promotionStockLogs: JSONValue?
+    /// Populated by `ApiClient` when SwiftyJSON finds logs Codable missed.
+    var enrichedStockLogs: [StockLog]?
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         promotion = try c.decodeIfPresent(Promotion.self, forKey: .promotion)
-        stockLogsJson = try c.decodeIfPresent(JSONValue.self, forKey: .stockLogsJson)
-        promotionStockLogsJson = try c.decodeIfPresent(JSONValue.self, forKey: .promotionStockLogsJson)
+        stockLogs = try c.decodeIfPresent(JSONValue.self, forKey: .stockLogs)
+        promotionStockLogs = try c.decodeIfPresent(JSONValue.self, forKey: .promotionStockLogs)
+        enrichedStockLogs = nil
     }
 
     private enum CodingKeys: String, CodingKey {
-        case promotion
-        case stockLogsJson = "stock_logs"
-        case promotionStockLogsJson = "promotion_stock_logs"
+        case promotion, stockLogs, promotionStockLogs
     }
 
     /// Parsed stock log rows — checks all known locations/keys (matches Android).
     func resolvedStockLogs() -> [StockLog] {
+        if let enriched = enrichedStockLogs, !enriched.isEmpty { return enriched }
         for raw in candidateStockLogSources() {
             let parsed = Self.parseStockLogs(raw)
             if !parsed.isEmpty { return parsed }
@@ -818,31 +835,35 @@ struct PromotionDetailData: Decodable {
 
     private func candidateStockLogSources() -> [JSONValue?] {
         [
-            promotion?.stockLogsJson,
-            promotion?.promotionStockLogsJson,
-            stockLogsJson,
-            promotionStockLogsJson
+            promotion?.stockLogs,
+            promotion?.promotionStockLogs,
+            stockLogs,
+            promotionStockLogs
         ]
     }
 
     /// Defensive parser for `stock_logs` (array or wrapped object), mirroring Android/Gson leniency.
     static func parseStockLogs(_ raw: JSONValue?) -> [StockLog] {
         guard let raw = raw else { return [] }
+        if case .null = raw { return [] }
+
+        let unwrapped = raw.unwrapped
         let elements: [JSONValue]
-        if let array = raw.arrayValue {
+        if let array = unwrapped.arrayValue {
             elements = array
-        } else if let items = raw["items"]?.arrayValue {
+        } else if let items = unwrapped["items"]?.arrayValue {
             elements = items
-        } else if let data = raw["data"]?.arrayValue {
+        } else if let data = unwrapped["data"]?.arrayValue {
             elements = data
-        } else if raw.objectValue != nil {
-            elements = [raw]
+        } else if unwrapped.objectValue != nil {
+            elements = [unwrapped]
         } else {
             return []
         }
         return elements.compactMap { el in
-            guard el.objectValue != nil else { return nil }
-            return StockLog(json: el)
+            let row = el.unwrapped
+            guard row.objectValue != nil else { return nil }
+            return StockLog(json: row)
         }
     }
 
@@ -853,28 +874,39 @@ struct PromotionDetailData: Decodable {
         let quantity: String?
         let createdAt: String?
 
+        init(productName: String?, productId: String?, action: String?,
+             quantity: String?, createdAt: String?) {
+            self.productName = productName
+            self.productId = productId
+            self.action = action
+            self.quantity = quantity
+            self.createdAt = createdAt
+        }
+
         init(json: JSONValue) {
             let productLabel = Self.firstNonEmpty(
-                json.string("product_name"),
-                json.string("name"),
-                json.string("product_title"),
-                json["product"]?.string("name") ?? "",
-                json.string("product_id"),
-                json.string("id"),
-                json["product"]?.string("id") ?? ""
+                json.flexString("product_name"),
+                json.flexString("name"),
+                json.flexString("product_title"),
+                json["product"]?.flexString("name") ?? "",
+                json.flexString("product_id"),
+                json.flexString("id"),
+                json["product"]?.flexString("id") ?? ""
             )
-            productName = productLabel.isEmpty ? nil : productLabel
+            productName = productLabel
             productId = Self.firstNonEmpty(
-                json.string("product_id"),
-                json.string("id"),
-                json["product"]?.string("id") ?? ""
+                json.flexString("product_id"),
+                json.flexString("id"),
+                json["product"]?.flexString("id") ?? ""
             )
-            action = json["action"]?.stringValue ?? json.string("action")
-            quantity = json["quantity"]?.stringValue ?? json.string("quantity")
+            action = json.flexString("action").isEmpty
+                ? json["action"]?.stringValue
+                : json.flexString("action")
+            quantity = json["quantity"]?.stringValue ?? json.flexString("quantity")
             createdAt = Self.firstNonEmpty(
-                json.string("created_at"),
-                json.string("date"),
-                json.string("logged_at")
+                json.flexString("created_at"),
+                json.flexString("date"),
+                json.flexString("logged_at")
             )
         }
 
@@ -915,8 +947,8 @@ struct PromotionDetailData: Decodable {
 
         let traderSegments: JSONValue?
         let selectedProducts: JSONValue?
-        let stockLogsJson: JSONValue?
-        let promotionStockLogsJson: JSONValue?
+        let stockLogs: JSONValue?
+        let promotionStockLogs: JSONValue?
 
         init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -944,8 +976,8 @@ struct PromotionDetailData: Decodable {
             attributedSales = JSONDecoding.flexString(c, key: .attributedSales)
             traderSegments = try c.decodeIfPresent(JSONValue.self, forKey: .traderSegments)
             selectedProducts = try c.decodeIfPresent(JSONValue.self, forKey: .selectedProducts)
-            stockLogsJson = try c.decodeIfPresent(JSONValue.self, forKey: .stockLogsJson)
-            promotionStockLogsJson = try c.decodeIfPresent(JSONValue.self, forKey: .promotionStockLogsJson)
+            stockLogs = try c.decodeIfPresent(JSONValue.self, forKey: .stockLogs)
+            promotionStockLogs = try c.decodeIfPresent(JSONValue.self, forKey: .promotionStockLogs)
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -955,9 +987,7 @@ struct PromotionDetailData: Decodable {
             case address, placeId, lat, lng
             case bannerFile, videoFile
             case reach, clicks, ctr, revenue, attributedSales
-            case traderSegments, selectedProducts
-            case stockLogsJson = "stock_logs"
-            case promotionStockLogsJson = "promotion_stock_logs"
+            case traderSegments, selectedProducts, stockLogs, promotionStockLogs
         }
     }
 
