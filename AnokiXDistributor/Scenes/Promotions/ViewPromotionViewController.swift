@@ -111,7 +111,7 @@ final class ViewPromotionViewController: BaseSecondaryViewController {
                     self.navigationController?.popViewController(animated: true)
                     return
                 }
-                self.bind(promotion, stockLogs: self.resolveStockLogs(data))
+                self.bind(promotion, stockLogs: data.resolvedStockLogs())
                 self.scrollView.isHidden = false
                 self.footerRow.isHidden = false
             case .failure(let error):
@@ -464,12 +464,6 @@ final class ViewPromotionViewController: BaseSecondaryViewController {
     }
 
     // MARK: - Parsing / formatting
-
-    private func resolveStockLogs(_ data: PromotionDetailData) -> [PromotionDetailData.StockLog] {
-        if let root = data.stockLogs, !root.isEmpty { return root }
-        if let nested = data.promotion?.stockLogs, !nested.isEmpty { return nested }
-        return []
-    }
 
     private func formatTargeting(_ p: PromotionDetailData.Promotion) -> String {
         var parts: [String] = []
