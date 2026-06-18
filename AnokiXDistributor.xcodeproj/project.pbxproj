@@ -10,12 +10,10 @@
 		05DD9A32506397943A80E42B /* ProductsTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D23903BB1B9D1D0ACD3F9756 /* ProductsTabViewController.swift */; };
 		09DB1879B4786FD05D411884 /* ReportsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0014905A214A71CA1E9395D0 /* ReportsViewController.swift */; };
 		0BC88EE29223F0A212AD898B /* UILabel+Styles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508A36A771BDF8395C3C5F18 /* UILabel+Styles.swift */; };
-		11794B47489CD4530324B56D /* PromoProductPickers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA45468DC57ACA9174D24515 /* PromoProductPickers.swift */; };
-		11A2B3C4D5E6F708192A3B4C /* ViewPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22B3C4D5E6F708192A3B4C5D /* ViewPromotionViewController.swift */; };
+		0F61D71983DC6A0B01F071AD /* Pods_AnokiXDistributor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21197764B7C49AF51F0BB3C2 /* Pods_AnokiXDistributor.framework */; };
 		124C8E3AF6130BEB959E5AC6 /* AdaptiveGridLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D71ED2B74AEB8C46DEDFC9 /* AdaptiveGridLayout.swift */; };
 		16C385409B356182BB508228 /* PickerViewControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2110788581B0C9ABDD9EAFA3 /* PickerViewControllers.swift */; };
 		1E150122E98593D4BF55341E /* AddProductOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CDA6C338D22242462AE5674 /* AddProductOptionsViewController.swift */; };
-		21CAAEBC70C160637D61B234 /* CreatePromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA25CF8CA0FF6413969FC4AB /* CreatePromotionViewController.swift */; };
 		220DCC792279D57187041A88 /* DonutChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7E7EA5DF434C5C29176EC8 /* DonutChartView.swift */; };
 		247B8B5166BE8B77AE92CC1F /* StoresViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B7B66AF87E8F82C3611E71 /* StoresViewController.swift */; };
 		2813F44AB952D81EF64F5F2E /* LogoHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = DFC9071EC94373BAF6F64961 /* LogoHeaderView.xib */; };
@@ -23,6 +21,7 @@
 		2AADDEB874DBC35D3A80FB6A /* DTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A2475C9A0309A40D263AE7B /* DTOs.swift */; };
 		2B0D52FFE4389E772FC3FCE0 /* OrderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89E5AA9B84CB5D0FC25C022 /* OrderCell.swift */; };
 		2CEAA5E90B936AE2CEC4812B /* DrawerMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E0F0B3E188B92EEC495C80 /* DrawerMenuCell.swift */; };
+		2CF59182AC7D9D2C7EEB4DF9 /* PromotionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B68AFE0E8A18707C0CF1D6A /* PromotionsViewController.swift */; };
 		2E17B43F87B7350628BFCED5 /* InventoryCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 87DA897D802A5C4BCA511725 /* InventoryCell.xib */; };
 		2F4BFA902F712054FEE8089B /* GoogleMapsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C0FFC6B013ABB479E008A5 /* GoogleMapsConfig.swift */; };
 		388A6CD524ECBD457FADA3BD /* FilterUiHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888481543406DF4DA9207745 /* FilterUiHelper.swift */; };
@@ -45,14 +44,15 @@
 		7153E1B4C665460A67FE8EC0 /* DeliveriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDFC0379EF541F4390B5024B /* DeliveriesViewController.swift */; };
 		73037A24F81876008636B6FF /* TradersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F39ECC454DAF6AFB2C046A7 /* TradersViewController.swift */; };
 		7756B2BA5D5B77AF3D7823BB /* DashboardHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A92A17A73C526C07998A88C5 /* DashboardHeaderView.xib */; };
+		7A29A1F8E02B39FDB90F0A6D /* PromoProductPickers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76C3740E2A3B78246BCEE67 /* PromoProductPickers.swift */; };
 		7AD6083EDB84ABC2EF792F70 /* StoreCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3F7C8E5351F5BABFEA172D0C /* StoreCell.xib */; };
 		7C1E8A68D7AD224D577B39FA /* DrawerMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F0115986430BC48659AD79F /* DrawerMenuViewController.swift */; };
 		7C876CA9CCBA8D731904BEF9 /* StoreCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E732C71E5A143ABD631083A /* StoreCell.swift */; };
 		7DDF30397C6E2CDE9DDF17E8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A95A6407A5486FA57B4E7BA7 /* Assets.xcassets */; };
 		818A9A7C2C263DE0ACA609D5 /* ProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1360C283782AA7BBE256EF /* ProductsViewController.swift */; };
 		83D172CE0179BE4E41CF72F1 /* AppHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669B94F58E5554DB9E3D9A95 /* AppHeaderView.swift */; };
+		87D0FD7E7175AF44915EEB94 /* CreatePromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D973D483E1D8393991E4A008 /* CreatePromotionViewController.swift */; };
 		89B43AE907E4DBC5C0D979BE /* MockDistributorRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D38B310DF3119E94E0BDCECC /* MockDistributorRepository.swift */; };
-		932AFBEBE42F8EF263F015CF /* Pods_AnokiXDistributor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FC62ECC2C5A6F7CEF71AF34 /* Pods_AnokiXDistributor.framework */; };
 		95AE02C2C889EDFBF8AF2A3D /* TraderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6997EEC31E94F1C7DA884D86 /* TraderCell.swift */; };
 		A39CF3E3B202A5FCC576BAF0 /* InventoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9FBAA74502FBE0DF0602DD1 /* InventoryCell.swift */; };
 		A45EDE1201E626A4B4A8042D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11CFA649B92B3C27D3E9AF86 /* Main.storyboard */; };
@@ -65,6 +65,7 @@
 		B630E90E597604F6CBFC61AF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1BEBE3D4F429E572C598B9E /* SceneDelegate.swift */; };
 		B6BFB66706C5F2CE292AE411 /* DistributorRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B81E3C641A84965906B404F /* DistributorRepository.swift */; };
 		B78D3ABA5A8CB9F96C9540BA /* FinancesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EBE2BF2B2360A8EF39D131A /* FinancesViewController.swift */; };
+		B926E2E7A2E7FED8FDE5C72C /* ViewPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D865E16297298AD8652521 /* ViewPromotionViewController.swift */; };
 		BB38EEF64336527251581FA0 /* AutoLayout+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FD54E5AF63D9C1E1822030D /* AutoLayout+Helpers.swift */; };
 		BC2C4B1E17D68057E7AD12D1 /* OrdersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C20CB35B15FBC56DFDE3CB /* OrdersViewController.swift */; };
 		BC4CB9F2F008A7A307660654 /* AppFonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = C444450A67242479B37269E6 /* AppFonts.swift */; };
@@ -74,7 +75,6 @@
 		C0EB7079699F9FA61F600415 /* CreateProductViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E2E3916F538EFDDE6A3F24 /* CreateProductViewController.swift */; };
 		C5C9B519F2832EBBDCEB459D /* Countries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F95E8B3CD1A4B08AB345FD /* Countries.swift */; };
 		C76B3718097DFF63A20E2202 /* StyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EBF42877BF96F9CC486A9D /* StyleKit.swift */; };
-		C9C7AEE5899E9BB58E607494 /* PromotionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DA4DC723270640B4BD7123A /* PromotionsViewController.swift */; };
 		CED1A393DC20CCB6447E04FE /* ListScreenHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476CDE9653A47E28B02AEFAF /* ListScreenHelpers.swift */; };
 		D10CE8CB86D76DA11698D25B /* AppChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B8718F0850D5E694CF3D59 /* AppChrome.swift */; };
 		DD7DFE2E26BE2D95C327839B /* ReturnsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0881138E23115F2F6C519B1B /* ReturnsViewController.swift */; };
@@ -96,15 +96,17 @@
 		0EBE2BF2B2360A8EF39D131A /* FinancesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancesViewController.swift; sourceTree = "<group>"; };
 		0F3D5E9791EB24D8F1F3A6DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		125658EC8F013F3987867C03 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LogoHeaderView.xib; sourceTree = "<group>"; };
-		15DDDFE292365AFB4B9A5AE2 /* Pods-AnokiXDistributor.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXDistributor.release.xcconfig"; path = "Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor.release.xcconfig"; sourceTree = "<group>"; };
 		177CB4D8B6817F51A7779D9C /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
-		1B262AFB48A1FF7D933DDA72 /* anokiX Distributor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "anokiX Distributor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B262AFB48A1FF7D933DDA72 /* AnokiXDistributor.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AnokiXDistributor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B81E3C641A84965906B404F /* DistributorRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributorRepository.swift; sourceTree = "<group>"; };
 		1CDA6C338D22242462AE5674 /* AddProductOptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProductOptionsViewController.swift; sourceTree = "<group>"; };
 		2110788581B0C9ABDD9EAFA3 /* PickerViewControllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerViewControllers.swift; sourceTree = "<group>"; };
+		21197764B7C49AF51F0BB3C2 /* Pods_AnokiXDistributor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AnokiXDistributor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2201FC759675B56DBF859251 /* Pods-AnokiXDistributor.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXDistributor.release.xcconfig"; path = "Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor.release.xcconfig"; sourceTree = "<group>"; };
 		26E0F0B3E188B92EEC495C80 /* DrawerMenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawerMenuCell.swift; sourceTree = "<group>"; };
 		316B0CE12B5FD82B0AF1E08A /* ApiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiClient.swift; sourceTree = "<group>"; };
 		32C20CB35B15FBC56DFDE3CB /* OrdersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersViewController.swift; sourceTree = "<group>"; };
+		340BE329AE1BB8CB6E547503 /* Pods-AnokiXDistributor.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXDistributor.debug.xcconfig"; path = "Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor.debug.xcconfig"; sourceTree = "<group>"; };
 		345D1FBA63F6437BFFFD080F /* BaseMainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseMainViewController.swift; sourceTree = "<group>"; };
 		36B8718F0850D5E694CF3D59 /* AppChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppChrome.swift; sourceTree = "<group>"; };
 		397F0E5581835F147B64552C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -112,16 +114,16 @@
 		3D12847532A9C2E05FECFAC3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/TraderCell.xib; sourceTree = "<group>"; };
 		3D7B6D0F30ADED760A0C53A7 /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
 		3D907F8E3E66E95C6812004F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/OrderCell.xib; sourceTree = "<group>"; };
-		3DA4DC723270640B4BD7123A /* PromotionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionsViewController.swift; sourceTree = "<group>"; };
-		22B3C4D5E6F708192A3B4C5D /* ViewPromotionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPromotionViewController.swift; sourceTree = "<group>"; };
 		432E7E4E99F004AE59774CF2 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		476CDE9653A47E28B02AEFAF /* ListScreenHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListScreenHelpers.swift; sourceTree = "<group>"; };
 		4DDE657DFBAF6C3C26A0C627 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		4EBD6B5C4FE8886CCC105963 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/DashboardHeaderView.xib; sourceTree = "<group>"; };
 		508A36A771BDF8395C3C5F18 /* UILabel+Styles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Styles.swift"; sourceTree = "<group>"; };
 		52EBF42877BF96F9CC486A9D /* StyleKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleKit.swift; sourceTree = "<group>"; };
+		57D865E16297298AD8652521 /* ViewPromotionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPromotionViewController.swift; sourceTree = "<group>"; };
 		5A459D177F24EFCDC162992A /* SparklineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparklineView.swift; sourceTree = "<group>"; };
 		5B0415D826FC7151CE88E27E /* DashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewController.swift; sourceTree = "<group>"; };
+		5B68AFE0E8A18707C0CF1D6A /* PromotionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionsViewController.swift; sourceTree = "<group>"; };
 		5F0115986430BC48659AD79F /* DrawerMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawerMenuViewController.swift; sourceTree = "<group>"; };
 		661F3D25ACC35319FE83E85D /* AppIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIcons.swift; sourceTree = "<group>"; };
 		669B94F58E5554DB9E3D9A95 /* AppHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppHeaderView.swift; sourceTree = "<group>"; };
@@ -133,7 +135,6 @@
 		87D71ED2B74AEB8C46DEDFC9 /* AdaptiveGridLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveGridLayout.swift; sourceTree = "<group>"; };
 		87F95E8B3CD1A4B08AB345FD /* Countries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Countries.swift; sourceTree = "<group>"; };
 		888481543406DF4DA9207745 /* FilterUiHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterUiHelper.swift; sourceTree = "<group>"; };
-		8FC62ECC2C5A6F7CEF71AF34 /* Pods_AnokiXDistributor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AnokiXDistributor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		90AE8F3FE62A04F499E04BDF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/StoreCell.xib; sourceTree = "<group>"; };
 		9266F144883BBDE2294D859E /* Http.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Http.swift; sourceTree = "<group>"; };
 		9314D37E331C802FA22E7085 /* ApiMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiMapper.swift; sourceTree = "<group>"; };
@@ -153,12 +154,14 @@
 		C05CB68ED6C6896B36D24E8E /* CreateTraderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTraderViewController.swift; sourceTree = "<group>"; };
 		C3BE86A57B8DB5241F851A0C /* ProductCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCell.swift; sourceTree = "<group>"; };
 		C444450A67242479B37269E6 /* AppFonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFonts.swift; sourceTree = "<group>"; };
+		C76C3740E2A3B78246BCEE67 /* PromoProductPickers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromoProductPickers.swift; sourceTree = "<group>"; };
 		C853752B0FC8035E9BEEFE2B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		CDFC0379EF541F4390B5024B /* DeliveriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveriesViewController.swift; sourceTree = "<group>"; };
 		D23903BB1B9D1D0ACD3F9756 /* ProductsTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsTabViewController.swift; sourceTree = "<group>"; };
 		D29A9889FE895D5A1EDCCB2A /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		D38B310DF3119E94E0BDCECC /* MockDistributorRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDistributorRepository.swift; sourceTree = "<group>"; };
 		D89E5AA9B84CB5D0FC25C022 /* OrderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderCell.swift; sourceTree = "<group>"; };
+		D973D483E1D8393991E4A008 /* CreatePromotionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePromotionViewController.swift; sourceTree = "<group>"; };
 		DE7E7EA5DF434C5C29176EC8 /* DonutChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonutChartView.swift; sourceTree = "<group>"; };
 		E265BE656E495FD5C0B6A1B4 /* AppStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStrings.swift; sourceTree = "<group>"; };
 		E5C0FFC6B013ABB479E008A5 /* GoogleMapsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMapsConfig.swift; sourceTree = "<group>"; };
@@ -166,20 +169,17 @@
 		EB9A65319ACAC5DBCF8F2C9B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		EE1360C283782AA7BBE256EF /* ProductsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsViewController.swift; sourceTree = "<group>"; };
 		F0F3580D78FE0F37F17CD7AB /* BaseSecondaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseSecondaryViewController.swift; sourceTree = "<group>"; };
-		F113CC00877F36B9550C7C9D /* Pods-AnokiXDistributor.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXDistributor.debug.xcconfig"; path = "Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor.debug.xcconfig"; sourceTree = "<group>"; };
 		F4A72DDF0CD936A09436CC31 /* InventoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryViewController.swift; sourceTree = "<group>"; };
 		F7B83B72C9AD3E20FA0E7724 /* AppMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetrics.swift; sourceTree = "<group>"; };
-		FA25CF8CA0FF6413969FC4AB /* CreatePromotionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePromotionViewController.swift; sourceTree = "<group>"; };
-		FA45468DC57ACA9174D24515 /* PromoProductPickers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromoProductPickers.swift; sourceTree = "<group>"; };
 		FD045C96935508653C994CA0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/InventoryCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		40E9EA2ECFDF195ABB3D5B2F /* Frameworks */ = {
+		2A7E1865A3531F850157449B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				932AFBEBE42F8EF263F015CF /* Pods_AnokiXDistributor.framework in Frameworks */,
+				0F61D71983DC6A0B01F071AD /* Pods_AnokiXDistributor.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -273,15 +273,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		2E9991838ABAD3C0EB49FBF4 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				F113CC00877F36B9550C7C9D /* Pods-AnokiXDistributor.debug.xcconfig */,
-				15DDDFE292365AFB4B9A5AE2 /* Pods-AnokiXDistributor.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		30B02B97D4ECCEE2D12DAC66 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
@@ -293,8 +284,8 @@
 				D65B1BD59B63C97209068515 /* Main */,
 				371C769F3151F413FC647E38 /* Notifications */,
 				CA8CF7DCA35C91EA38B2A183 /* Orders */,
-				965602041F6CE5EF8F5A2EF0 /* Promotions */,
 				42E6FBBE47E72281B1572CAA /* Products */,
+				46449E0863BD3DB5692C4C14 /* Promotions */,
 				06D461DBAD58A9508465AADA /* Reports */,
 				BB10D47DA6EBEE405E70045D /* Returns */,
 				3A60F821ED098BDED1BEE8CC /* Settings */,
@@ -333,10 +324,21 @@
 			path = Products;
 			sourceTree = "<group>";
 		};
-		49CF8F2DDD8BF3747B72A0A0 /* Frameworks */ = {
+		46449E0863BD3DB5692C4C14 /* Promotions */ = {
 			isa = PBXGroup;
 			children = (
-				8FC62ECC2C5A6F7CEF71AF34 /* Pods_AnokiXDistributor.framework */,
+				D973D483E1D8393991E4A008 /* CreatePromotionViewController.swift */,
+				C76C3740E2A3B78246BCEE67 /* PromoProductPickers.swift */,
+				5B68AFE0E8A18707C0CF1D6A /* PromotionsViewController.swift */,
+				57D865E16297298AD8652521 /* ViewPromotionViewController.swift */,
+			);
+			path = Promotions;
+			sourceTree = "<group>";
+		};
+		4C454C3499D45A4739C50A7F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				21197764B7C49AF51F0BB3C2 /* Pods_AnokiXDistributor.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -372,7 +374,7 @@
 		741E46C5CD830A5A114E8705 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1B262AFB48A1FF7D933DDA72 /* anokiX Distributor.app */,
+				1B262AFB48A1FF7D933DDA72 /* AnokiXDistributor.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -404,15 +406,14 @@
 			path = Inventory;
 			sourceTree = "<group>";
 		};
-		965602041F6CE5EF8F5A2EF0 /* Promotions */ = {
+		8A5870A9C1F398C43E037FF6 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				FA25CF8CA0FF6413969FC4AB /* CreatePromotionViewController.swift */,
-				FA45468DC57ACA9174D24515 /* PromoProductPickers.swift */,
-				3DA4DC723270640B4BD7123A /* PromotionsViewController.swift */,
-				22B3C4D5E6F708192A3B4C5D /* ViewPromotionViewController.swift */,
+				340BE329AE1BB8CB6E547503 /* Pods-AnokiXDistributor.debug.xcconfig */,
+				2201FC759675B56DBF859251 /* Pods-AnokiXDistributor.release.xcconfig */,
 			);
-			path = Promotions;
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		9F90F57DCFFF10107835A776 /* DTO */ = {
@@ -454,8 +455,8 @@
 			children = (
 				282F60CD45E1BC32073318C8 /* AnokiXDistributor */,
 				741E46C5CD830A5A114E8705 /* Products */,
-				2E9991838ABAD3C0EB49FBF4 /* Pods */,
-				49CF8F2DDD8BF3747B72A0A0 /* Frameworks */,
+				8A5870A9C1F398C43E037FF6 /* Pods */,
+				4C454C3499D45A4739C50A7F /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -514,12 +515,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B6F16DC378E461C90CA18DEB /* Build configuration list for PBXNativeTarget "AnokiXDistributor" */;
 			buildPhases = (
-				DD5A6A6C1DAFC9546A8E2FF8 /* [CP] Check Pods Manifest.lock */,
+				398E95874A72DAA240A9F3F4 /* [CP] Check Pods Manifest.lock */,
 				7BF8E06877BAEE004523779A /* Sources */,
 				550F96816C924744E3A9F4C3 /* Resources */,
-				40E9EA2ECFDF195ABB3D5B2F /* Frameworks */,
-				950668427BC0908361980E5C /* [CP] Embed Pods Frameworks */,
-				4A2BB18EC1B2C468446417D4 /* [CP] Copy Pods Resources */,
+				2A7E1865A3531F850157449B /* Frameworks */,
+				4DFEC38AF87E3BB9A79FD2C6 /* [CP] Embed Pods Frameworks */,
+				1C072CA0D0BC56312F61DCAA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -527,7 +528,7 @@
 			);
 			name = AnokiXDistributor;
 			productName = AnokiXDistributor;
-			productReference = 1B262AFB48A1FF7D933DDA72 /* anokiX Distributor.app */;
+			productReference = 1B262AFB48A1FF7D933DDA72 /* AnokiXDistributor.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -587,7 +588,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		4A2BB18EC1B2C468446417D4 /* [CP] Copy Pods Resources */ = {
+		1C072CA0D0BC56312F61DCAA /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -595,41 +596,16 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		950668427BC0908361980E5C /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		DD5A6A6C1DAFC9546A8E2FF8 /* [CP] Check Pods Manifest.lock */ = {
+		398E95874A72DAA240A9F3F4 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -649,6 +625,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4DFEC38AF87E3BB9A79FD2C6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -677,7 +670,7 @@
 				63292C978763AD1A78F35AA1 /* Components.swift in Sources */,
 				C5C9B519F2832EBBDCEB459D /* Countries.swift in Sources */,
 				C0EB7079699F9FA61F600415 /* CreateProductViewController.swift in Sources */,
-				21CAAEBC70C160637D61B234 /* CreatePromotionViewController.swift in Sources */,
+				87D0FD7E7175AF44915EEB94 /* CreatePromotionViewController.swift in Sources */,
 				BE933853D85D93987BBEA23F /* CreateTraderViewController.swift in Sources */,
 				2AADDEB874DBC35D3A80FB6A /* DTOs.swift in Sources */,
 				BC9835F6C2444838E9B4173C /* DashboardViewController.swift in Sources */,
@@ -705,9 +698,8 @@
 				F9214A3E3BDC745FC0BBA2AC /* ProductCell.swift in Sources */,
 				05DD9A32506397943A80E42B /* ProductsTabViewController.swift in Sources */,
 				818A9A7C2C263DE0ACA609D5 /* ProductsViewController.swift in Sources */,
-				11794B47489CD4530324B56D /* PromoProductPickers.swift in Sources */,
-				C9C7AEE5899E9BB58E607494 /* PromotionsViewController.swift in Sources */,
-				11A2B3C4D5E6F708192A3B4C /* ViewPromotionViewController.swift in Sources */,
+				7A29A1F8E02B39FDB90F0A6D /* PromoProductPickers.swift in Sources */,
+				2CF59182AC7D9D2C7EEB4DF9 /* PromotionsViewController.swift in Sources */,
 				09DB1879B4786FD05D411884 /* ReportsViewController.swift in Sources */,
 				DD7DFE2E26BE2D95C327839B /* ReturnsViewController.swift in Sources */,
 				2A64C44EC7D1D9748C7DDD66 /* Router.swift in Sources */,
@@ -723,6 +715,7 @@
 				73037A24F81876008636B6FF /* TradersViewController.swift in Sources */,
 				0BC88EE29223F0A212AD898B /* UILabel+Styles.swift in Sources */,
 				3C3423FE3537D0FC30856E2B /* UITableView+Nib.swift in Sources */,
+				B926E2E7A2E7FED8FDE5C72C /* ViewPromotionViewController.swift in Sources */,
 				4194AF26022FAB032346DC64 /* WelcomeViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -823,7 +816,7 @@
 /* Begin XCBuildConfiguration section */
 		AAF8B913B6B3647633F93427 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F113CC00877F36B9550C7C9D /* Pods-AnokiXDistributor.debug.xcconfig */;
+			baseConfigurationReference = 340BE329AE1BB8CB6E547503 /* Pods-AnokiXDistributor.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -904,7 +897,7 @@
 		};
 		F284550FEDD735754D0E3A8B /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 15DDDFE292365AFB4B9A5AE2 /* Pods-AnokiXDistributor.release.xcconfig */;
+			baseConfigurationReference = 2201FC759675B56DBF859251 /* Pods-AnokiXDistributor.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
