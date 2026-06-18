@@ -863,7 +863,7 @@ struct PromotionDetailData: Decodable {
                 json.string("id"),
                 json["product"]?.string("id") ?? ""
             )
-            productName = productLabel.isEmpty ? nil : productLabel
+            productName = productLabel
             productId = Self.firstNonEmpty(
                 json.string("product_id"),
                 json.string("id"),
