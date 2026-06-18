@@ -789,25 +789,40 @@ struct PromotionsData: Decodable {
 /// are kept as raw `JSONValue` and parsed defensively by the wizard.
 struct PromotionDetailData: Decodable {
     let promotion: Promotion?
-    /// Raw `stock_logs` at the data root (shape varies — parse via `parseStockLogs`).
+    /// Raw `stock_logs` at the data root.
     let stockLogsJson: JSONValue?
+    /// Alternate key used by some API builds (`promotion_stock_logs` table name).
+    let promotionStockLogsJson: JSONValue?
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         promotion = try c.decodeIfPresent(Promotion.self, forKey: .promotion)
         stockLogsJson = try c.decodeIfPresent(JSONValue.self, forKey: .stockLogsJson)
+        promotionStockLogsJson = try c.decodeIfPresent(JSONValue.self, forKey: .promotionStockLogsJson)
     }
 
     private enum CodingKeys: String, CodingKey {
         case promotion
         case stockLogsJson = "stock_logs"
+        case promotionStockLogsJson = "promotion_stock_logs"
     }
 
-    /// Parsed stock log rows — checks data root first, then nested under `promotion`.
+    /// Parsed stock log rows — checks all known locations/keys (matches Android).
     func resolvedStockLogs() -> [StockLog] {
-        let root = Self.parseStockLogs(stockLogsJson)
-        if !root.isEmpty { return root }
-        return Self.parseStockLogs(promotion?.stockLogsJson)
+        for raw in candidateStockLogSources() {
+            let parsed = Self.parseStockLogs(raw)
+            if !parsed.isEmpty { return parsed }
+        }
+        return []
+    }
+
+    private func candidateStockLogSources() -> [JSONValue?] {
+        [
+            promotion?.stockLogsJson,
+            promotion?.promotionStockLogsJson,
+            stockLogsJson,
+            promotionStockLogsJson
+        ]
     }
 
     /// Defensive parser for `stock_logs` (array or wrapped object), mirroring Android/Gson leniency.
@@ -839,14 +854,20 @@ struct PromotionDetailData: Decodable {
         let createdAt: String?
 
         init(json: JSONValue) {
-            productName = Self.firstNonEmpty(
+            let productLabel = Self.firstNonEmpty(
                 json.string("product_name"),
                 json.string("name"),
-                json["product"]?.string("name") ?? ""
+                json.string("product_title"),
+                json["product"]?.string("name") ?? "",
+                json.string("product_id"),
+                json.string("id"),
+                json["product"]?.string("id") ?? ""
             )
+            productName = productLabel.isEmpty ? nil : productLabel
             productId = Self.firstNonEmpty(
                 json.string("product_id"),
-                json.string("id")
+                json.string("id"),
+                json["product"]?.string("id") ?? ""
             )
             action = json["action"]?.stringValue ?? json.string("action")
             quantity = json["quantity"]?.stringValue ?? json.string("quantity")
@@ -895,6 +916,7 @@ struct PromotionDetailData: Decodable {
         let traderSegments: JSONValue?
         let selectedProducts: JSONValue?
         let stockLogsJson: JSONValue?
+        let promotionStockLogsJson: JSONValue?
 
         init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -923,6 +945,7 @@ struct PromotionDetailData: Decodable {
             traderSegments = try c.decodeIfPresent(JSONValue.self, forKey: .traderSegments)
             selectedProducts = try c.decodeIfPresent(JSONValue.self, forKey: .selectedProducts)
             stockLogsJson = try c.decodeIfPresent(JSONValue.self, forKey: .stockLogsJson)
+            promotionStockLogsJson = try c.decodeIfPresent(JSONValue.self, forKey: .promotionStockLogsJson)
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -934,6 +957,7 @@ struct PromotionDetailData: Decodable {
             case reach, clicks, ctr, revenue, attributedSales
             case traderSegments, selectedProducts
             case stockLogsJson = "stock_logs"
+            case promotionStockLogsJson = "promotion_stock_logs"
         }
     }
 

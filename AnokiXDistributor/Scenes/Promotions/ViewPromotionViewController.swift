@@ -195,19 +195,14 @@ final class ViewPromotionViewController: BaseSecondaryViewController {
             if lines.isEmpty, let bare = dealEl.arrayValue { lines = bare }
             guard !lines.isEmpty else { continue }
             sections += 1
-            let subtitle = S.promoDealPriceStock(
-                formatMoney(dealEl.string("campaign_selling_price")),
-                dealEl.string("available_stock"))
-            addProductSection(title: S.promoComboDeals, subtitle: subtitle, lines: lines, role: nil)
+            addProductSection(title: S.promoComboDeals,
+                              subtitle: comboDealSubtitle(dealEl), lines: lines, role: nil)
         }
 
         for dealEl in root.array("buy1_get1_deals") {
             guard dealEl.objectValue != nil else { continue }
             sections += 1
-            let subtitle = S.promoDealPriceStock(
-                formatMoney(dealEl.string("campaign_selling_price")),
-                dealEl.string("available_stock"))
-            addDealHeader(title: S.promoB1g1Deals, subtitle: subtitle)
+            addDealHeader(title: S.promoB1g1Deals, subtitle: b1g1DealSubtitle(dealEl))
             appendProductLines(dealEl.array("buy_products"), role: S.promoRoleBuy)
             appendProductLines(dealEl.array("free_products"), role: S.promoRoleFree)
         }
@@ -464,6 +459,58 @@ final class ViewPromotionViewController: BaseSecondaryViewController {
     }
 
     // MARK: - Parsing / formatting
+
+    private struct DealMetrics {
+        var sumPrice: Double = 0
+        var minStock: Int?
+    }
+
+    private func metricsFromLines(_ lines: [JSONValue]) -> DealMetrics {
+        var m = DealMetrics()
+        for el in lines {
+            guard el.objectValue != nil else { continue }
+            let cpStr = el.string("campaign_selling_price")
+            if !cpStr.isEmpty, let cp = Double(cpStr) { m.sumPrice += cp }
+            let stockRaw = firstNonEmpty(el.string("available_stock"), el.string("original_stock"))
+            if !stockRaw.isEmpty, let stockVal = Double(stockRaw) {
+                let s = Int(stockVal.rounded())
+                m.minStock = min(m.minStock ?? s, s)
+            }
+        }
+        return m
+    }
+
+    private func comboDealSubtitle(_ deal: JSONValue) -> String? {
+        var price = deal.string("campaign_selling_price")
+        var stock = deal.string("available_stock")
+        if price.isEmpty || stock.isEmpty {
+            let metrics = metricsFromLines(deal.array("products"))
+            if price.isEmpty, metrics.sumPrice > 0 {
+                price = metrics.sumPrice.truncatingRemainder(dividingBy: 1) == 0
+                    ? String(Int(metrics.sumPrice)) : String(metrics.sumPrice)
+            }
+            if stock.isEmpty, let minStock = metrics.minStock {
+                stock = String(minStock)
+            }
+        }
+        return dealSubtitle(price: price, stock: stock)
+    }
+
+    private func b1g1DealSubtitle(_ deal: JSONValue) -> String? {
+        var price = deal.string("campaign_selling_price")
+        var stock = deal.string("available_stock")
+        if stock.isEmpty {
+            let metrics = metricsFromLines(deal.array("buy_products"))
+            if let minStock = metrics.minStock { stock = String(minStock) }
+        }
+        return dealSubtitle(price: price, stock: stock)
+    }
+
+    private func dealSubtitle(price: String, stock: String) -> String? {
+        let priceText = formatMoney(price)
+        if priceText.isEmpty && stock.isEmpty { return nil }
+        return S.promoDealPriceStock(priceText.isEmpty ? "—" : priceText, stock.isEmpty ? "—" : stock)
+    }
 
     private func formatTargeting(_ p: PromotionDetailData.Promotion) -> String {
         var parts: [String] = []
