@@ -11,6 +11,7 @@
 		09DB1879B4786FD05D411884 /* ReportsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0014905A214A71CA1E9395D0 /* ReportsViewController.swift */; };
 		0BC88EE29223F0A212AD898B /* UILabel+Styles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508A36A771BDF8395C3C5F18 /* UILabel+Styles.swift */; };
 		11794B47489CD4530324B56D /* PromoProductPickers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA45468DC57ACA9174D24515 /* PromoProductPickers.swift */; };
+		11A2B3C4D5E6F708192A3B4C /* ViewPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22B3C4D5E6F708192A3B4C5D /* ViewPromotionViewController.swift */; };
 		124C8E3AF6130BEB959E5AC6 /* AdaptiveGridLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D71ED2B74AEB8C46DEDFC9 /* AdaptiveGridLayout.swift */; };
 		16C385409B356182BB508228 /* PickerViewControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2110788581B0C9ABDD9EAFA3 /* PickerViewControllers.swift */; };
 		1E150122E98593D4BF55341E /* AddProductOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CDA6C338D22242462AE5674 /* AddProductOptionsViewController.swift */; };
@@ -112,6 +113,7 @@
 		3D7B6D0F30ADED760A0C53A7 /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
 		3D907F8E3E66E95C6812004F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/OrderCell.xib; sourceTree = "<group>"; };
 		3DA4DC723270640B4BD7123A /* PromotionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionsViewController.swift; sourceTree = "<group>"; };
+		22B3C4D5E6F708192A3B4C5D /* ViewPromotionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPromotionViewController.swift; sourceTree = "<group>"; };
 		432E7E4E99F004AE59774CF2 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		476CDE9653A47E28B02AEFAF /* ListScreenHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListScreenHelpers.swift; sourceTree = "<group>"; };
 		4DDE657DFBAF6C3C26A0C627 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
@@ -408,6 +410,7 @@
 				FA25CF8CA0FF6413969FC4AB /* CreatePromotionViewController.swift */,
 				FA45468DC57ACA9174D24515 /* PromoProductPickers.swift */,
 				3DA4DC723270640B4BD7123A /* PromotionsViewController.swift */,
+				22B3C4D5E6F708192A3B4C5D /* ViewPromotionViewController.swift */,
 			);
 			path = Promotions;
 			sourceTree = "<group>";
@@ -704,6 +707,7 @@
 				818A9A7C2C263DE0ACA609D5 /* ProductsViewController.swift in Sources */,
 				11794B47489CD4530324B56D /* PromoProductPickers.swift in Sources */,
 				C9C7AEE5899E9BB58E607494 /* PromotionsViewController.swift in Sources */,
+				11A2B3C4D5E6F708192A3B4C /* ViewPromotionViewController.swift in Sources */,
 				09DB1879B4786FD05D411884 /* ReportsViewController.swift in Sources */,
 				DD7DFE2E26BE2D95C327839B /* ReturnsViewController.swift in Sources */,
 				2A64C44EC7D1D9748C7DDD66 /* Router.swift in Sources */,

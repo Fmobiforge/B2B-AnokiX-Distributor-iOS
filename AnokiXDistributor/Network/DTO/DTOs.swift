@@ -789,6 +789,32 @@ struct PromotionsData: Decodable {
 /// are kept as raw `JSONValue` and parsed defensively by the wizard.
 struct PromotionDetailData: Decodable {
     let promotion: Promotion?
+    /// May be returned at the data root or nested under `Promotion`.
+    let stockLogs: [StockLog]?
+
+    struct StockLog: Decodable {
+        let productName: String?
+        let productId: String?
+        let action: String?
+        let quantity: String?
+        let createdAt: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            productName = try c.decodeIfPresent(String.self, forKey: .productName)
+            productId = JSONDecoding.flexString(c, key: .productId)
+            action = try c.decodeIfPresent(String.self, forKey: .action)
+            quantity = JSONDecoding.flexString(c, key: .quantity)
+            createdAt = try c.decodeIfPresent(String.self, forKey: .createdAt)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case productName = "product_name"
+            case productId = "product_id"
+            case action, quantity
+            case createdAt = "created_at"
+        }
+    }
 
     struct Promotion: Decodable {
         let id: String?
@@ -812,8 +838,16 @@ struct PromotionDetailData: Decodable {
         let bannerFile: Media?
         let videoFile: Media?
 
+        /// Analytics (get-by-id).
+        let reach: String?
+        let clicks: String?
+        let ctr: String?
+        let revenue: String?
+        let attributedSales: String?
+
         let traderSegments: JSONValue?
         let selectedProducts: JSONValue?
+        let stockLogs: [StockLog]?
 
         init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -834,8 +868,14 @@ struct PromotionDetailData: Decodable {
             lng = JSONDecoding.flexString(c, key: .lng)
             bannerFile = try c.decodeIfPresent(Media.self, forKey: .bannerFile)
             videoFile = try c.decodeIfPresent(Media.self, forKey: .videoFile)
+            reach = JSONDecoding.flexString(c, key: .reach)
+            clicks = JSONDecoding.flexString(c, key: .clicks)
+            ctr = JSONDecoding.flexString(c, key: .ctr)
+            revenue = JSONDecoding.flexString(c, key: .revenue)
+            attributedSales = JSONDecoding.flexString(c, key: .attributedSales)
             traderSegments = try c.decodeIfPresent(JSONValue.self, forKey: .traderSegments)
             selectedProducts = try c.decodeIfPresent(JSONValue.self, forKey: .selectedProducts)
+            stockLogs = try c.decodeIfPresent([StockLog].self, forKey: .stockLogs)
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -843,7 +883,10 @@ struct PromotionDetailData: Decodable {
             case promotionDescription = "description"
             case startDate, endDate, budget, dailyBudget, productsCost
             case address, placeId, lat, lng
-            case bannerFile, videoFile, traderSegments, selectedProducts
+            case bannerFile, videoFile
+            case reach, clicks, ctr, revenue
+            case attributedSales = "attributed_sales"
+            case traderSegments, selectedProducts, stockLogs = "stock_logs"
         }
     }
 

@@ -269,24 +269,11 @@ final class PromotionsViewController: BaseSecondaryViewController {
         present(sheet, animated: true)
     }
 
-    /// Quick read-only summary built from the list row (no extra fetch).
+    /// Opens the full campaign detail screen (loads get-by-id from the API).
     private func showDetails(_ item: PromotionItem) {
-        var lines: [String] = []
-        func add(_ label: String, _ value: String) {
-            if !value.isEmpty { lines.append("\(label): \(value)") }
-        }
-        add("Type", item.typeLabel)
-        add("Status", item.statusLabel)
-        add("Duration", item.dateRange)
-        add("Budget", item.budget)
-        add("Reach", item.reach)
-        add("Clicks", item.clicks)
-        add("CTR", item.ctr)
-        let alert = UIAlertController(title: item.name, message: lines.joined(separator: "\n"),
-                                      preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: S.promoEdit, style: .default) { [weak self] _ in self?.openEditor(item) })
-        alert.addAction(UIAlertAction(title: S.promoClose, style: .cancel))
-        present(alert, animated: true)
+        let detail = ViewPromotionViewController(promotionId: item.id)
+        detail.onUpdated = { [weak self] in self?.loadData() }
+        navigationController?.pushViewController(detail, animated: true)
     }
 
     private func confirmDelete(_ item: PromotionItem) {

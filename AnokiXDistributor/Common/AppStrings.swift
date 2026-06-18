@@ -152,6 +152,29 @@ enum S {
     static let promoDeletedMessage = "Campaign deleted"
     static let promoTypeLocked = "The campaign type can't be changed when editing."
     static let promoViewDetails = "View Details"
+    static let promoViewTitle = "Campaign Details"
+    static let promoSummaryTitle = "Campaign Summary"
+    static let promoAddedProducts = "Added Products"
+    static let promoStockLogs = "Stock Logs"
+    static let promoEditCampaign = "Edit Campaign"
+    static let promoNoProducts = "No products added to this campaign."
+    static let promoNoStockLogs = "No stock log entries yet."
+    static let promoTargeting = "Targeting"
+    static let promoTraderSegmentsLabel = "Trader Segments"
+    static let promoProductsSummary = "Products"
+    static let promoProductsCost = "Products Cost"
+    static let promoSalesImpact = "Sales Impact"
+    static let promoTypeLabel = "Type"
+    static let promoStatusLabel = "Status"
+    static let promoDuration = "Campaign Duration"
+    static let promoSingleProducts = "Single Products"
+    static let promoComboDeals = "Combo Deals"
+    static let promoB1g1Deals = "Buy1Get1 Free Deals"
+    static let promoRoleBuy = "Buy"
+    static let promoRoleFree = "Free"
+    static func promoDealPriceStock(_ price: String, _ stock: String) -> String {
+        "Deal price: \(price) · Stock: \(stock)"
+    }
     static let promoEdit = "Edit"
     static let promoDelete = "Delete"
     static let promoClose = "Close"
@@ -164,6 +187,11 @@ enum S {
     static let promoVideoUploaded = "Video uploaded"
     static func promoDeal(_ n: Int) -> String { "Deal \(n)" }
     static func promoMediaFailed(_ msg: String) -> String { "Campaign saved, but media upload failed: \(msg)" }
+    static let budget = "Budget"
+    static let reach = "Reach"
+    static let clicks = "Clicks"
+    static let ctr = "CTR"
+    static let errPromoName = "Please enter a campaign name."
 
     // Promotion list filters
     static let allTypes = "All Types"
