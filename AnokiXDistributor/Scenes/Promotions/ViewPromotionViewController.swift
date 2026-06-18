@@ -405,20 +405,40 @@ final class ViewPromotionViewController: BaseSecondaryViewController {
     private func makeStockLogRow(_ log: PromotionDetailData.StockLog) -> UIView {
         let resolved = firstNonEmpty(log.productName, log.productId)
         let product = resolved.isEmpty ? "—" : resolved
-        let row = UIStackView.vertical(spacing: 4, alignment: .leading)
-        row.addArrangedSubview(UILabel.make(product, font: AppFonts.bold(14), color: AppColors.textPrimary))
-        let detail = UIStackView.horizontal(spacing: 8, alignment: .center)
-        detail.distribution = .fillEqually
-        detail.addArrangedSubview(UILabel.make(log.action ?? "", font: AppFonts.regular(12), color: AppColors.textSecondary))
-        let qty = log.quantity.map { "Qty: \($0)" } ?? ""
-        detail.addArrangedSubview(UILabel.make(qty, font: AppFonts.regular(12), color: AppColors.textSecondary))
-        detail.addArrangedSubview(UILabel.make(log.createdAt ?? "", font: AppFonts.regular(12),
-                                               color: AppColors.textSecondary, align: .right))
-        row.addArrangedSubview(detail)
-        row.layoutMargins = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
-        row.isLayoutMarginsRelativeArrangement = true
-        row.addArrangedSubview(ListScreenLayout.hairline())
-        return row
+
+        let column = UIStackView.vertical(spacing: 2, alignment: .fill)
+        column.addArrangedSubview(
+            UILabel.make(product, font: AppFonts.bold(14), color: AppColors.textPrimary))
+
+        let actionQty = UIStackView.horizontal(spacing: 8, alignment: .center)
+        actionQty.distribution = .fill
+
+        let actionLabel = UILabel.make(log.action ?? "", font: AppFonts.regular(11),
+                                       color: AppColors.textSecondary)
+        actionLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        actionLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+        let qtyText = log.quantity.flatMap { $0.isEmpty ? nil : "Qty: \($0)" } ?? ""
+        let qtyLabel = UILabel.make(qtyText, font: AppFonts.bold(11), color: AppColors.textPrimary,
+                                    align: .right)
+        qtyLabel.setContentHuggingPriority(.required, for: .horizontal)
+        qtyLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        actionQty.addArrangedSubview(actionLabel)
+        actionQty.addArrangedSubview(qtyLabel)
+        column.addArrangedSubview(actionQty)
+
+        if let date = log.createdAt, !date.isEmpty {
+            column.addArrangedSubview(
+                UILabel.make(date, font: AppFonts.light(10), color: AppColors.textTertiary))
+        }
+
+        let wrapper = UIStackView.vertical(spacing: 0, alignment: .fill)
+        wrapper.addArrangedSubview(column)
+        wrapper.addArrangedSubview(ListScreenLayout.hairline())
+        wrapper.layoutMargins = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
+        wrapper.isLayoutMarginsRelativeArrangement = true
+        return wrapper
     }
 
     private func applyPromotionStatusBadge(_ badge: PaddingLabel, status: String?) {
