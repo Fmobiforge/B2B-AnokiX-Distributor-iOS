@@ -25,7 +25,7 @@ final class ApiClient {
     // MARK: - Endpoints
 
     func login(email: String, password: String, completion: @escaping (Result<LoginData, ApiError>) -> Void) {
-        let form = ["email": email, "password": password]
+        let form = ["email": email, "password": password, "portal_type": "distributor"]
         Http.postForm(baseUrl: Self.baseURL, path: "api/common/login", form: form, token: nil) { [weak self] r in
             self?.deliver(r, type: LoginData.self, completion: completion)
         }
