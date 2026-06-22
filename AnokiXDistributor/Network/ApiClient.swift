@@ -70,6 +70,16 @@ final class ApiClient {
                   type: CoordinateData.self, completion: completion)
     }
 
+    /// Public distributor self-registration ("Create Account"). Multipart with logo +
+    /// KYC documents; sends **no token** (public endpoint — mirrors the Android client).
+    func registerDistributor(form: [String: String], files: [Http.FilePart],
+                             completion: @escaping (Result<RegisterDistributorData, ApiError>) -> Void) {
+        Http.postMultipart(baseUrl: Self.baseURL, path: "api/distributor/register",
+                           form: form, files: files, token: nil) { [weak self] r in
+            self?.deliver(r, type: RegisterDistributorData.self, completion: completion)
+        }
+    }
+
     /// Create a trader under the logged-in distributor (multipart, with KYC documents).
     func createTrader(form: [String: String], files: [Http.FilePart],
                       completion: @escaping (Result<CreateTraderData, ApiError>) -> Void) {

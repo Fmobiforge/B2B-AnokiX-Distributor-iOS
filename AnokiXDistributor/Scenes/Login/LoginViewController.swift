@@ -74,7 +74,9 @@ final class LoginViewController: UIViewController {
     }
 
     @IBAction private func forgotTapped(_ sender: UIButton) { toast("Password reset coming soon") }
-    @IBAction private func joinTapped(_ sender: UIButton) { toast("Join portal coming soon") }
+    @IBAction private func joinTapped(_ sender: UIButton) {
+        RegisterDistributorViewController.open(from: self)
+    }
 
     @IBAction private func loginTapped(_ sender: UIButton) {
         let email = emailField.text?.trimmingCharacters(in: .whitespaces) ?? ""

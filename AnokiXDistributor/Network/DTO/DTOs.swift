@@ -465,6 +465,69 @@ struct CreateTraderData: Decodable {
     }
 }
 
+// MARK: - Register Distributor
+
+/// `data` block of POST /api/distributor/register. Only the identity/status fields
+/// needed to confirm the registration succeeded are modelled (mirrors the Android DTO).
+struct RegisterDistributorData: Decodable {
+    let user: User?
+    let distributor: Distributor?
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        user = try c.decodeIfPresent(User.self, forKey: .user)
+        distributor = try c.decodeIfPresent(Distributor.self, forKey: .distributor)
+    }
+
+    private enum CodingKeys: String, CodingKey { case user, distributor }
+
+    struct User: Decodable {
+        let id: String?
+        let firstName: String?
+        let lastName: String?
+        let email: String?
+        let phoneNumber: String?
+        let status: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            firstName = try c.decodeIfPresent(String.self, forKey: .firstName)
+            lastName = try c.decodeIfPresent(String.self, forKey: .lastName)
+            email = try c.decodeIfPresent(String.self, forKey: .email)
+            phoneNumber = try c.decodeIfPresent(String.self, forKey: .phoneNumber)
+            status = try c.decodeIfPresent(String.self, forKey: .status)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, firstName, lastName, email, phoneNumber, status
+        }
+    }
+
+    struct Distributor: Decodable {
+        let id: String?
+        let distributorCode: String?
+        let companyLegalName: String?
+        let tradingName: String?
+        let status: String?
+        let registrationStatus: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            distributorCode = try c.decodeIfPresent(String.self, forKey: .distributorCode)
+            companyLegalName = try c.decodeIfPresent(String.self, forKey: .companyLegalName)
+            tradingName = try c.decodeIfPresent(String.self, forKey: .tradingName)
+            status = try c.decodeIfPresent(String.self, forKey: .status)
+            registrationStatus = try c.decodeIfPresent(String.self, forKey: .registrationStatus)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, distributorCode, companyLegalName, tradingName, status, registrationStatus
+        }
+    }
+}
+
 // MARK: - Address autocomplete (Google proxy)
 
 struct AutocompleteData: Decodable {

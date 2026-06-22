@@ -122,7 +122,7 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
     }
 
     @objc private func createAccount() {
-        toast(S.distributorRegisterComingSoon)
+        RegisterDistributorViewController.open(from: self)
     }
 
     @objc private func openSupport() {

@@ -137,6 +137,24 @@ enum S {
     static let selectCategoriesHint = "Tap to select categories"
     static let selectDistributorsHint = "Tap to select distributors"
 
+    // Distributor registration ("Create Account") wizard
+    static let registerAccountTitle = "Create Account"
+    static let registerAccountSubtitle = "Join the anokiX distributor network."
+    static let rStepCompany = "Company"
+    static let rStepBusiness = "Business"
+    static let rStepContacts = "Contacts"
+    static let rStepLocation = "Location"
+    static let rStepDocuments = "Documents"
+    static let rStepService = "Service"
+    static let rStepWallet = "Wallet"
+    static let rStepTerms = "Terms"
+    static let cropCompanyLogo = "Crop Company Logo"
+    static let cropScale = "Scale"
+    static let cropRotation = "Rotation"
+    static let cropDragHint = "Drag the image to reposition"
+    static let cropUploadNew = "Upload new image"
+    static let ok = "OK"
+
     // Promotions / Create Ads & Promotion wizard
     static let promotionsSubtitle = "Manage campaigns and track performance"
     static let createPromotionTitle = "Create Ads & Promotion"

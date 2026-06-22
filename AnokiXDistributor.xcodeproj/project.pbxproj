@@ -16,6 +16,10 @@
 		1E150122E98593D4BF55341E /* AddProductOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CDA6C338D22242462AE5674 /* AddProductOptionsViewController.swift */; };
 		220DCC792279D57187041A88 /* DonutChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7E7EA5DF434C5C29176EC8 /* DonutChartView.swift */; };
 		247B8B5166BE8B77AE92CC1F /* StoresViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B7B66AF87E8F82C3611E71 /* StoresViewController.swift */; };
+		24A1B2C3D4E5F60718293A4B /* LogoCropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A1B2C3D4E5F60718293A4C /* LogoCropView.swift */; };
+		24A1B2C3D4E5F60718293A4D /* LogoCropViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A1B2C3D4E5F60718293A4E /* LogoCropViewController.swift */; };
+		24A1B2C3D4E5F60718293A4F /* RegisterDistributorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A1B2C3D4E5F60718293A50 /* RegisterDistributorViewController.swift */; };
+		24A1B2C3D4E5F60718293A51 /* RegisterSubmittedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A1B2C3D4E5F60718293A52 /* RegisterSubmittedViewController.swift */; };
 		2813F44AB952D81EF64F5F2E /* LogoHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = DFC9071EC94373BAF6F64961 /* LogoHeaderView.xib */; };
 		2A64C44EC7D1D9748C7DDD66 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C197FF80B487B73CECAF3D3 /* Router.swift */; };
 		2AADDEB874DBC35D3A80FB6A /* DTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A2475C9A0309A40D263AE7B /* DTOs.swift */; };
@@ -107,6 +111,10 @@
 		1B81E3C641A84965906B404F /* DistributorRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributorRepository.swift; sourceTree = "<group>"; };
 		1CDA6C338D22242462AE5674 /* AddProductOptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProductOptionsViewController.swift; sourceTree = "<group>"; };
 		2110788581B0C9ABDD9EAFA3 /* PickerViewControllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerViewControllers.swift; sourceTree = "<group>"; };
+		24A1B2C3D4E5F60718293A4C /* LogoCropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoCropView.swift; sourceTree = "<group>"; };
+		24A1B2C3D4E5F60718293A4E /* LogoCropViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoCropViewController.swift; sourceTree = "<group>"; };
+		24A1B2C3D4E5F60718293A50 /* RegisterDistributorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterDistributorViewController.swift; sourceTree = "<group>"; };
+		24A1B2C3D4E5F60718293A52 /* RegisterSubmittedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterSubmittedViewController.swift; sourceTree = "<group>"; };
 		26E0F0B3E188B92EEC495C80 /* DrawerMenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawerMenuCell.swift; sourceTree = "<group>"; };
 		2A015C501C37D9AF8F76714B /* Pods_AnokiXDistributor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AnokiXDistributor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		316B0CE12B5FD82B0AF1E08A /* ApiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiClient.swift; sourceTree = "<group>"; };
@@ -298,6 +306,7 @@
 				CA8CF7DCA35C91EA38B2A183 /* Orders */,
 				42E6FBBE47E72281B1572CAA /* Products */,
 				46449E0863BD3DB5692C4C14 /* Promotions */,
+				24A1B2C3D4E5F60718293A53 /* Register */,
 				06D461DBAD58A9508465AADA /* Reports */,
 				BB10D47DA6EBEE405E70045D /* Returns */,
 				3A60F821ED098BDED1BEE8CC /* Settings */,
@@ -351,6 +360,17 @@
 				57D865E16297298AD8652521 /* ViewPromotionViewController.swift */,
 			);
 			path = Promotions;
+			sourceTree = "<group>";
+		};
+		24A1B2C3D4E5F60718293A53 /* Register */ = {
+			isa = PBXGroup;
+			children = (
+				24A1B2C3D4E5F60718293A4C /* LogoCropView.swift */,
+				24A1B2C3D4E5F60718293A4E /* LogoCropViewController.swift */,
+				24A1B2C3D4E5F60718293A50 /* RegisterDistributorViewController.swift */,
+				24A1B2C3D4E5F60718293A52 /* RegisterSubmittedViewController.swift */,
+			);
+			path = Register;
 			sourceTree = "<group>";
 		};
 		4D585B570DDB0ADAEB45F3D1 /* Stores */ = {
@@ -734,6 +754,10 @@
 				69C06145291554FE07973D1D /* SplashViewController.swift in Sources */,
 				7C876CA9CCBA8D731904BEF9 /* StoreCell.swift in Sources */,
 				247B8B5166BE8B77AE92CC1F /* StoresViewController.swift in Sources */,
+				24A1B2C3D4E5F60718293A4B /* LogoCropView.swift in Sources */,
+				24A1B2C3D4E5F60718293A4D /* LogoCropViewController.swift in Sources */,
+				24A1B2C3D4E5F60718293A4F /* RegisterDistributorViewController.swift in Sources */,
+				24A1B2C3D4E5F60718293A51 /* RegisterSubmittedViewController.swift in Sources */,
 				C76B3718097DFF63A20E2202 /* StyleKit.swift in Sources */,
 				95AE02C2C889EDFBF8AF2A3D /* TraderCell.swift in Sources */,
 				73037A24F81876008636B6FF /* TradersViewController.swift in Sources */,
