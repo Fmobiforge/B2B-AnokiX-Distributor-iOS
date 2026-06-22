@@ -809,11 +809,12 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         row.addArrangedSubview(day)
         row.addArrangedSubview(open)
         row.addArrangedSubview(close)
-        NSLayoutConstraint.activate([
-            day.widthAnchor.constraint(equalTo: row.widthAnchor, multiplier: 1.4 / 3.4),
-            open.widthAnchor.constraint(equalTo: row.widthAnchor, multiplier: 1.0 / 3.4),
-            close.widthAnchor.constraint(equalTo: row.widthAnchor, multiplier: 1.0 / 3.4)
-        ])
+        // 1.4 : 1 : 1 column weights (Android) — relative widths only, no row-width multipliers
+        // (those fight stack spacing and cause Open/Close overlap).
+        open.widthAnchor.constraint(equalTo: close.widthAnchor).isActive = true
+        day.widthAnchor.constraint(equalTo: open.widthAnchor, multiplier: 1.2).isActive = true
+        open.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        close.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         return row
     }
 
@@ -837,12 +838,18 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
 
     private func buildTimeField(defaultValue: String) -> UITextField {
         let field = UITextField()
-        StyleKit.styleInput(field)
+        field.backgroundColor = AppColors.surface
+        field.layer.cornerRadius = AppMetrics.radiusMD
+        field.layer.borderWidth = 1
+        field.layer.borderColor = AppColors.border.cgColor
         field.textAlignment = .center
         field.keyboardType = .numberPad
         field.font = AppFonts.regular(13)
+        field.textColor = AppColors.textPrimary
         field.text = defaultValue
-        field.constrainHeight(40)
+        field.constrainHeight(36)
+        field.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        field.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         return field
     }
 
@@ -1553,15 +1560,29 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         field.isSecureTextEntry = true
         field.autocapitalizationType = .none
         field.textContentType = .oneTimeCode  // avoid the iOS strong-password overlay
+
+        let symbol = UIImage.SymbolConfiguration(pointSize: 15, weight: .regular)
         let eye = UIButton(type: .system)
-        eye.setImage(UIImage(systemName: "eye"), for: .normal)
+        eye.setImage(UIImage(systemName: "eye", withConfiguration: symbol), for: .normal)
         eye.tintColor = AppColors.textSecondary
-        eye.frame = CGRect(x: 0, y: 0, width: 38, height: 24)
+        eye.translatesAutoresizingMaskIntoConstraints = false
+
+        let container = UIView(frame: CGRect(x: 0, y: 0, width: 44, height: 48))
+        container.addSubview(eye)
+        NSLayoutConstraint.activate([
+            eye.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
+            eye.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            eye.widthAnchor.constraint(equalToConstant: 22),
+            eye.heightAnchor.constraint(equalToConstant: 22)
+        ])
+
         eye.addAction(UIAction { _ in
             field.isSecureTextEntry.toggle()
-            eye.setImage(UIImage(systemName: field.isSecureTextEntry ? "eye" : "eye.slash"), for: .normal)
+            let name = field.isSecureTextEntry ? "eye" : "eye.slash"
+            eye.setImage(UIImage(systemName: name, withConfiguration: symbol), for: .normal)
         }, for: .touchUpInside)
-        field.rightView = eye
+
+        field.rightView = container
         field.rightViewMode = .always
         return group
     }
