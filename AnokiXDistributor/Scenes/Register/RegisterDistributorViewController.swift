@@ -440,7 +440,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
             if pickedCoordinate == nil { return fail("Please select your business location on the map.") }
             return true
         case stepDocuments:
-            for d in docDefs where d.required && docFiles[d.key] == nil {
+            for d in docDefs where d.required && docFiles[d.key!] == nil {
                 return fail("Please upload all required documents.")
             }
             return true
@@ -678,17 +678,17 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
             icon.heightAnchor.constraint(equalToConstant: 20)
         ])
 
-        let title = UILabel.make(def.required ? def.title + " *" : def.title, font: AppFonts.bold(13), color: AppColors.textPrimary, lines: 0)
+        let title = UILabel.make(def.required ? def.title! + " *" : def.title, font: AppFonts.bold(13), color: AppColors.textPrimary, lines: 0)
         let textCol = UIStackView.vertical(spacing: 2, alignment: .leading)
         textCol.addArrangedSubview(title)
         if let subText = def.sub {
             let sub = UILabel.make(subText, font: AppFonts.regular(11), color: AppColors.textSecondary, lines: 0)
-            docSubtitleLabels[def.key] = sub
+            docSubtitleLabels[def.key!] = sub
             textCol.addArrangedSubview(sub)
         } else {
             let sub = UILabel.make("", font: AppFonts.regular(11), color: AppColors.textSecondary, lines: 0)
             sub.isHidden = true
-            docSubtitleLabels[def.key] = sub
+            docSubtitleLabels[def.key!] = sub
             textCol.addArrangedSubview(sub)
         }
 
@@ -705,7 +705,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
             self?.presentSourceSheet(allowFiles: true, from: upload)
         }, for: .touchUpInside)
         upload.setContentHuggingPriority(.required, for: .horizontal)
-        docButtons[def.key] = upload
+        docButtons[def.key!] = upload
 
         let row = UIStackView.horizontal(spacing: 12, alignment: .center)
         row.forAutoLayout()
