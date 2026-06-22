@@ -43,10 +43,21 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
     private let fleetSizes = ["No fleet", "1-3 vehicles", "4-10 vehicles", "11-20 vehicles", "21+ vehicles"]
     private let fleetSizeCodes = ["no_fleet", "1_3", "4_10", "11_20", "21_plus"]
 
-    // Delivery-day chips (Sun first, Mon–Fri default on — matches the design table).
+    // Delivery-day table (Sun first, Mon–Fri default on — matches Android).
     private let dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     private let dayDefaultOn = [false, true, true, true, true, true, false]
-    private var selectedDays: [String] = []
+    private final class DeliveryDayRow {
+        let checkbox: UIButton
+        let openField: UITextField
+        let closeField: UITextField
+        init(checkbox: UIButton, openField: UITextField, closeField: UITextField) {
+            self.checkbox = checkbox
+            self.openField = openField
+            self.closeField = closeField
+        }
+    }
+    private var deliveryDayRows: [DeliveryDayRow] = []
+    private let deliveryDaysTable = UIStackView.vertical(spacing: 4, alignment: .fill)
 
     // Chrome
     private let stepperScroll = UIScrollView()
@@ -125,9 +136,6 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
     private let categoryHint = UILabel.make("Tap to select categories", font: AppFonts.regular(13), color: AppColors.textSecondary)
     private let categoryChipsScroll = UIScrollView()
     private let categoryChips = UIStackView.horizontal(spacing: 8, alignment: .center)
-
-    // Delivery day chips
-    private let deliveryDaysStack = UIStackView.horizontal(spacing: 8, alignment: .center)
 
     // Location
     private let addressField = UITextField()
@@ -725,11 +733,11 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         stack.addArrangedSubview(subtitle("How do you serve your customers?"))
 
         stack.addArrangedSubview(UILabel.make("Distribution Coverage *", font: AppFonts.bold(14), color: AppColors.textPrimary))
-        let coverageRow = UIStackView.horizontal(spacing: 12, alignment: .fill)
+        let coverageRow = UIStackView.horizontal(spacing: 8, alignment: .fill)
         coverageRow.distribution = .fillEqually
         coverageRow.addArrangedSubview(coverageCard(value: "Local", systemIcon: "mappin.and.ellipse", desc: "Within your city"))
         coverageRow.addArrangedSubview(coverageCard(value: "Regional", systemIcon: "map", desc: "Across provinces"))
-        coverageRow.addArrangedSubview(coverageCard(value: "National", systemIcon: "globe.africa.fill", desc: "Country-wide"))
+        coverageRow.addArrangedSubview(coverageCard(value: "National", systemIcon: "flag.fill", desc: "Country-wide"))
         stack.addArrangedSubview(coverageRow)
 
         stack.addArrangedSubview(UILabel.make("Product Categories You Serve", font: AppFonts.bold(14), color: AppColors.textPrimary))
@@ -756,16 +764,103 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         stack.addArrangedSubview(dropdownGroup("Delivery Fleet Size", key: "delivery_fleet_size", title: "Delivery Fleet Size", options: fleetSizes, codes: fleetSizeCodes))
 
         stack.addArrangedSubview(UILabel.make("Preferred Delivery Days", font: AppFonts.bold(14), color: AppColors.textPrimary))
-        let daysScroll = UIScrollView()
-        daysScroll.showsHorizontalScrollIndicator = false
-        deliveryDaysStack.forAutoLayout()
-        daysScroll.addSubview(deliveryDaysStack)
-        deliveryDaysStack.pinEdges(to: daysScroll)
-        deliveryDaysStack.heightAnchor.constraint(equalTo: daysScroll.heightAnchor).isActive = true
-        daysScroll.heightAnchor.constraint(equalToConstant: 38).isActive = true
-        buildDeliveryDayChips()
-        stack.addArrangedSubview(daysScroll)
+        stack.addArrangedSubview(buildDeliveryDaysPanel())
         return stack
+    }
+
+    private func buildDeliveryDaysPanel() -> UIView {
+        let card = StyleKit.cardView()
+        deliveryDaysTable.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        deliveryDayRows.removeAll()
+
+        let headerDay = headerLabel("Day")
+        let headerOpen = headerLabel("Open", align: .center)
+        let headerClose = headerLabel("Close", align: .center)
+        deliveryDaysTable.addArrangedSubview(proportionalDeliveryRow(day: headerDay, open: headerOpen, close: headerClose))
+
+        for (index, day) in dayLabels.enumerated() {
+            let selected = dayDefaultOn[index]
+            let checkbox = makeDayCheckbox(day: day, selected: selected)
+            checkbox.addTarget(self, action: #selector(toggleDeliveryDay(_:)), for: .touchUpInside)
+            checkbox.tag = index
+
+            let open = buildTimeField(defaultValue: selected ? "8" : "")
+            let close = buildTimeField(defaultValue: selected ? "18" : "")
+            open.isEnabled = selected
+            close.isEnabled = selected
+
+            deliveryDayRows.append(DeliveryDayRow(checkbox: checkbox, openField: open, closeField: close))
+            deliveryDaysTable.addArrangedSubview(proportionalDeliveryRow(day: checkbox, open: open, close: close))
+        }
+
+        deliveryDaysTable.forAutoLayout()
+        card.addSubview(deliveryDaysTable)
+        deliveryDaysTable.pinEdges(to: card, insets: UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8))
+        return card
+    }
+
+    private func headerLabel(_ text: String, align: NSTextAlignment = .left) -> UILabel {
+        UILabel.make(text, font: AppFonts.bold(11), color: AppColors.textSecondary, align: align)
+    }
+
+    private func proportionalDeliveryRow(day: UIView, open: UIView, close: UIView) -> UIStackView {
+        let row = UIStackView.horizontal(spacing: 8, alignment: .center)
+        row.distribution = .fill
+        row.addArrangedSubview(day)
+        row.addArrangedSubview(open)
+        row.addArrangedSubview(close)
+        NSLayoutConstraint.activate([
+            day.widthAnchor.constraint(equalTo: row.widthAnchor, multiplier: 1.4 / 3.4),
+            open.widthAnchor.constraint(equalTo: row.widthAnchor, multiplier: 1.0 / 3.4),
+            close.widthAnchor.constraint(equalTo: row.widthAnchor, multiplier: 1.0 / 3.4)
+        ])
+        return row
+    }
+
+    private func makeDayCheckbox(day: String, selected: Bool) -> UIButton {
+        let checkbox = UIButton(type: .custom)
+        let symbol = UIImage.SymbolConfiguration(pointSize: 20, weight: .regular)
+        let empty = UIImage(systemName: "square", withConfiguration: symbol)?
+            .withTintColor(AppColors.purplePrimary, renderingMode: .alwaysOriginal)
+        let checked = UIImage(systemName: "checkmark.square.fill", withConfiguration: symbol)?
+            .withTintColor(AppColors.purplePrimary, renderingMode: .alwaysOriginal)
+        checkbox.setImage(empty, for: .normal)
+        checkbox.setImage(checked, for: .selected)
+        checkbox.setTitle(" \(day)", for: .normal)
+        checkbox.setTitleColor(AppColors.purplePrimary, for: .normal)
+        checkbox.titleLabel?.font = AppFonts.regular(13)
+        checkbox.contentHorizontalAlignment = .leading
+        checkbox.isSelected = selected
+        checkbox.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        return checkbox
+    }
+
+    private func buildTimeField(defaultValue: String) -> UITextField {
+        let field = UITextField()
+        StyleKit.styleInput(field)
+        field.textAlignment = .center
+        field.keyboardType = .numberPad
+        field.font = AppFonts.regular(13)
+        field.text = defaultValue
+        field.constrainHeight(40)
+        return field
+    }
+
+    @objc private func toggleDeliveryDay(_ sender: UIButton) {
+        sender.isSelected.toggle()
+        guard deliveryDayRows.indices.contains(sender.tag) else { return }
+        let row = deliveryDayRows[sender.tag]
+        if sender.isSelected {
+            if text(row.openField).isEmpty { row.openField.text = "8" }
+            if text(row.closeField).isEmpty { row.closeField.text = "18" }
+            row.openField.isEnabled = true
+            row.closeField.isEnabled = true
+        } else {
+            row.openField.text = ""
+            row.closeField.text = ""
+            row.openField.isEnabled = false
+            row.closeField.isEnabled = false
+        }
     }
 
     private func coverageCard(value: String, systemIcon: String, desc: String) -> UIView {
@@ -775,10 +870,12 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         card.layer.borderColor = AppColors.border.cgColor
         card.backgroundColor = AppColors.surface
         card.isUserInteractionEnabled = true
-        let icon = UIImageView(image: UIImage(systemName: systemIcon))
+        let icon = UIImageView(image: UIImage(systemName: systemIcon) ?? UIImage(systemName: "flag.fill"))
         icon.tintColor = AppColors.textSecondary
         icon.contentMode = .scaleAspectFit
         icon.constrainSize(24)
+        icon.setContentCompressionResistancePriority(.required, for: .horizontal)
+        icon.setContentCompressionResistancePriority(.required, for: .vertical)
         let title = UILabel.make(value, font: AppFonts.bold(13), color: AppColors.textPrimary, align: .center)
         let sub = UILabel.make(desc, font: AppFonts.regular(10), color: AppColors.textSecondary, align: .center, lines: 2)
         let inner = UIStackView.vertical(spacing: 6, alignment: .center)
@@ -808,39 +905,6 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
             entry.view.layer.borderWidth = selected ? 1.5 : 1
             entry.icon.tintColor = selected ? AppColors.purplePrimary : AppColors.textSecondary
             entry.title.textColor = selected ? AppColors.purplePrimary : AppColors.textPrimary
-        }
-    }
-
-    private func buildDeliveryDayChips() {
-        for (i, day) in dayLabels.enumerated() {
-            let chip = PaddingLabel(insets: UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16))
-            chip.text = day
-            chip.font = AppFonts.regular(13)
-            chip.layer.cornerRadius = 16
-            chip.layer.borderWidth = 1
-            chip.layer.masksToBounds = true
-            chip.isUserInteractionEnabled = true
-            chip.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(toggleDay(_:))))
-            deliveryDaysStack.addArrangedSubview(chip)
-            if dayDefaultOn[i] { selectedDays.append(day) }
-            styleDayChip(chip, selected: dayDefaultOn[i])
-        }
-    }
-
-    private func styleDayChip(_ chip: PaddingLabel, selected: Bool) {
-        chip.textColor = selected ? AppColors.purplePrimary : AppColors.textSecondary
-        chip.backgroundColor = selected ? AppColors.purpleLight : AppColors.surface
-        chip.layer.borderColor = (selected ? AppColors.purplePrimary : AppColors.border).cgColor
-    }
-
-    @objc private func toggleDay(_ gesture: UITapGestureRecognizer) {
-        guard let chip = gesture.view as? PaddingLabel, let day = chip.text else { return }
-        if let idx = selectedDays.firstIndex(of: day) {
-            selectedDays.remove(at: idx)
-            styleDayChip(chip, selected: false)
-        } else {
-            selectedDays.append(day)
-            styleDayChip(chip, selected: true)
         }
     }
 
@@ -1087,18 +1151,24 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
     }
 
     /// Web payload format: "{dayNum}:{open}.00-{close}.00" entries joined by "/",
-    /// where dayNum is the ISO weekday (Mon=1 … Sun=7). Example for Mon–Fri 8–18:
-    /// "1:8.00-18.00/2:8.00-18.00/3:8.00-18.00/4:8.00-18.00/5:8.00-18.00".
-    /// iOS has no per-day hour editor (chips are on/off only), so the default
-    /// 8.00–18.00 business window is sent for every selected day.
+    /// where dayNum is the ISO weekday (Mon=1 … Sun=7).
     private func buildDeliveryDays() -> String {
         var parts: [String] = []
         for num in 1...7 {
             let idx = (num == 7) ? 0 : num // dayLabels is Sun-first (0=Sun … 6=Sat)
-            guard selectedDays.contains(dayLabels[idx]) else { continue }
-            parts.append("\(num):8.00-18.00")
+            guard deliveryDayRows.indices.contains(idx), deliveryDayRows[idx].checkbox.isSelected else { continue }
+            let row = deliveryDayRows[idx]
+            var open = text(row.openField)
+            var close = text(row.closeField)
+            if open.isEmpty { open = "8" }
+            if close.isEmpty { close = "18" }
+            parts.append("\(num):\(formatHour(open))-\(formatHour(close))")
         }
         return parts.joined(separator: "/")
+    }
+
+    private func formatHour(_ value: String) -> String {
+        value.contains(".") ? value : value + ".00"
     }
 
     // MARK: - Address autocomplete
@@ -1278,7 +1348,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
             DispatchQueue.main.async {
                 if key == Self.logoKey {
                     self.applyLogo(image)
-                } else if let data = Self.downscaledJpeg(image, maxDimension: 1440, quality: 0.6) {
+                } else if let data = Self.compressedUploadData(from: image) {
                     self.applyPickedFile(key: key, data: data, name: suggested + ".jpg", mime: "image/jpeg")
                 }
                 self.pendingDocKey = nil
@@ -1295,7 +1365,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         var mime = mimeType(for: url)
 
         if mime.hasPrefix("image/"), let image = UIImage(data: data),
-           let jpeg = Self.downscaledJpeg(image, maxDimension: 1440, quality: 0.6) {
+           let jpeg = Self.compressedUploadData(from: image) {
             data = jpeg
             name = url.deletingPathExtension().lastPathComponent + ".jpg"
             mime = "image/jpeg"
@@ -1357,6 +1427,11 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
             return mime
         }
         return "application/octet-stream"
+    }
+
+    /// JPEG upload payload for document images — downscaled to max 1440 px, quality 0.6.
+    private static func compressedUploadData(from image: UIImage) -> Data? {
+        downscaledJpeg(image, maxDimension: 1440, quality: 0.6)
     }
 
     private static func downscaledJpeg(_ image: UIImage, maxDimension: CGFloat, quality: CGFloat) -> Data? {
@@ -1550,15 +1625,26 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         config.background.backgroundColor = AppColors.surface
         config.cornerStyle = .medium
         config.title = placeholder
-        config.image = UIImage(systemName: "chevron.down")
-        config.imagePlacement = .trailing
-        config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12)
+        config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 34)
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
             var out = incoming; out.font = AppFonts.regular(AppMetrics.textBody); return out
         }
         button.configuration = config
         button.contentHorizontalAlignment = .leading
         button.constrainHeight(48)
+
+        button.subviews.filter { $0.tag == 8802 }.forEach { $0.removeFromSuperview() }
+        let chevron = UIImageView(image: UIImage(systemName: "chevron.down",
+            withConfiguration: UIImage.SymbolConfiguration(pointSize: 12, weight: .semibold)))
+        chevron.tag = 8802
+        chevron.tintColor = AppColors.textSecondary
+        chevron.isUserInteractionEnabled = false
+        chevron.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(chevron)
+        NSLayoutConstraint.activate([
+            chevron.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: -12),
+            chevron.centerYAnchor.constraint(equalTo: button.centerYAnchor)
+        ])
     }
 
     private func setPickerTitle(_ button: UIButton, _ title: String) {
