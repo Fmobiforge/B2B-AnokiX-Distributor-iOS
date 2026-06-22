@@ -1563,26 +1563,28 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
 
         let symbol = UIImage.SymbolConfiguration(pointSize: 15, weight: .regular)
         let eye = UIButton(type: .system)
-        eye.setImage(UIImage(systemName: "eye", withConfiguration: symbol), for: .normal)
         eye.tintColor = AppColors.textSecondary
-        eye.translatesAutoresizingMaskIntoConstraints = false
-
-        let container = UIView(frame: CGRect(x: 0, y: 0, width: 44, height: 48))
-        container.addSubview(eye)
-        NSLayoutConstraint.activate([
-            eye.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
-            eye.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-            eye.widthAnchor.constraint(equalToConstant: 22),
-            eye.heightAnchor.constraint(equalToConstant: 22)
-        ])
+        var config = UIButton.Configuration.plain()
+        config.image = UIImage(systemName: "eye", withConfiguration: symbol)
+        config.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 14)
+        eye.configuration = config
+        // Use the button directly as rightView — a wrapper UIView with Auto Layout
+        // intercepts taps and prevents the field from becoming first responder.
+        eye.frame = CGRect(x: 0, y: 0, width: 44, height: 48)
 
         eye.addAction(UIAction { _ in
+            let wasFirstResponder = field.isFirstResponder
+            let text = field.text
             field.isSecureTextEntry.toggle()
+            field.text = text
+            if wasFirstResponder { field.becomeFirstResponder() }
             let name = field.isSecureTextEntry ? "eye" : "eye.slash"
-            eye.setImage(UIImage(systemName: name, withConfiguration: symbol), for: .normal)
+            var updated = eye.configuration
+            updated?.image = UIImage(systemName: name, withConfiguration: symbol)
+            eye.configuration = updated
         }, for: .touchUpInside)
 
-        field.rightView = container
+        field.rightView = eye
         field.rightViewMode = .always
         return group
     }
