@@ -304,7 +304,7 @@ final class OrderStatusTabsView: UIView {
         }
     }
 
-    private func makeTab(_ title: String, index: Int) -> (UIControl, UILabel, PaddingLabel, UIView) {
+    private func makeTab(_ title: String, index: Int) -> (container: UIControl, label: UILabel, count: PaddingLabel, indicator: UIView) {
         let container = TabControl()
         container.tag = index
         container.addTarget(self, action: #selector(tabTapped(_:)), for: .touchUpInside)
