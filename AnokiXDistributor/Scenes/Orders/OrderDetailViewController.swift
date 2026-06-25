@@ -196,7 +196,11 @@ final class OrderDetailViewController: BaseSecondaryViewController {
 
     private func stageRow(label: String, subtitle: String?, caption: String?, done: Bool, current: Bool,
                           hasLine: Bool, lineDone: Bool) -> UIView {
-        let row = UIStackView.horizontal(spacing: 14, alignment: .fill)
+        // `.top` (not `.fill`): the indicator column keeps its natural height instead of being
+        // stretched to the row. With `.fill`, a row whose left column is a lone fixed-size circle
+        // (the last stage / terminal node, no connector line) conflicts with the row height when the
+        // text column is taller — AutoLayout then under-measures the card and clips the bottom row.
+        let row = UIStackView.horizontal(spacing: 14, alignment: .top)
 
         let left = UIStackView.vertical(spacing: 0, alignment: .center)
         left.addArrangedSubview(buildCircle(done: done, current: current))
@@ -230,7 +234,7 @@ final class OrderDetailViewController: BaseSecondaryViewController {
     }
 
     private func terminalRow(label: String, note: String) -> UIView {
-        let row = UIStackView.horizontal(spacing: 14, alignment: .fill)
+        let row = UIStackView.horizontal(spacing: 14, alignment: .top)
 
         let circle = UIView()
         circle.backgroundColor = AppColors.danger
