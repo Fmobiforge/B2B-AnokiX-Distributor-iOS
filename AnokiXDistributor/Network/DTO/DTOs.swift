@@ -1074,3 +1074,109 @@ struct PromotionDetailData: Decodable {
         }
     }
 }
+
+// MARK: - Orders (GET api/distributor/orders)
+
+/// Orders list payload. Property names are camelCase; the shared decoder uses
+/// `.convertFromSnakeCase`, so JSON keys like `order_number` / `status_counts`
+/// map automatically.
+struct OrdersData: Decodable {
+    let orders: [OrderDTO]?
+    let pagination: OrderPagination?
+    let statusCounts: OrderStatusCounts?
+}
+
+struct OrderDTO: Decodable {
+    let id: Int
+    let orderNumber: String?
+    let traderId: Int?
+    let distributorId: Int?
+    let status: String?
+    let statusKey: String?
+    let subtotal: Double?
+    let totalAmount: Double?
+    let itemCount: Int?
+    let lineCount: Int?
+    let deliveryDate: String?
+    let deliveryStartTime: String?
+    let deliveryEndTime: String?
+    let notes: String?
+    let trader: OrderTraderDTO?
+    let products: [String]?       // list endpoint only
+    let items: [OrderItemDTO]?    // detail endpoint only
+    let createdAt: String?
+    let updatedAt: String?
+
+    var resolvedStatusKey: String {
+        if let k = statusKey, !k.isEmpty { return k }
+        return status?.lowercased() ?? "pending"
+    }
+
+    var traderName: String {
+        if let n = trader?.name, !n.trimmingCharacters(in: .whitespaces).isEmpty { return n }
+        return "Trader"
+    }
+
+    var amount: Double { totalAmount ?? subtotal ?? 0 }
+}
+
+struct OrderTraderDTO: Decodable {
+    let id: Int?
+    let name: String?
+    let phone: String?
+    let location: String?
+    let segment: String?
+}
+
+/// Line item on the detail response (`orders/get-by-id`). The fields are flat —
+/// `name` and `image_url` sit directly on the item, not under a nested product.
+struct OrderItemDTO: Decodable {
+    let id: Int?
+    let productId: Int?
+    let name: String?
+    let quantity: Int?
+    let unitPrice: Double?
+    let lineTotal: Double?
+    let status: String?
+    let imageUrl: String?
+}
+
+struct OrderPagination: Decodable {
+    let page: Int?
+    let perPage: Int?
+    let total: Int?
+    let totalPages: Int?
+}
+
+struct OrderStatusCounts: Decodable {
+    let all: Int?
+    let pending: Int?
+    let accepted: Int?
+    let picking: Int?
+    let packing: Int?
+    let readyForDelivery: Int?
+    let outForDelivery: Int?
+    let delivered: Int?
+    let cancelled: Int?
+    let failed: Int?
+
+    func count(for key: String) -> Int {
+        switch key {
+        case "all": return all ?? 0
+        case "pending": return pending ?? 0
+        case "accepted": return accepted ?? 0
+        case "picking": return picking ?? 0
+        case "packing": return packing ?? 0
+        case "ready_for_delivery": return readyForDelivery ?? 0
+        case "out_for_delivery": return outForDelivery ?? 0
+        case "delivered": return delivered ?? 0
+        case "cancelled": return cancelled ?? 0
+        case "failed": return failed ?? 0
+        default: return 0
+        }
+    }
+}
+
+struct OrderDetailData: Decodable {
+    let order: OrderDTO?
+}

@@ -24,6 +24,46 @@ enum S {
     static let dashboardSubtitle = "Here's what's happening today."
     static let ordersQueue = "Orders Queue"
     static let ordersSubtitle = "Manage and process incoming orders"
+
+    // Orders list + detail
+    static let allTraders = "All Traders"
+    static let ordersDateRange = "Date range"
+    static let ordersSearchHint = "Search by order ID or trader name…"
+    static let noOrdersFound = "No orders found."
+    static let ordersLoadFailed = "Failed to load orders."
+    static let orderDetails = "Order Details"
+    static let orderTracking = "Order Tracking"
+    static let liveUpdates = "Live updates"
+    static let orderTraderSection = "Trader"
+    static let orderSubtotal = "Subtotal"
+    static let orderTotal = "Total"
+    static let orderLoadFailed = "Failed to load order details."
+    static let orderCallFailed = "No phone app available to place the call."
+    // Active-stage captions shown under the current step in the detail timeline
+    static let orderStageCaptionAccepted = "Order accepted and queued for fulfilment"
+    static let orderStageCaptionPicking = "Items are being picked at the warehouse"
+    static let orderStageCaptionPacking = "Order is being packed for dispatch"
+    static let orderStageCaptionReady = "Packed and waiting for a delivery slot"
+    static let orderStageCaptionOutForDelivery = "Order is on the way to the trader"
+    static let orderCancelledStage = "Order Cancelled"
+    static let orderCancelledNote = "This order was cancelled."
+    static let orderFailedStage = "Order Failed"
+    static let orderFailedNote = "This order could not be completed."
+    static let orderActionViewOrder = "View Order"
+    static let orderActionAccept = "Accept Order"
+    static let orderActionReject = "Reject Order"
+    static let orderActionPick = "Pick Order"
+    static let orderActionPack = "Pack Order"
+    static let orderActionMarkReady = "Mark Ready"
+    static let orderActionDispatch = "Dispatch"
+    static let orderActionDelivered = "Delivered"
+    static let orderActionFailed = "Action failed. Please try again."
+    static func ordersPagination(_ from: Int, _ to: Int, _ total: Int) -> String {
+        "Showing \(from) to \(to) of \(total) orders"
+    }
+    static func ordersItemsCount(_ count: Int) -> String { "\(count) items" }
+    static func ordersItemsHeader(_ count: Int) -> String { "Items (\(count))" }
+    static func ordersProductsLabel(_ count: Int) -> String { "PRODUCTS \(count)" }
     static let inventoryOverview = "Inventory"
     static let inventorySubtitle = "Track stock levels and SKUs"
     static let productsTitle = "Products"

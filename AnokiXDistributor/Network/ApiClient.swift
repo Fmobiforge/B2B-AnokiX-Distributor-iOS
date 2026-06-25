@@ -182,6 +182,38 @@ final class ApiClient {
         getAuthed("api/distributor/inventory/summary", query: nil, type: InventorySummaryData.self, completion: completion)
     }
 
+    // MARK: Orders
+
+    /// Orders list for a status tab. Empty/null filters are omitted; `status` "all"
+    /// is also omitted so the backend returns every status.
+    func getOrders(traderId: String?, search: String, dateFrom: String, dateTo: String,
+                   status: String, page: Int, perPage: Int,
+                   completion: @escaping (Result<OrdersData, ApiError>) -> Void) {
+        var q: [String: String] = ["page": String(page), "per_page": String(perPage)]
+        if !status.isEmpty, status != "all" { q["status"] = status }
+        if let traderId = traderId, !traderId.isEmpty { q["trader_id"] = traderId }
+        let trimmed = search.trimmingCharacters(in: .whitespaces)
+        if !trimmed.isEmpty { q["search"] = trimmed }
+        if !dateFrom.isEmpty { q["date_from"] = dateFrom }
+        if !dateTo.isEmpty { q["date_to"] = dateTo }
+        getAuthed("api/distributor/orders", query: q, type: OrdersData.self, completion: completion)
+    }
+
+    /// Full order detail (+ items) for the tracking screen.
+    func getOrderById(id: String, completion: @escaping (Result<OrderDetailData, ApiError>) -> Void) {
+        getAuthed("api/distributor/orders/get-by-id", query: ["id": id], type: OrderDetailData.self, completion: completion)
+    }
+
+    /// Advance an order through the fulfilment flow. `action` is one of
+    /// accept / reject / pick / pack / ready / dispatch / deliver.
+    func orderAction(_ action: String, orderId: Int,
+                     completion: @escaping (Result<Void, ApiError>) -> Void) {
+        Http.postForm(baseUrl: Self.baseURL, path: "api/distributor/orders/\(action)",
+                      form: ["order_id": String(orderId)], token: session.token) { [weak self] r in
+            self?.deliverStatus(r, completion: completion)
+        }
+    }
+
     func getBaseInfo(completion: @escaping (Result<BaseInfoData, ApiError>) -> Void) {
         getAuthed("api/common/base-info", query: nil, type: BaseInfoData.self, completion: completion)
     }

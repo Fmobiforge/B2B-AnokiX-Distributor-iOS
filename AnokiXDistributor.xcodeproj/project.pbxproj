@@ -21,6 +21,8 @@
 		2A64C44EC7D1D9748C7DDD66 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C197FF80B487B73CECAF3D3 /* Router.swift */; };
 		2AADDEB874DBC35D3A80FB6A /* DTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A2475C9A0309A40D263AE7B /* DTOs.swift */; };
 		2B0D52FFE4389E772FC3FCE0 /* OrderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89E5AA9B84CB5D0FC25C022 /* OrderCell.swift */; };
+		A1B2C3D4E5F600000000A001 /* OrderListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000B001 /* OrderListCell.swift */; };
+		A1B2C3D4E5F600000000A002 /* OrderDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000B002 /* OrderDetailViewController.swift */; };
 		2CEAA5E90B936AE2CEC4812B /* DrawerMenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E0F0B3E188B92EEC495C80 /* DrawerMenuCell.swift */; };
 		2CF59182AC7D9D2C7EEB4DF9 /* PromotionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B68AFE0E8A18707C0CF1D6A /* PromotionsViewController.swift */; };
 		2E17B43F87B7350628BFCED5 /* InventoryCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 87DA897D802A5C4BCA511725 /* InventoryCell.xib */; };
@@ -178,6 +180,8 @@
 		D29A9889FE895D5A1EDCCB2A /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		D38B310DF3119E94E0BDCECC /* MockDistributorRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDistributorRepository.swift; sourceTree = "<group>"; };
 		D89E5AA9B84CB5D0FC25C022 /* OrderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderCell.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000B001 /* OrderListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderListCell.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000B002 /* OrderDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderDetailViewController.swift; sourceTree = "<group>"; };
 		D973D483E1D8393991E4A008 /* CreatePromotionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePromotionViewController.swift; sourceTree = "<group>"; };
 		DABF6F41B6F068451FA5EA0D /* SettingsSecurityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSecurityViewController.swift; sourceTree = "<group>"; };
 		DE7E7EA5DF434C5C29176EC8 /* DonutChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonutChartView.swift; sourceTree = "<group>"; };
@@ -521,6 +525,8 @@
 			isa = PBXGroup;
 			children = (
 				D89E5AA9B84CB5D0FC25C022 /* OrderCell.swift */,
+				A1B2C3D4E5F600000000B001 /* OrderListCell.swift */,
+				A1B2C3D4E5F600000000B002 /* OrderDetailViewController.swift */,
 				32C20CB35B15FBC56DFDE3CB /* OrdersViewController.swift */,
 			);
 			path = Orders;
@@ -734,6 +740,8 @@
 				45E49BEFA3433085988E1814 /* Models.swift in Sources */,
 				B284C2C9F4B08F1537A2E379 /* NotificationsViewController.swift in Sources */,
 				2B0D52FFE4389E772FC3FCE0 /* OrderCell.swift in Sources */,
+				A1B2C3D4E5F600000000A001 /* OrderListCell.swift in Sources */,
+				A1B2C3D4E5F600000000A002 /* OrderDetailViewController.swift in Sources */,
 				BC2C4B1E17D68057E7AD12D1 /* OrdersViewController.swift in Sources */,
 				16C385409B356182BB508228 /* PickerViewControllers.swift in Sources */,
 				F9214A3E3BDC745FC0BBA2AC /* ProductCell.swift in Sources */,
