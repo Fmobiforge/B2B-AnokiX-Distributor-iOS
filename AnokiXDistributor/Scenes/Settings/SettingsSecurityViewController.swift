@@ -23,15 +23,29 @@ final class SettingsSecurityViewController: BaseSettingsFormViewController {
         stack.pinEdges(to: card, insets: UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16))
     }
 
+    private var isSaving = false
+
     override func onSave() {
         let current = currentField.text ?? ""
         let newPassword = newField.text ?? ""
         let confirm = confirmField.text ?? ""
-        if let error = repository.changePassword(current: current, newPassword: newPassword, confirm: confirm) {
-            toast(error)
-            return
+
+        if current.isEmpty { toast(S.errCurrentPassword); return }
+        if newPassword.count < 8 { toast(S.errPasswordLength); return }
+        if newPassword != confirm { toast(S.errPasswordMatch); return }
+        if isSaving { return }
+
+        isSaving = true
+        ApiClient.shared.changePassword(currentPassword: current, newPassword: newPassword) { [weak self] result in
+            guard let self = self else { return }
+            self.isSaving = false
+            switch result {
+            case .success:
+                self.toast(S.settingsPasswordChanged)
+                self.navigationController?.popViewController(animated: true)
+            case .failure(let error):
+                self.toast(error.message.isEmpty ? S.settingsGenericError : error.message)
+            }
         }
-        settingsSavedToast()
-        navigationController?.popViewController(animated: true)
     }
 }

@@ -1,5 +1,7 @@
 import UIKit
 
+/// Profile Settings — loads the account from GET api/common/base-info and saves edits via
+/// POST api/common/profile/update (1-Settings-Profile.png).
 final class SettingsProfileViewController: BaseSettingsFormViewController {
 
     override var screenTitle: String { S.settingsProfileTitle }
@@ -9,9 +11,13 @@ final class SettingsProfileViewController: BaseSettingsFormViewController {
     private let lastNameField = UITextField()
     private let emailField = UITextField()
     private let phoneField = UITextField()
+    private var phoneCountry = Countries.default
+    private let phoneCountryButton = UIButton(type: .system)
     private let avatarLabel = UILabel()
     private let displayNameLabel = UILabel()
     private let companyLabel = UILabel()
+    private var companyName = ""
+    private var isSaving = false
 
     override func setupForm(in card: UIView) {
         avatarLabel.font = AppFonts.bold(22)
@@ -45,7 +51,7 @@ final class SettingsProfileViewController: BaseSettingsFormViewController {
         stack.addArrangedSubview(settingsFieldGroup(S.firstNameReq, firstNameField, placeholder: ""))
         stack.addArrangedSubview(settingsFieldGroup(S.lastNameReq, lastNameField, placeholder: ""))
         stack.addArrangedSubview(settingsFieldGroup(S.emailReq, emailField, placeholder: "", keyboard: .emailAddress))
-        stack.addArrangedSubview(settingsFieldGroup(S.phoneLabel, phoneField, placeholder: S.phoneHint, keyboard: .phonePad))
+        stack.addArrangedSubview(phoneGroup(S.phoneLabel))
 
         stack.forAutoLayout()
         card.addSubview(stack)
@@ -53,39 +59,60 @@ final class SettingsProfileViewController: BaseSettingsFormViewController {
     }
 
     override func loadData() {
-        let data = repository.getProfileSettings()
         let session = SessionManager.shared
-        let firstName = session.firstName.isEmpty ? data.firstName : session.firstName
-        let lastName = session.lastName.isEmpty ? data.lastName : session.lastName
-        let email = session.email.isEmpty ? data.email : session.email
-        let displayName = "\(firstName) \(lastName)".trimmingCharacters(in: .whitespaces)
+        bindFields(first: session.firstName, last: session.lastName, email: session.email, phone: "")
 
-        avatarLabel.text = initialsOf(displayName.isEmpty ? data.firstName + " " + data.lastName : displayName)
-        displayNameLabel.text = displayName.isEmpty ? "\(data.firstName) \(data.lastName)" : displayName
-        companyLabel.text = data.companyName
-        firstNameField.text = firstName
-        lastNameField.text = lastName
+        ApiClient.shared.getBaseInfo { [weak self] result in
+            guard let self = self, case .success(let data) = result else { return }
+            self.companyName = data.portalInfo?.companyLegalName ?? ""
+            if let user = data.user {
+                self.bindFields(first: user.firstName ?? "", last: user.lastName ?? "",
+                                email: user.email ?? "", phone: user.phoneNumber ?? "")
+            } else {
+                self.companyLabel.text = self.companyName
+            }
+        }
+    }
+
+    private func bindFields(first: String, last: String, email: String, phone: String) {
+        let displayName = "\(first) \(last)".trimmingCharacters(in: .whitespaces)
+        avatarLabel.text = initialsOf(displayName)
+        displayNameLabel.text = displayName
+        companyLabel.text = companyName
+        firstNameField.text = first
+        lastNameField.text = last
         emailField.text = email
-        phoneField.text = data.phone
+        let (country, number) = splitPhone(phone)
+        phoneCountry = country
+        configureCountryButton(phoneCountryButton, country: country)
+        phoneField.text = number
     }
 
     override func onSave() {
         let firstName = firstNameField.text?.trimmingCharacters(in: .whitespaces) ?? ""
         let lastName = lastNameField.text?.trimmingCharacters(in: .whitespaces) ?? ""
         let email = emailField.text?.trimmingCharacters(in: .whitespaces) ?? ""
-        let phone = phoneField.text?.trimmingCharacters(in: .whitespaces) ?? ""
+        let phone = fullPhone(phoneCountry, phoneField)
 
         if firstName.isEmpty { toast(S.errFirstNameSettings); return }
         if lastName.isEmpty { toast(S.errLastNameSettings); return }
         if email.isEmpty { toast(S.errEmailSettings); return }
+        if isSaving { return }
 
-        let current = repository.getProfileSettings()
-        repository.saveProfileSettings(ProfileSettings(
-            firstName: firstName, lastName: lastName, email: email, phone: phone, companyName: current.companyName))
-        SessionManager.shared.setUser(firstName: firstName, lastName: lastName, email: email,
-                                      roleLabel: SessionManager.shared.roleLabel)
-        settingsSavedToast()
-        navigationController?.popViewController(animated: true)
+        isSaving = true
+        ApiClient.shared.updateProfile(firstName: firstName, lastName: lastName, email: email, phone: phone) { [weak self] result in
+            guard let self = self else { return }
+            self.isSaving = false
+            switch result {
+            case .success:
+                SessionManager.shared.setUser(firstName: firstName, lastName: lastName,
+                                              email: email, roleLabel: SessionManager.shared.roleLabel)
+                self.settingsSavedToast()
+                self.navigationController?.popViewController(animated: true)
+            case .failure(let error):
+                self.toast(error.message.isEmpty ? S.settingsGenericError : error.message)
+            }
+        }
     }
 
     private func initialsOf(_ name: String) -> String {
@@ -95,5 +122,87 @@ final class SettingsProfileViewController: BaseSettingsFormViewController {
             if let first = part.first { result.append(first) }
         }
         return result.isEmpty ? "?" : result.uppercased()
+    }
+
+    // MARK: - Phone (country picker, matching Android)
+
+    private func phoneGroup(_ label: String) -> UIStackView {
+        configureCountryButton(phoneCountryButton, country: phoneCountry)
+        phoneCountryButton.addAction(UIAction { [weak self] _ in self?.pickCountry() }, for: .touchUpInside)
+
+        phoneField.placeholder = "Phone number"
+        phoneField.keyboardType = .phonePad
+        phoneField.font = AppFonts.regular(14)
+        phoneField.textColor = AppColors.textPrimary
+
+        let container = UIView()
+        container.backgroundColor = AppColors.surface
+        container.layer.cornerRadius = AppMetrics.radiusMD
+        container.layer.borderWidth = 1
+        container.layer.borderColor = AppColors.border.cgColor
+        container.constrainHeight(45)
+        let divider = UIView()
+        divider.backgroundColor = AppColors.border
+        let row = UIStackView.horizontal(spacing: 8, alignment: .center)
+        row.forAutoLayout()
+        phoneCountryButton.setContentHuggingPriority(.required, for: .horizontal)
+        phoneField.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        row.addArrangedSubview(phoneCountryButton)
+        row.addArrangedSubview(divider)
+        row.addArrangedSubview(phoneField)
+        container.addSubview(row)
+        row.pinEdges(to: container, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 12))
+        divider.widthAnchor.constraint(equalToConstant: 1).isActive = true
+        divider.heightAnchor.constraint(equalToConstant: 24).isActive = true
+
+        let stack = UIStackView.vertical(spacing: 5, alignment: .fill)
+        stack.addArrangedSubview(UILabel.make(label, font: AppFonts.regular(13), color: AppColors.textPrimary))
+        stack.addArrangedSubview(container)
+        return stack
+    }
+
+    private func configureCountryButton(_ button: UIButton, country: Country) {
+        var config = UIButton.Configuration.plain()
+        config.title = "\(country.flag) \(country.dialCode)"
+        config.image = UIImage(systemName: "chevron.down")
+        config.imagePlacement = .trailing
+        config.imagePadding = 4
+        config.baseForegroundColor = AppColors.textPrimary
+        config.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 4)
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 10, weight: .regular)
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var out = incoming; out.font = AppFonts.regular(14); return out
+        }
+        button.configuration = config
+    }
+
+    private func pickCountry() {
+        let picker = CountryPickerViewController()
+        picker.onSelect = { [weak self] country in
+            guard let self = self else { return }
+            self.phoneCountry = country
+            self.configureCountryButton(self.phoneCountryButton, country: country)
+        }
+        present(UINavigationController(rootViewController: picker), animated: true)
+    }
+
+    private func fullPhone(_ country: Country, _ field: UITextField) -> String {
+        var number = (field.text ?? "").filter { $0.isNumber }
+        if number.isEmpty { return "" }
+        if number.hasPrefix("0") { number.removeFirst() }
+        return country.dialCode + number
+    }
+
+    private func splitPhone(_ raw: String?) -> (Country, String) {
+        let value = (raw ?? "").trimmingCharacters(in: .whitespaces)
+        if value.hasPrefix("+") {
+            let match = Countries.all
+                .filter { value.hasPrefix($0.dialCode) }
+                .max { $0.dialCode.count < $1.dialCode.count }
+            if let c = match {
+                return (c, String(value.dropFirst(c.dialCode.count)).filter { $0.isNumber })
+            }
+        }
+        return (Countries.default, value.filter { $0.isNumber })
     }
 }

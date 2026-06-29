@@ -214,8 +214,172 @@ final class ApiClient {
         }
     }
 
+    // MARK: Deliveries
+
+    /// Deliveries list + KPI summary + status counts for a date range. Empty filters are
+    /// omitted; tab/area/search filtering is then applied locally over the returned set.
+    func getDeliveries(dateFrom: String, dateTo: String, search: String, page: Int, perPage: Int,
+                       completion: @escaping (Result<DeliveriesData, ApiError>) -> Void) {
+        var q: [String: String] = ["page": String(page), "per_page": String(perPage)]
+        if !dateFrom.isEmpty { q["date_from"] = dateFrom }
+        if !dateTo.isEmpty { q["date_to"] = dateTo }
+        let trimmed = search.trimmingCharacters(in: .whitespaces)
+        if !trimmed.isEmpty { q["search"] = trimmed }
+        getAuthed("api/distributor/deliveries", query: q, type: DeliveriesData.self, completion: completion)
+    }
+
+    /// Full delivery detail (+ items) for the detail screen.
+    func getDeliveryById(id: String, completion: @escaping (Result<DeliveryDetailData, ApiError>) -> Void) {
+        getAuthed("api/distributor/deliveries/get-by-id", query: ["id": id],
+                  type: DeliveryDetailData.self, completion: completion)
+    }
+
+    /// Advance a delivery: `action` is `dispatch` (ReadyForDelivery → OutForDelivery) or
+    /// `deliver` (OutForDelivery → Delivered). Returns the updated delivery.
+    func deliveryAction(_ action: String, deliveryId: Int,
+                        completion: @escaping (Result<DeliveryDetailData, ApiError>) -> Void) {
+        Http.postForm(baseUrl: Self.baseURL, path: "api/distributor/deliveries/\(action)",
+                      form: ["order_id": String(deliveryId)], token: session.token) { [weak self] r in
+            self?.deliver(r, type: DeliveryDetailData.self, completion: completion)
+        }
+    }
+
+    // MARK: Returns (GRNs)
+
+    /// Returns list + KPI summary + status counts for a date range. Empty filters are omitted;
+    /// status tab / reason / search filtering is then applied locally over the returned set.
+    func getReturns(dateFrom: String, dateTo: String, search: String, page: Int, perPage: Int,
+                    completion: @escaping (Result<ReturnsData, ApiError>) -> Void) {
+        var q: [String: String] = ["page": String(page), "per_page": String(perPage)]
+        if !dateFrom.isEmpty { q["date_from"] = dateFrom }
+        if !dateTo.isEmpty { q["date_to"] = dateTo }
+        let trimmed = search.trimmingCharacters(in: .whitespaces)
+        if !trimmed.isEmpty { q["search"] = trimmed }
+        getAuthed("api/distributor/grns", query: q, type: ReturnsData.self, completion: completion)
+    }
+
+    /// Full return detail (+ items) for the detail screen.
+    func getReturnById(id: String, completion: @escaping (Result<ReturnDetailData, ApiError>) -> Void) {
+        getAuthed("api/distributor/grns/get-by-id", query: ["id": id],
+                  type: ReturnDetailData.self, completion: completion)
+    }
+
+    /// Decide a return: `action` is `approve` or `reject`; `note` is the optional decision
+    /// note. Returns the updated return (same shape as get-by-id).
+    func returnAction(_ action: String, grnId: Int, note: String,
+                      completion: @escaping (Result<ReturnDetailData, ApiError>) -> Void) {
+        var form = ["grn_id": String(grnId)]
+        if !note.isEmpty { form["note"] = note }
+        Http.postForm(baseUrl: Self.baseURL, path: "api/distributor/grns/\(action)",
+                      form: form, token: session.token) { [weak self] r in
+            self?.deliver(r, type: ReturnDetailData.self, completion: completion)
+        }
+    }
+
+    // MARK: Notifications (common)
+
+    /// Live unread-notification count (api/common/notifications/unread-count).
+    func getUnreadCount(completion: @escaping (Result<UnreadCountData, ApiError>) -> Void) {
+        getAuthed("api/common/notifications/unread-count", query: nil, type: UnreadCountData.self, completion: completion)
+    }
+
+    /// Notification feed (api/common/notifications). `filter` is "all" (omitted) or "unread";
+    /// paged by `page`/`perPage`.
+    func getNotifications(filter: String, page: Int, perPage: Int,
+                          completion: @escaping (Result<NotificationsData, ApiError>) -> Void) {
+        var q: [String: String] = ["page": String(page), "per_page": String(perPage)]
+        if !filter.isEmpty && filter != "all" { q["filter"] = filter }
+        getAuthed("api/common/notifications", query: q, type: NotificationsData.self, completion: completion)
+    }
+
+    /// Mark one notification read (api/common/notifications/read, id=).
+    func markNotificationRead(id: String, completion: @escaping (Result<Void, ApiError>) -> Void) {
+        Http.postForm(baseUrl: Self.baseURL, path: "api/common/notifications/read",
+                      form: ["id": id], token: session.token) { [weak self] r in
+            self?.deliverStatusOnly(r, completion: completion)
+        }
+    }
+
+    /// Mark every notification read (api/common/notifications/read, all=true).
+    func markAllNotificationsRead(completion: @escaping (Result<Void, ApiError>) -> Void) {
+        Http.postForm(baseUrl: Self.baseURL, path: "api/common/notifications/read",
+                      form: ["all": "true"], token: session.token) { [weak self] r in
+            self?.deliverStatusOnly(r, completion: completion)
+        }
+    }
+
     func getBaseInfo(completion: @escaping (Result<BaseInfoData, ApiError>) -> Void) {
         getAuthed("api/common/base-info", query: nil, type: BaseInfoData.self, completion: completion)
+    }
+
+    // MARK: Settings: business profile (7-step)
+
+    /// Full distributor business record for the Business editor.
+    func getBusinessProfile(completion: @escaping (Result<BusinessProfileData, ApiError>) -> Void) {
+        getAuthed("api/distributor/business/profile", query: nil,
+                  type: BusinessProfileData.self, completion: completion)
+    }
+
+    /// Save one Business step (multipart so logo/document steps share the path).
+    func updateBusinessProfile(form: [String: String], files: [Http.FilePart],
+                               completion: @escaping (Result<Void, ApiError>) -> Void) {
+        Http.postMultipart(baseUrl: Self.baseURL, path: "api/distributor/business/profile/update",
+                           form: form, files: files, token: session.token) { [weak self] r in
+            self?.deliverStatusOnly(r, completion: completion)
+        }
+    }
+
+    // MARK: Settings: profile / preferences
+
+    /// Portal preferences + notification toggles (api/common/preferences).
+    func getPreferences(completion: @escaping (Result<PreferencesData, ApiError>) -> Void) {
+        getAuthed("api/common/preferences", query: nil, type: PreferencesData.self, completion: completion)
+    }
+
+    /// Update the personal profile (api/common/profile/update).
+    func updateProfile(firstName: String, lastName: String, email: String, phone: String,
+                       completion: @escaping (Result<ProfileUpdateData, ApiError>) -> Void) {
+        postAuthed("api/common/profile/update",
+                   form: ["first_name": firstName, "last_name": lastName,
+                          "email": email, "phone_number": phone],
+                   type: ProfileUpdateData.self, completion: completion)
+    }
+
+    /// Change the account password (api/common/profile/password).
+    func changePassword(currentPassword: String, newPassword: String,
+                        completion: @escaping (Result<Void, ApiError>) -> Void) {
+        Http.postForm(baseUrl: Self.baseURL, path: "api/common/profile/password",
+                      form: ["current_password": currentPassword, "new_password": newPassword],
+                      token: session.token) { [weak self] r in
+            self?.deliverStatusOnly(r, completion: completion)
+        }
+    }
+
+    /// Update the 5 notification toggles (api/common/preferences/update, JSON body).
+    func updateNotificationPrefs(orderAlerts: Bool, lowStockAlerts: Bool, deliveryUpdates: Bool,
+                                 financeReminders: Bool, reportReady: Bool,
+                                 completion: @escaping (Result<Void, ApiError>) -> Void) {
+        let notifications: [String: Any] = [
+            "orderAlerts": orderAlerts, "lowStockAlerts": lowStockAlerts,
+            "deliveryUpdates": deliveryUpdates, "financeReminders": financeReminders,
+            "reportReady": reportReady
+        ]
+        postPreferences(["notifications": notifications], completion: completion)
+    }
+
+    /// Update the regional preferences (api/common/preferences/update, JSON body).
+    func updatePreferences(language: String, currency: String, timezone: String, dateFormat: String,
+                           completion: @escaping (Result<Void, ApiError>) -> Void) {
+        postPreferences(["language": language, "currency": currency,
+                         "timezone": timezone, "date_format": dateFormat], completion: completion)
+    }
+
+    private func postPreferences(_ body: [String: Any],
+                                 completion: @escaping (Result<Void, ApiError>) -> Void) {
+        Http.postJson(baseUrl: Self.baseURL, path: "api/common/preferences/update",
+                      json: body, token: session.token) { [weak self] r in
+            self?.deliverStatusOnly(r, completion: completion)
+        }
     }
 
     func getStore(id: String, completion: @escaping (Result<StoreDetailData, ApiError>) -> Void) {
@@ -269,6 +433,23 @@ final class ApiClient {
             } else {
                 let message = envelope["message"].string ?? "Request failed"
                 result = .failure(ApiError(message: message))
+            }
+        } else {
+            result = .failure(ApiError(message: "Network error (HTTP \(r.code))"))
+        }
+        DispatchQueue.main.async { completion(result) }
+    }
+
+    /// Checks only the `status`/`message` of an envelope, ignoring the shape of `data`.
+    /// Used by endpoints (e.g. notifications/read) whose `data` block is not consumed.
+    private func deliverStatusOnly(_ r: Http.Result, completion: @escaping (Result<Void, ApiError>) -> Void) {
+        var result: Result<Void, ApiError>
+        if let body = r.body, !body.isEmpty {
+            let envelope = JSON(parseJSON: body)
+            if envelope["status"].boolValue {
+                result = .success(())
+            } else {
+                result = .failure(ApiError(message: envelope["message"].string ?? "Request failed"))
             }
         } else {
             result = .failure(ApiError(message: "Network error (HTTP \(r.code))"))

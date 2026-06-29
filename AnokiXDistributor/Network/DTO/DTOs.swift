@@ -566,11 +566,31 @@ struct CoordinateData: Decodable {
 // MARK: - Base info (currencies + timezones)
 
 struct BaseInfoData: Decodable {
+    let user: AccountUser?
+    let portalInfo: PortalInfo?
     let currencies: [Currency]?
     let timezones: [Timezone]?
     let brands: [Brand]?
     let productCategories: [ProductCategory]?
     let productUnits: [ProductUnit]?
+
+    /// Logged-in account (Settings → Profile).
+    struct AccountUser: Decodable {
+        let id: String?
+        let email: String?
+        let firstName: String?
+        let lastName: String?
+        let phoneNumber: String?
+    }
+
+    /// Distributor portal record (Settings header + company name).
+    struct PortalInfo: Decodable {
+        let id: String?
+        let companyLegalName: String?
+        let tradingName: String?
+        let companyEmail: String?
+        let companyLogoUrl: String?
+    }
 
     struct Currency: Decodable {
         let id: String?
@@ -1179,4 +1199,444 @@ struct OrderStatusCounts: Decodable {
 
 struct OrderDetailData: Decodable {
     let order: OrderDTO?
+}
+
+// MARK: - Deliveries
+
+struct DeliveriesData: Decodable {
+    let deliveries: [DeliveryDTO]?
+    let summary: DeliverySummary?
+    let statusCounts: DeliveryStatusCounts?
+    let areas: [String]?
+    let pagination: DeliveryPagination?
+}
+
+struct DeliveryDTO: Decodable {
+    let id: Int
+    let deliveryNumber: String?
+    let orderNumber: String?
+    let traderId: Int?
+    let traderName: String?
+    let traderPhone: String?
+    let area: String?
+    let driver: String?
+    let rawStatus: String?       // ReadyForDelivery / OutForDelivery / Delivered ...
+    let deliveryDate: String?
+    let deliveryAt: String?
+    let updatedAt: String?
+    let itemCount: Int?
+    let totalAmount: Double?
+    let status: String?          // delivered / delayed / in_transit / failed / returned
+    let onTime: Bool?
+
+    var resolvedTraderName: String {
+        if let n = traderName, !n.trimmingCharacters(in: .whitespaces).isEmpty { return n }
+        return "Trader"
+    }
+}
+
+struct DeliverySummary: Decodable {
+    let totalDeliveries: Int?
+    let onTime: Int?
+    let onTimePct: Double?
+    let inTransit: Int?
+    let inTransitPct: Double?
+    let delayed: Int?
+    let delayedPct: Double?
+    let failed: Int?
+    let failedPct: Double?
+    let delivered: Int?
+}
+
+struct DeliveryStatusCounts: Decodable {
+    let all: Int?
+    let inTransit: Int?
+    let delivered: Int?
+    let delayed: Int?
+    let failed: Int?
+    let returned: Int?
+
+    func count(for key: String) -> Int {
+        switch key {
+        case "all": return all ?? 0
+        case "in_transit": return inTransit ?? 0
+        case "delivered": return delivered ?? 0
+        case "delayed": return delayed ?? 0
+        case "failed": return failed ?? 0
+        case "returned": return returned ?? 0
+        default: return 0
+        }
+    }
+}
+
+struct DeliveryPagination: Decodable {
+    let page: Int?
+    let perPage: Int?
+    let total: Int?
+    let totalPages: Int?
+}
+
+struct DeliveryDetailData: Decodable {
+    let delivery: DeliveryDetailDTO?
+}
+
+struct DeliveryDetailDTO: Decodable {
+    let id: Int
+    let orderNumber: String?
+    let deliveryNumber: String?
+    let traderId: Int?
+    let status: String?           // raw e.g. "ReadyForDelivery"
+    let statusKey: String?
+    let deliveryStatus: String?   // computed (delivered / delayed ...)
+    let subtotal: Double?
+    let totalAmount: Double?
+    let itemCount: Int?
+    let deliveryDate: String?
+    let deliveryStartTime: String?
+    let deliveryEndTime: String?
+    let deliveryAt: String?
+    let area: String?
+    let notes: String?
+    let trader: OrderTraderDTO?
+    let items: [DeliveryItemDTO]?
+    let createdAt: String?
+    let updatedAt: String?
+
+    var resolvedTraderName: String {
+        if let n = trader?.name, !n.trimmingCharacters(in: .whitespaces).isEmpty { return n }
+        return "Trader"
+    }
+}
+
+struct DeliveryItemDTO: Decodable {
+    let id: Int?
+    let productId: Int?
+    let name: String?
+    let quantity: Int?
+    let unitPrice: Double?
+    let lineTotal: Double?
+    let status: String?
+    let imageUrl: String?
+}
+
+// MARK: - Returns (GRNs)
+
+struct ReturnsData: Decodable {
+    let returns: [ReturnDTO]?
+    let summary: ReturnSummary?
+    let statusCounts: ReturnStatusCounts?
+    let pagination: ReturnPagination?
+}
+
+struct ReturnDTO: Decodable {
+    let id: Int
+    let grnNumber: String?
+    let sourceGrvId: Int?
+    let traderId: Int?
+    let traderName: String?
+    let traderPhone: String?
+    let reason: String?           // damaged / expired / ...
+    let reasonLabel: String?      // "Damaged Items"
+    let status: String?           // pending / approved / rejected
+    let rawStatus: String?
+    let itemCount: Int?
+    let totalQuantity: Int?
+    let note: String?
+    let decisionNote: String?
+    let creditNoteNumber: String?
+    let creditNoteTotal: Double?
+    let approvedAt: String?
+    let createdAt: String?
+
+    var resolvedTraderName: String {
+        if let n = traderName, !n.trimmingCharacters(in: .whitespaces).isEmpty { return n }
+        return "Trader"
+    }
+}
+
+struct ReturnSummary: Decodable {
+    let totalReturns: Int?
+    let pending: Int?
+    let approved: Int?
+    let rejected: Int?
+    let totalValue: Double?
+}
+
+struct ReturnStatusCounts: Decodable {
+    let all: Int?
+    let pending: Int?
+    let approved: Int?
+    let rejected: Int?
+
+    func count(for key: String) -> Int {
+        switch key {
+        case "all": return all ?? 0
+        case "pending": return pending ?? 0
+        case "approved": return approved ?? 0
+        case "rejected": return rejected ?? 0
+        default: return 0
+        }
+    }
+}
+
+struct ReturnPagination: Decodable {
+    let page: Int?
+    let perPage: Int?
+    let total: Int?
+    let totalPages: Int?
+}
+
+struct ReturnDetailData: Decodable {
+    let returnItem: ReturnDetailDTO?
+
+    /// `return` is a Swift keyword, so the JSON member is bound explicitly.
+    enum CodingKeys: String, CodingKey {
+        case returnItem = "return"
+    }
+}
+
+struct ReturnDetailDTO: Decodable {
+    let id: Int
+    let grnNumber: String?
+    let sourceGrvId: Int?
+    let traderId: Int?
+    let traderName: String?
+    let traderPhone: String?
+    let reason: String?
+    let reasonLabel: String?
+    let status: String?           // pending / approved / rejected
+    let rawStatus: String?
+    let itemCount: Int?
+    let totalQuantity: Int?
+    let note: String?
+    let decisionNote: String?
+    let creditNoteNumber: String?
+    let creditNoteTotal: Double?
+    let approvedAt: String?
+    let createdAt: String?
+    let items: [ReturnItemDTO]?
+
+    var resolvedTraderName: String {
+        if let n = traderName, !n.trimmingCharacters(in: .whitespaces).isEmpty { return n }
+        return "Trader"
+    }
+}
+
+struct ReturnItemDTO: Decodable {
+    let id: Int?
+    let productId: Int?
+    let name: String?
+    let quantity: Int?
+    let unitCost: Double?
+    let lineTotal: Double?
+    let reason: String?
+}
+
+// MARK: - Notifications (common)
+
+struct NotificationsData: Decodable {
+    let notifications: [NotificationDTO]?
+    let unreadCount: Int?
+    let pagination: NotificationPagination?
+}
+
+struct NotificationDTO: Decodable {
+    let id: String
+    let userId: String?
+    /// e.g. "order.status", "return.decision", "stock.low".
+    let type: String?
+    let title: String?
+    let body: String?
+    /// Routing payload (route + order_id/grn_id/product_id…).
+    let data: NotificationPayload?
+    let readAt: String?
+    /// "dd/MM/yyyy HH:mm:ss".
+    let createdAt: String?
+    var isRead: Bool?
+}
+
+struct NotificationPayload: Decodable {
+    let route: String?
+    let orderId: Int?
+    let orderNumber: String?
+    let grnId: Int?
+    let grnNumber: String?
+    let deliveryId: Int?
+    let productId: Int?
+    let status: String?
+    let decision: String?
+}
+
+struct NotificationPagination: Decodable {
+    let page: Int?
+    let perPage: Int?
+    let total: Int?
+    let totalPages: Int?
+}
+
+/// Response for GET api/common/notifications/unread-count.
+struct UnreadCountData: Decodable {
+    let unreadCount: Int?
+}
+
+// MARK: - Settings: preferences / profile
+
+/// data block of GET api/common/preferences. `notifications` may arrive as an object or, when
+/// never set, an empty array; the custom decoder tolerates both and leaves it nil for arrays.
+struct PreferencesData: Decodable {
+    let preferences: Preferences?
+
+    struct Preferences: Decodable {
+        let language: String?
+        let currency: String?
+        let timezone: String?
+        let dateFormat: String?
+        let notifications: NotificationFlags?
+
+        enum CodingKeys: String, CodingKey {
+            case language, currency, timezone, dateFormat, notifications
+        }
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            language = try c.decodeIfPresent(String.self, forKey: .language)
+            currency = try c.decodeIfPresent(String.self, forKey: .currency)
+            timezone = try c.decodeIfPresent(String.self, forKey: .timezone)
+            dateFormat = try c.decodeIfPresent(String.self, forKey: .dateFormat)
+            // Empty array → decode fails → nil (treated as "all on" by the screen).
+            notifications = try? c.decodeIfPresent(NotificationFlags.self, forKey: .notifications)
+        }
+
+        /// Toggle value, defaulting to true when notifications are unset.
+        func notif(_ key: NotificationKey) -> Bool {
+            guard let n = notifications else { return true }
+            switch key {
+            case .orderAlerts: return n.orderAlerts ?? true
+            case .lowStockAlerts: return n.lowStockAlerts ?? true
+            case .deliveryUpdates: return n.deliveryUpdates ?? true
+            case .financeReminders: return n.financeReminders ?? true
+            case .reportReady: return n.reportReady ?? true
+            }
+        }
+    }
+
+    enum NotificationKey { case orderAlerts, lowStockAlerts, deliveryUpdates, financeReminders, reportReady }
+
+    struct NotificationFlags: Decodable {
+        let orderAlerts: Bool?
+        let lowStockAlerts: Bool?
+        let deliveryUpdates: Bool?
+        let financeReminders: Bool?
+        let reportReady: Bool?
+    }
+}
+
+/// data block of POST api/common/profile/update.
+struct ProfileUpdateData: Decodable {
+    let user: ProfileUser?
+
+    struct ProfileUser: Decodable {
+        let id: String?
+        let firstName: String?
+        let lastName: String?
+        let email: String?
+        let phoneNumber: String?
+    }
+}
+
+// MARK: - Settings: business profile (7-step)
+
+/// data block of GET api/distributor/business/profile — the full distributor record used to
+/// pre-fill the 7-step Business editor. Numeric-or-string fields use `flexString`.
+struct BusinessProfileData: Decodable {
+    let profile: Profile?
+
+    struct Profile: Decodable {
+        let companyLegalName: String?
+        let tradingName: String?
+        let companyLogoUrl: String?
+        let companyRegistrationNumber: String?
+        let vatNumber: String?
+        let companyEmail: String?
+        let companyPhoneNumber: String?
+        let businessType: String?
+        let businessEstablishedYear: String?
+        let employeeCount: String?
+        let annualTurnover: String?
+        let bankName: String?
+        let accountHolderName: String?
+        let accountNumber: String?
+        let accountType: String?
+        let branchCode: String?
+        let contactPersons: [Contact]?
+        let address: String?
+        let latitude: Double?
+        let longitude: Double?
+        let distributionCoverage: String?
+        let primaryProductCategoryIds: String?
+        let activeClientsCount: String?
+        let deliveryFleetSize: String?
+        let preferredDeliveryDays: String?
+        let documents: Documents?
+
+        enum CodingKeys: String, CodingKey {
+            case companyLegalName, tradingName, companyLogoUrl, companyRegistrationNumber,
+                 vatNumber, companyEmail, companyPhoneNumber, businessType, businessEstablishedYear,
+                 employeeCount, annualTurnover, bankName, accountHolderName, accountNumber,
+                 accountType, branchCode, contactPersons, address, latitude, longitude,
+                 distributionCoverage, primaryProductCategoryIds, activeClientsCount,
+                 deliveryFleetSize, preferredDeliveryDays, documents
+        }
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            companyLegalName = try? c.decodeIfPresent(String.self, forKey: .companyLegalName)
+            tradingName = try? c.decodeIfPresent(String.self, forKey: .tradingName)
+            companyLogoUrl = try? c.decodeIfPresent(String.self, forKey: .companyLogoUrl)
+            companyRegistrationNumber = JSONDecoding.flexString(c, key: .companyRegistrationNumber)
+            vatNumber = JSONDecoding.flexString(c, key: .vatNumber)
+            companyEmail = try? c.decodeIfPresent(String.self, forKey: .companyEmail)
+            companyPhoneNumber = JSONDecoding.flexString(c, key: .companyPhoneNumber)
+            businessType = try? c.decodeIfPresent(String.self, forKey: .businessType)
+            businessEstablishedYear = JSONDecoding.flexString(c, key: .businessEstablishedYear)
+            employeeCount = try? c.decodeIfPresent(String.self, forKey: .employeeCount)
+            annualTurnover = try? c.decodeIfPresent(String.self, forKey: .annualTurnover)
+            bankName = try? c.decodeIfPresent(String.self, forKey: .bankName)
+            accountHolderName = try? c.decodeIfPresent(String.self, forKey: .accountHolderName)
+            accountNumber = JSONDecoding.flexString(c, key: .accountNumber)
+            accountType = try? c.decodeIfPresent(String.self, forKey: .accountType)
+            branchCode = JSONDecoding.flexString(c, key: .branchCode)
+            contactPersons = try? c.decodeIfPresent([Contact].self, forKey: .contactPersons)
+            address = try? c.decodeIfPresent(String.self, forKey: .address)
+            latitude = try? c.decodeIfPresent(Double.self, forKey: .latitude)
+            longitude = try? c.decodeIfPresent(Double.self, forKey: .longitude)
+            distributionCoverage = try? c.decodeIfPresent(String.self, forKey: .distributionCoverage)
+            primaryProductCategoryIds = JSONDecoding.flexString(c, key: .primaryProductCategoryIds)
+            activeClientsCount = JSONDecoding.flexString(c, key: .activeClientsCount)
+            deliveryFleetSize = JSONDecoding.flexString(c, key: .deliveryFleetSize)
+            preferredDeliveryDays = try? c.decodeIfPresent(String.self, forKey: .preferredDeliveryDays)
+            documents = try? c.decodeIfPresent(Documents.self, forKey: .documents)
+        }
+    }
+
+    struct Contact: Decodable {
+        let fullName: String?
+        let position: String?
+        let mobileNumber: String?
+        let emailAddress: String?
+    }
+
+    struct Documents: Decodable {
+        let companyRegistrationCertificate: [DocFile]?
+        let proofOfAddress: [DocFile]?
+        let bankConfirmationLetter: [DocFile]?
+        let taxClearanceCertificate: [DocFile]?
+        let vatRegistrationCertificate: [DocFile]?
+    }
+
+    struct DocFile: Decodable {
+        let id: Int64?
+        let fileUrl: String?
+        let originalName: String?
+    }
 }

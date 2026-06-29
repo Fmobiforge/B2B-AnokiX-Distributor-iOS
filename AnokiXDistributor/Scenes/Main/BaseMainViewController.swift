@@ -70,28 +70,23 @@ class BaseMainViewController: UIViewController {
 
     func addNotificationBadge(to button: UIButton) {
         button.accessibilityIdentifier = Self.notificationButtonId
+        _ = ensureBadge(on: button)
         refreshNotificationBadge(on: button)
     }
 
-    func refreshNotificationBadge(on button: UIButton) {
-        guard button.accessibilityIdentifier == Self.notificationButtonId else { return }
-        let count = repository.getUnreadNotificationCount()
-        let text = count > 99 ? "99+" : "\(count)"
-        if let badge = button.viewWithTag(Self.notificationBadgeTag) as? UILabel {
-            badge.text = text
-            badge.isHidden = count == 0
-            return
-        }
-        guard count > 0 else { return }
+    /// Creates the (initially hidden) badge label once so the live count can be filled in async.
+    @discardableResult
+    private func ensureBadge(on button: UIButton) -> UILabel {
+        if let badge = button.viewWithTag(Self.notificationBadgeTag) as? UILabel { return badge }
         let badge = UILabel()
         badge.tag = Self.notificationBadgeTag
-        badge.text = text
         badge.font = AppFonts.bold(9)
         badge.textColor = .white
         badge.textAlignment = .center
         badge.backgroundColor = AppColors.purplePrimary
         badge.layer.cornerRadius = 8
         badge.layer.masksToBounds = true
+        badge.isHidden = true
         badge.translatesAutoresizingMaskIntoConstraints = false
         button.addSubview(badge)
         NSLayoutConstraint.activate([
@@ -100,6 +95,23 @@ class BaseMainViewController: UIViewController {
             badge.topAnchor.constraint(equalTo: button.topAnchor, constant: 2),
             badge.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: -2)
         ])
+        return badge
+    }
+
+    /// Fills the bell badge from the live unread count (GET notifications/unread-count).
+    /// Hides at zero, shows "99+" beyond 99.
+    func refreshNotificationBadge(on button: UIButton) {
+        guard button.accessibilityIdentifier == Self.notificationButtonId else { return }
+        let badge = ensureBadge(on: button)
+        ApiClient.shared.getUnreadCount { result in
+            let count: Int
+            switch result {
+            case .success(let data): count = data.unreadCount ?? 0
+            case .failure: count = 0
+            }
+            badge.text = count > 99 ? "99+" : "\(count)"
+            badge.isHidden = count == 0
+        }
     }
 
     /// Called when header chrome is already placed in Main.storyboard.

@@ -47,6 +47,8 @@
 		701C1AEF205F777EB84464C9 /* OrderListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F5BB7BCAD7E13B34BEFCE3 /* OrderListCell.swift */; };
 		7042253405DF1E4AFBB3ABAD /* BaseSecondaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F3580D78FE0F37F17CD7AB /* BaseSecondaryViewController.swift */; };
 		7153E1B4C665460A67FE8EC0 /* DeliveriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDFC0379EF541F4390B5024B /* DeliveriesViewController.swift */; };
+		DE11DE7A0001000000000001 /* DeliveryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE11DE7A0002000000000002 /* DeliveryDetailViewController.swift */; };
+		DE11DE7B0001000000000001 /* ReturnDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE11DE7B0002000000000002 /* ReturnDetailViewController.swift */; };
 		73037A24F81876008636B6FF /* TradersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F39ECC454DAF6AFB2C046A7 /* TradersViewController.swift */; };
 		7756B2BA5D5B77AF3D7823BB /* DashboardHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A92A17A73C526C07998A88C5 /* DashboardHeaderView.xib */; };
 		7A29A1F8E02B39FDB90F0A6D /* PromoProductPickers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76C3740E2A3B78246BCEE67 /* PromoProductPickers.swift */; };
@@ -177,6 +179,8 @@
 		C76C3740E2A3B78246BCEE67 /* PromoProductPickers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromoProductPickers.swift; sourceTree = "<group>"; };
 		C853752B0FC8035E9BEEFE2B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		CDFC0379EF541F4390B5024B /* DeliveriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveriesViewController.swift; sourceTree = "<group>"; };
+		DE11DE7A0002000000000002 /* DeliveryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryDetailViewController.swift; sourceTree = "<group>"; };
+		DE11DE7B0002000000000002 /* ReturnDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnDetailViewController.swift; sourceTree = "<group>"; };
 		D23903BB1B9D1D0ACD3F9756 /* ProductsTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsTabViewController.swift; sourceTree = "<group>"; };
 		D29A9889FE895D5A1EDCCB2A /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		D38B310DF3119E94E0BDCECC /* MockDistributorRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDistributorRepository.swift; sourceTree = "<group>"; };
@@ -488,6 +492,7 @@
 			isa = PBXGroup;
 			children = (
 				CDFC0379EF541F4390B5024B /* DeliveriesViewController.swift */,
+				DE11DE7A0002000000000002 /* DeliveryDetailViewController.swift */,
 			);
 			path = Deliveries;
 			sourceTree = "<group>";
@@ -506,6 +511,7 @@
 			isa = PBXGroup;
 			children = (
 				0881138E23115F2F6C519B1B /* ReturnsViewController.swift */,
+				DE11DE7B0002000000000002 /* ReturnDetailViewController.swift */,
 			);
 			path = Returns;
 			sourceTree = "<group>";
@@ -720,6 +726,7 @@
 				2AADDEB874DBC35D3A80FB6A /* DTOs.swift in Sources */,
 				BC9835F6C2444838E9B4173C /* DashboardViewController.swift in Sources */,
 				7153E1B4C665460A67FE8EC0 /* DeliveriesViewController.swift in Sources */,
+				DE11DE7A0001000000000001 /* DeliveryDetailViewController.swift in Sources */,
 				B6BFB66706C5F2CE292AE411 /* DistributorRepository.swift in Sources */,
 				220DCC792279D57187041A88 /* DonutChartView.swift in Sources */,
 				2CEAA5E90B936AE2CEC4812B /* DrawerMenuCell.swift in Sources */,
@@ -753,6 +760,7 @@
 				3FCA5955E47202154B029A0E /* RegisterSubmittedViewController.swift in Sources */,
 				09DB1879B4786FD05D411884 /* ReportsViewController.swift in Sources */,
 				DD7DFE2E26BE2D95C327839B /* ReturnsViewController.swift in Sources */,
+				DE11DE7B0001000000000001 /* ReturnDetailViewController.swift in Sources */,
 				2A64C44EC7D1D9748C7DDD66 /* Router.swift in Sources */,
 				B630E90E597604F6CBFC61AF /* SceneDelegate.swift in Sources */,
 				4AEA6269EBBB27A5C73E506D /* SessionManager.swift in Sources */,

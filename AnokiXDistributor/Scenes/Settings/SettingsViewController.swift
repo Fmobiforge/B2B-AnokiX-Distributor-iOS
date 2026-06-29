@@ -25,6 +25,16 @@ final class SettingsViewController: BaseSecondaryViewController {
 
     override func loadData() {
         refreshProfileHeader()
+        // Refresh the header from the live account (base data).
+        ApiClient.shared.getBaseInfo { [weak self] result in
+            guard let self = self, case .success(let data) = result, let user = data.user else { return }
+            let name = "\(user.firstName ?? "") \(user.lastName ?? "")".trimmingCharacters(in: .whitespaces)
+            if !name.isEmpty {
+                self.nameLabel.text = name
+                self.avatarLabel.text = self.initialsOf(name, fallback: "?")
+            }
+            if let email = user.email, !email.isEmpty { self.emailLabel.text = email }
+        }
     }
 
     private func refreshProfileHeader() {

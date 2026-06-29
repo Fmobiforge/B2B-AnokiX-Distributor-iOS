@@ -69,6 +69,20 @@ enum Http {
             }
     }
 
+    /// application/json POST — for endpoints that expect a JSON body (e.g. preferences/update).
+    static func postJson(baseUrl: String, path: String, json: [String: Any], token: String?,
+                         completion: @escaping (Result) -> Void) {
+        guard let url = URL(string: baseUrl + path) else {
+            completion(Result(code: -1, body: nil))
+            return
+        }
+        session.request(url, method: .post, parameters: json, encoding: JSONEncoding.default,
+                        headers: formHeaders(token: token))
+            .responseString { response in
+                completion(map(response))
+            }
+    }
+
     /// One file part for a multipart upload (content already read into memory).
     struct FilePart {
         let field: String
