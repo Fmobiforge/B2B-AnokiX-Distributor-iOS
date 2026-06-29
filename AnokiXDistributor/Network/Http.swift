@@ -70,6 +70,10 @@ enum Http {
     }
 
     /// application/json POST — for endpoints that expect a JSON body (e.g. preferences/update).
+    /// Uses the plain headers (Accept + Authorization only) so `JSONEncoding` sets
+    /// `Content-Type: application/json` itself — passing `formHeaders` here would pin a
+    /// `x-www-form-urlencoded` content-type that JSONEncoding won't override, making the
+    /// server read an empty form body (HTTP 422 "No preference fields supplied").
     static func postJson(baseUrl: String, path: String, json: [String: Any], token: String?,
                          completion: @escaping (Result) -> Void) {
         guard let url = URL(string: baseUrl + path) else {
@@ -77,7 +81,7 @@ enum Http {
             return
         }
         session.request(url, method: .post, parameters: json, encoding: JSONEncoding.default,
-                        headers: formHeaders(token: token))
+                        headers: headers(token: token))
             .responseString { response in
                 completion(map(response))
             }
