@@ -24,7 +24,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.anokix.distributorapp
-        PRODUCT_NAME: anokiX Distributor
+        PRODUCT_NAME: AnokiX Distributor
         PRODUCT_MODULE_NAME: AnokiXDistributor
         INFOPLIST_FILE: AnokiXDistributor/Resources/Info.plist
         CODE_SIGN_ENTITLEMENTS: AnokiXDistributor/Resources/AnokiXDistributor.entitlements
