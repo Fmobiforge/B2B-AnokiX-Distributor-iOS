@@ -14,6 +14,17 @@ enum S {
     static let signingIn = "Signing in…"
     static let joinPortal = "Join Distributor App now"
     static let forgotPassword = "Forgot password?"
+    static let forgotPasswordTitle = "Forgot Password?"
+    static let forgotPasswordSubtitle = "Enter the email linked to your account and we'll send you a link to reset your password."
+    static let sendResetLink = "Send Reset Link"
+    static let sending = "Sending…"
+    static let enterEmailPrompt = "Please enter your email address"
+    static let enterValidEmail = "Please enter a valid email address"
+    static let resetLinkSentTitle = "Check your email"
+    static let backToLogin = "Back to Login"
+    static func resetLinkSentMessage(_ email: String) -> String {
+        "If an account exists for \(email), a password reset link is on its way. Please check your inbox and spam folder."
+    }
 
     static let navHome = "Home"
     static let navDashboard = "Dashboard"

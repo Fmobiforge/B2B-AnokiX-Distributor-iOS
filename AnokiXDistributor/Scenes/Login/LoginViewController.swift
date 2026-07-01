@@ -73,7 +73,9 @@ final class LoginViewController: UIViewController {
         togglePasswordButton.setImage(UIImage(systemName: icon), for: .normal)
     }
 
-    @IBAction private func forgotTapped(_ sender: UIButton) { toast("Password reset coming soon") }
+    @IBAction private func forgotTapped(_ sender: UIButton) {
+        ForgotPasswordViewController.open(from: self)
+    }
     @IBAction private func joinTapped(_ sender: UIButton) {
         RegisterDistributorViewController.open(from: self)
     }
@@ -97,6 +99,9 @@ final class LoginViewController: UIViewController {
                                                   email: user.email, roleLabel: user.roleLabel)
                 }
                 SessionManager.shared.companyLogoUrl = data.portalInfo?.companyLogoUrl ?? ""
+                // FCM: ask for push permission and register this device's token now that we're signed in.
+                PushManager.shared.requestAuthorization()
+                PushManager.shared.registerCurrentToken()
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let main = storyboard.instantiateViewController(withIdentifier: "MainTabBarController")
                 SceneDelegate.setRoot(main)

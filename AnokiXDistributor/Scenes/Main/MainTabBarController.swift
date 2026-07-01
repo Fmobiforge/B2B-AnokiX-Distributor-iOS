@@ -31,11 +31,17 @@ final class MainTabBarController: UITabBarController, UITabBarControllerDelegate
         applyTabBarItems()
         configureTabBarVisibility()
         TabBarStyling.apply(to: tabBar)
+        // FCM: covers the auto-login path (returning users who skip LoginViewController) —
+        // ask for push permission and register this device's token. Both calls are idempotent.
+        PushManager.shared.requestAuthorization()
+        PushManager.shared.registerCurrentToken()
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         configureTabBarVisibility()
+        // Apply any navigation a notification tap requested while the app was launching.
+        PushManager.shared.applyPendingRoute()
     }
 
     /// Keep the classic Android-style bottom bar always visible (iOS 26 minimizes on scroll by default).

@@ -137,6 +137,7 @@ final class DrawerMenuViewController: UIViewController, UITableViewDataSource, U
     }
 
     private func performLogout() {
+        PushManager.shared.unregister()   // drop this device's token server-side
         SessionManager.shared.clear()
         ImageLoader.clearCache()
         let storyboard = UIStoryboard(name: "Main", bundle: nil)

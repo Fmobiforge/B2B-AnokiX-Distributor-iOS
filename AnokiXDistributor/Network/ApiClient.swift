@@ -31,6 +31,38 @@ final class ApiClient {
         }
     }
 
+    /// Request a password reset email. Public endpoint (no token). The backend always returns a
+    /// generic success and never reveals whether the email exists, so only status/message matter.
+    func forgotPassword(email: String, completion: @escaping (Result<Void, ApiError>) -> Void) {
+        let form = ["email": email, "portal_type": "distributor"]
+        Http.postForm(baseUrl: Self.baseURL, path: "api/common/forgot-password", form: form, token: nil) { [weak self] r in
+            self?.deliverStatusOnly(r, completion: completion)
+        }
+    }
+
+    // MARK: Push / device tokens (FCM)
+
+    /// Register this device's FCM token so the backend can target it with pushes
+    /// (api/common/device-tokens). Best-effort: only status/message matter, and a failure
+    /// (e.g. the endpoint not yet live) surfaces via the completion but never crashes the app.
+    func registerDeviceToken(_ token: String, completion: @escaping (Result<Void, ApiError>) -> Void) {
+        // Field is `device_token` (not `token` — that key is reserved by the API gateway).
+        let form = ["device_token": token, "platform": "ios"]
+        Http.postForm(baseUrl: Self.baseURL, path: "api/common/device-tokens", form: form,
+                      token: session.token) { [weak self] r in
+            self?.deliverStatusOnly(r, completion: completion)
+        }
+    }
+
+    /// Remove this device's FCM token on logout (api/common/device-tokens/delete).
+    func unregisterDeviceToken(_ token: String, completion: @escaping (Result<Void, ApiError>) -> Void) {
+        let form = ["device_token": token]
+        Http.postForm(baseUrl: Self.baseURL, path: "api/common/device-tokens/delete", form: form,
+                      token: session.token) { [weak self] r in
+            self?.deliverStatusOnly(r, completion: completion)
+        }
+    }
+
     func getDashboard(completion: @escaping (Result<DashboardData, ApiError>) -> Void) {
         getAuthed("api/distributor/dashboard", query: nil, type: DashboardData.self, completion: completion)
     }

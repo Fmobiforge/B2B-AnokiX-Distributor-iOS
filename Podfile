@@ -6,6 +6,8 @@ target 'AnokiXDistributor' do
   pod 'Alamofire', '~> 5.9'
   pod 'SwiftyJSON', '~> 5.0'
   pod 'GoogleMaps', '~> 9.0'
+  # Firebase Cloud Messaging (push notifications). Run `pod install` after adding.
+  pod 'Firebase/Messaging', '~> 11.0'
 end
 
 post_install do |installer|
