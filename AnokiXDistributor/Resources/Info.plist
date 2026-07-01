@@ -57,11 +57,7 @@
 	<key>UIDesignRequiresCompatibility</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<!-- Lock the app to Light appearance so system dark mode never inverts the
-	     hardcoded light-design palette (e.g. text fields defaulting to white on white). -->
-	<key>UIUserInterfaceStyle</key>
-	<string>Light</string>
+	<string>LaunchScreen.storyboard</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -75,5 +71,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
 </dict>
 </plist>
