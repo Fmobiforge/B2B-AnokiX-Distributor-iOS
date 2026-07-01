@@ -71,6 +71,14 @@ final class DrawerMenuViewController: UIViewController, UITableViewDataSource, U
         tableView.forAutoLayout()
         panel.addSubview(tableView)
 
+        let divider = UIView()
+        divider.backgroundColor = AppColors.drawerBadgeBg
+        divider.forAutoLayout()
+        panel.addSubview(divider)
+
+        let logoutRow = buildLogoutRow()
+        panel.addSubview(logoutRow)
+
         NSLayoutConstraint.activate([
             header.topAnchor.constraint(equalTo: panel.safeAreaLayoutGuide.topAnchor, constant: 48),
             header.leadingAnchor.constraint(equalTo: panel.leadingAnchor, constant: AppMetrics.spacingLG),
@@ -79,8 +87,61 @@ final class DrawerMenuViewController: UIViewController, UITableViewDataSource, U
             tableView.topAnchor.constraint(equalTo: header.bottomAnchor, constant: AppMetrics.spacingXL),
             tableView.leadingAnchor.constraint(equalTo: panel.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: panel.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: panel.safeAreaLayoutGuide.bottomAnchor, constant: -AppMetrics.spacingLG)
+            tableView.bottomAnchor.constraint(equalTo: divider.topAnchor),
+
+            divider.leadingAnchor.constraint(equalTo: panel.leadingAnchor, constant: AppMetrics.spacingXL),
+            divider.trailingAnchor.constraint(equalTo: panel.trailingAnchor, constant: -AppMetrics.spacingXL),
+            divider.heightAnchor.constraint(equalToConstant: 1),
+            divider.bottomAnchor.constraint(equalTo: logoutRow.topAnchor),
+
+            logoutRow.leadingAnchor.constraint(equalTo: panel.leadingAnchor),
+            logoutRow.trailingAnchor.constraint(equalTo: panel.trailingAnchor),
+            logoutRow.bottomAnchor.constraint(equalTo: panel.safeAreaLayoutGuide.bottomAnchor, constant: -AppMetrics.spacingLG)
         ])
+    }
+
+    private func buildLogoutRow() -> UIView {
+        let icon = UIImageView(image: UIImage(systemName: "rectangle.portrait.and.arrow.right"))
+        icon.tintColor = AppColors.drawerTextMuted
+        icon.contentMode = .scaleAspectFit
+        icon.forAutoLayout()
+        icon.widthAnchor.constraint(equalToConstant: AppMetrics.drawerIconSize).isActive = true
+        icon.heightAnchor.constraint(equalToConstant: AppMetrics.drawerIconSize).isActive = true
+
+        let label = UILabel()
+        label.text = S.logout
+        label.font = AppFonts.regular(14)
+        label.textColor = AppColors.drawerTextMuted
+
+        let row = UIStackView.horizontal(spacing: AppMetrics.spacingMD, alignment: .center)
+        row.isLayoutMarginsRelativeArrangement = true
+        row.layoutMargins = UIEdgeInsets(top: AppMetrics.spacingLG, left: AppMetrics.spacingXL,
+                                         bottom: AppMetrics.spacingLG, right: AppMetrics.spacingXL)
+        row.addArrangedSubview(icon)
+        row.addArrangedSubview(label)
+        row.addArrangedSubview(UIView())
+        row.forAutoLayout()
+        row.isUserInteractionEnabled = true
+        row.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(logoutTapped)))
+        return row
+    }
+
+    @objc private func logoutTapped() {
+        let alert = UIAlertController(title: S.logoutConfirmTitle,
+                                      message: S.logoutConfirmMessage, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: S.cancel, style: .cancel))
+        alert.addAction(UIAlertAction(title: S.logout, style: .destructive) { [weak self] _ in
+            self?.performLogout()
+        })
+        present(alert, animated: true)
+    }
+
+    private func performLogout() {
+        SessionManager.shared.clear()
+        ImageLoader.clearCache()
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let login = storyboard.instantiateViewController(withIdentifier: "LoginNavigationController")
+        dismiss(animated: false) { SceneDelegate.setRoot(login) }
     }
 
     override func viewDidAppear(_ animated: Bool) {

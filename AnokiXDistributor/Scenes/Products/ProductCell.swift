@@ -171,6 +171,8 @@ final class ProductCell: UICollectionViewCell {
 enum ImageLoader {
     private static let cache = NSCache<NSURL, UIImage>()
 
+    static func clearCache() { cache.removeAllObjects() }
+
     @discardableResult
     static func load(_ url: URL, completion: @escaping (UIImage?) -> Void) -> URLSessionDataTask? {
         if let cached = cache.object(forKey: url as NSURL) { completion(cached); return nil }

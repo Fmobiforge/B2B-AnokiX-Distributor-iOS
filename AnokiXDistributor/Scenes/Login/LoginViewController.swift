@@ -96,6 +96,7 @@ final class LoginViewController: UIViewController {
                     SessionManager.shared.setUser(firstName: user.firstName, lastName: user.lastName,
                                                   email: user.email, roleLabel: user.roleLabel)
                 }
+                SessionManager.shared.companyLogoUrl = data.portalInfo?.companyLogoUrl ?? ""
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let main = storyboard.instantiateViewController(withIdentifier: "MainTabBarController")
                 SceneDelegate.setRoot(main)

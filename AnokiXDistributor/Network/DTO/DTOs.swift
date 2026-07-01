@@ -32,6 +32,7 @@ struct LoginData: Decodable {
     let token: String?
     let user: User?
     let portalType: String?
+    let portalInfo: PortalInfo?
 
     struct User: Decodable {
         let id: String?
@@ -41,6 +42,12 @@ struct LoginData: Decodable {
         let phoneNumber: String?
         let roleType: String?
         let roleLabel: String?
+    }
+
+    /// Branding for the logged-in distributor company. `companyLogoUrl` is an absolute URL
+    /// to the uploaded logo (may be nil/empty when none was set).
+    struct PortalInfo: Decodable {
+        let companyLogoUrl: String?
     }
 }
 

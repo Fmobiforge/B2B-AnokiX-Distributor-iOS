@@ -87,6 +87,8 @@ enum S {
     static let inventorySummary = "Inventory Summary"
     static let markAllRead = "Mark all as read"
     static let logout = "Logout"
+    static let logoutConfirmTitle = "Log out"
+    static let logoutConfirmMessage = "Are you sure you want to log out?"
     static let saveChanges = "Save Changes"
     static let verifiedDistributor = "Verified Distributor"
     static let active = "Active"

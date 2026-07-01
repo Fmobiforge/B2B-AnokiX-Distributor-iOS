@@ -13,6 +13,7 @@ final class SessionManager {
         static let lastName = "last_name"
         static let email = "email"
         static let roleLabel = "role_label"
+        static let companyLogoUrl = "company_logo_url"
     }
 
     private init() {}
@@ -37,6 +38,12 @@ final class SessionManager {
     var email: String { defaults.string(forKey: Key.email) ?? "" }
     var roleLabel: String { defaults.string(forKey: Key.roleLabel) ?? "" }
 
+    /// Absolute URL of the distributor company logo (from login `portal_info`), or "" when none.
+    var companyLogoUrl: String {
+        get { defaults.string(forKey: Key.companyLogoUrl) ?? "" }
+        set { defaults.set(newValue, forKey: Key.companyLogoUrl) }
+    }
+
     var initials: String {
         let f = firstName.prefix(1)
         let l = lastName.prefix(1)
@@ -45,7 +52,7 @@ final class SessionManager {
     }
 
     func clear() {
-        [Key.token, Key.firstName, Key.lastName, Key.email, Key.roleLabel].forEach {
+        [Key.token, Key.firstName, Key.lastName, Key.email, Key.roleLabel, Key.companyLogoUrl].forEach {
             defaults.removeObject(forKey: $0)
         }
     }

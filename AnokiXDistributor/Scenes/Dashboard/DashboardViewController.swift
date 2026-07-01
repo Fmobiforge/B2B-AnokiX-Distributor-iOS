@@ -12,6 +12,18 @@ final class DashboardViewController: BaseMainViewController {
 
     private var stack: UIStackView { contentStackView }
 
+    /// Distributor company logo (from login `portal_info`) shown over the initials avatar
+    /// when a valid URL is available; hidden otherwise so the initials show through.
+    private lazy var avatarImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.contentMode = .scaleAspectFill
+        iv.clipsToBounds = true
+        iv.layer.cornerRadius = 18
+        iv.isHidden = true
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
+
     override func configureStoryboardChrome() {
         welcomeLabel.font = AppFonts.bold(AppMetrics.textTitle)
         welcomeLabel.textColor = AppColors.textPrimary
@@ -23,6 +35,16 @@ final class DashboardViewController: BaseMainViewController {
         avatarLabel.backgroundColor = AppColors.purpleLight
         avatarLabel.textColor = AppColors.purplePrimary
         avatarLabel.font = AppFonts.bold(14)
+        if avatarImageView.superview == nil {
+            avatarLabel.isUserInteractionEnabled = true
+            avatarLabel.addSubview(avatarImageView)
+            NSLayoutConstraint.activate([
+                avatarImageView.leadingAnchor.constraint(equalTo: avatarLabel.leadingAnchor),
+                avatarImageView.trailingAnchor.constraint(equalTo: avatarLabel.trailingAnchor),
+                avatarImageView.topAnchor.constraint(equalTo: avatarLabel.topAnchor),
+                avatarImageView.bottomAnchor.constraint(equalTo: avatarLabel.bottomAnchor)
+            ])
+        }
         menuButton.tintColor = AppColors.textPrimary
         notificationsButton.tintColor = AppColors.textPrimary
         addNotificationBadge(to: notificationsButton)
@@ -38,6 +60,24 @@ final class DashboardViewController: BaseMainViewController {
     private func refreshWelcome() {
         welcomeLabel.text = S.welcomeBack(SessionManager.shared.firstName)
         avatarLabel.text = SessionManager.shared.initials
+        bindAvatarLogo()
+    }
+
+    private func bindAvatarLogo() {
+        let urlString = SessionManager.shared.companyLogoUrl
+        guard !urlString.isEmpty, let url = URL(string: urlString) else {
+            avatarImageView.isHidden = true
+            return
+        }
+        ImageLoader.load(url) { [weak self] image in
+            guard let self = self else { return }
+            if let image = image {
+                self.avatarImageView.image = image
+                self.avatarImageView.isHidden = false
+            } else {
+                self.avatarImageView.isHidden = true
+            }
+        }
     }
 
     @IBAction private func menuTapped(_ sender: UIButton) { openDrawer() }
