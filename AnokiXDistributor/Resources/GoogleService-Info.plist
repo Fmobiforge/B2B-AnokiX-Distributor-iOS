@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.anokix.distributor</string>
+	<string>com.anokix.distributorapp</string>
 	<key>PROJECT_ID</key>
 	<string>anokix-57e18</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:304349087062:ios:678f01bc9312baafbe82f7</string>
+	<string>1:304349087062:ios:2add0fee9dbbaf09be82f7</string>
 </dict>
 </plist>

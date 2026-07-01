@@ -1,7 +1,7 @@
 # anokiX Distributor — iOS
 
 A native iOS (UIKit) port of the **AnokiXDistributorV2** Android app. Same bundle id
-(`com.anokix.distributor`), same backend (`http://155.117.20.51/ax/`), same screens,
+(`com.anokix.distributorapp`), same backend (`http://155.117.20.51/ax/`), same screens,
 data models, and visual design system.
 
 ## Requirements

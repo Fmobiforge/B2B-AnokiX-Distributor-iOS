@@ -23,7 +23,7 @@ targets:
       - path: AnokiXDistributor
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.anokix.distributor
+        PRODUCT_BUNDLE_IDENTIFIER: com.anokix.distributorapp
         PRODUCT_NAME: anokiX Distributor
         PRODUCT_MODULE_NAME: AnokiXDistributor
         INFOPLIST_FILE: AnokiXDistributor/Resources/Info.plist
