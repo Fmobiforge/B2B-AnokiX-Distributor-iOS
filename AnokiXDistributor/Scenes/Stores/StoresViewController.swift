@@ -1,6 +1,6 @@
 import UIKit
 
-/// Port of StoresActivity + activity_stores.xml. Search, area filter, filter icon, store cards.
+/// Port of StoresActivity + activity_stores.xml. Search, status filter, filter icon, store cards.
 final class StoresViewController: BaseSecondaryViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
     override var screenTitle: String { S.stores }
@@ -11,20 +11,20 @@ final class StoresViewController: BaseSecondaryViewController, UICollectionViewD
         frame: .zero, collectionViewLayout: AdaptiveGridLayout.make(estimatedHeight: 100))
     private var allItems: [StoreItem] = []
     private var filtered: [StoreItem] = []
-    private var selectedArea = S.allAreas
+    private var selectedStatus = S.allStatus
     private var search = ""
-    private var areaPill: FilterPillButton!
+    private var statusPill: FilterPillButton!
 
     override func setupContent(in container: UIView) {
         let searchBar = SearchBarView(placeholder: "Search stores…", height: 42)
         searchBar.onChange = { [weak self] text in self?.search = text; self?.applyFilters() }
 
-        areaPill = FilterPillButton(title: selectedArea)
-        areaPill.addTarget(self, action: #selector(pickArea), for: .touchUpInside)
+        statusPill = FilterPillButton(title: selectedStatus)
+        statusPill.addTarget(self, action: #selector(pickStatus), for: .touchUpInside)
         let filterButton = FilterIconButton.make()
 
         let filterRow = UIStackView.horizontal(spacing: 8, alignment: .center)
-        filterRow.addArrangedSubview(areaPill)
+        filterRow.addArrangedSubview(statusPill)
         filterRow.addArrangedSubview(filterButton)
 
         let chrome = ListScreenLayout.surfaceSection(
@@ -62,12 +62,12 @@ final class StoresViewController: BaseSecondaryViewController, UICollectionViewD
         navigationController?.pushViewController(editor, animated: true)
     }
 
-    @objc private func pickArea() {
+    @objc private func pickStatus() {
         let sheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        for area in MockData.filterAreas {
-            sheet.addAction(UIAlertAction(title: area, style: .default) { [weak self] _ in
-                self?.selectedArea = area
-                self?.areaPill.setTitle(area)
+        for status in MockData.filterStatus {
+            sheet.addAction(UIAlertAction(title: status, style: .default) { [weak self] _ in
+                self?.selectedStatus = status
+                self?.statusPill.setTitle(status)
                 self?.applyFilters()
             })
         }
@@ -77,9 +77,9 @@ final class StoresViewController: BaseSecondaryViewController, UICollectionViewD
 
     private func applyFilters() {
         filtered = allItems.filter { item in
-            let matchesArea = selectedArea == S.allAreas || item.area == selectedArea
+            let matchesStatus = selectedStatus == S.allStatus || item.status == selectedStatus
             let matchesSearch = search.isEmpty || item.name.localizedCaseInsensitiveContains(search)
-            return matchesArea && matchesSearch
+            return matchesStatus && matchesSearch
         }
         collectionView.reloadData()
     }
