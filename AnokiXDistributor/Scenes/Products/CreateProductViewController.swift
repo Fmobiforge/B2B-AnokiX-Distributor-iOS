@@ -452,7 +452,7 @@ final class CreateProductViewController: BaseSecondaryViewController,
         primaryPlaceholder.textColor = AppColors.textSecondary
         primaryPlaceholder.forAutoLayout()
         primaryBox.addSubview(primaryPlaceholder)
-        primaryImageView.contentMode = .scaleAspectFit
+        primaryImageView.contentMode = .scaleAspectFill
         primaryImageView.clipsToBounds = true
         primaryImageView.layer.cornerRadius = AppMetrics.radiusMD
         primaryImageView.isHidden = true
@@ -777,7 +777,7 @@ final class CreateProductViewController: BaseSecondaryViewController,
         chip.layer.borderColor = AppColors.border.cgColor
 
         let thumb = UIImageView()
-        thumb.contentMode = .scaleAspectFit
+        thumb.contentMode = .scaleAspectFill
         thumb.clipsToBounds = true
         thumb.backgroundColor = AppColors.surface
         thumb.layer.cornerRadius = AppMetrics.radiusSM
