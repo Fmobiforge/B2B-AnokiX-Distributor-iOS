@@ -8,6 +8,7 @@ enum Router {
         case "stores": return StoresViewController()
         case "traders": return TradersViewController()
         // Drawer "products" selects the Products tab (MainActivity parity) — not a pushed screen.
+        case "airtime": return AirtimeViewController()
         case "promotions": return PromotionsViewController()
         case "finances": return FinancesViewController()
         case "reports": return ReportsViewController()

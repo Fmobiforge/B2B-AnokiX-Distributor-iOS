@@ -1647,3 +1647,157 @@ struct BusinessProfileData: Decodable {
         let originalName: String?
     }
 }
+
+// MARK: - Airtime & VAS
+
+/// `data` block of GET api/common/vas/transactions — recent transactions + KPI summary.
+struct VasTransactionsData: Decodable {
+    let transactions: [Transaction]
+    let summary: Summary?
+
+    enum CodingKeys: String, CodingKey { case transactions, summary }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        transactions = (try? c.decode([Transaction].self, forKey: .transactions)) ?? []
+        summary = try? c.decodeIfPresent(Summary.self, forKey: .summary)
+    }
+
+    struct Transaction: Decodable, Identifiable {
+        let id: String
+        let msisdn: String?
+        let name: String?
+        let category: String?
+        let amount: String?
+        let commission: String?
+        let status: String?
+        let createdAt: String?
+
+        enum CodingKeys: String, CodingKey {
+            case id, msisdn, name, category, amount, commission, status, createdAt
+        }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id) ?? UUID().uuidString
+            msisdn = JSONDecoding.flexString(c, key: .msisdn)
+            name = try? c.decodeIfPresent(String.self, forKey: .name)
+            category = try? c.decodeIfPresent(String.self, forKey: .category)
+            amount = JSONDecoding.flexString(c, key: .amount)
+            commission = JSONDecoding.flexString(c, key: .commission)
+            status = try? c.decodeIfPresent(String.self, forKey: .status)
+            createdAt = try? c.decodeIfPresent(String.self, forKey: .createdAt)
+        }
+    }
+
+    /// Header KPI figures for the VAS dashboard.
+    struct Summary: Decodable {
+        let salesToday: Double
+        let countToday: Double
+        let commissionMonth: Double
+        let walletBalance: Double
+
+        enum CodingKeys: String, CodingKey {
+            case salesToday, countToday, commissionMonth, walletBalance
+        }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            salesToday = (try? c.decode(Double.self, forKey: .salesToday)) ?? 0
+            countToday = (try? c.decode(Double.self, forKey: .countToday)) ?? 0
+            commissionMonth = (try? c.decode(Double.self, forKey: .commissionMonth)) ?? 0
+            walletBalance = (try? c.decode(Double.self, forKey: .walletBalance)) ?? 0
+        }
+    }
+}
+
+/// `data` block of GET api/common/vas/categories. The categories form a tree; only leaf
+/// nodes (no children) that have products are purchasable, so `leaves` flattens the tree
+/// depth-first (respecting displayOrder) into the flat list the UI shows.
+struct VasCategoriesData: Decodable {
+    let configured: Bool
+    let commissionRate: Double
+    let categories: [Node]
+
+    enum CodingKeys: String, CodingKey { case configured, commissionRate, categories }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        configured = (try? c.decode(Bool.self, forKey: .configured)) ?? false
+        commissionRate = (try? c.decode(Double.self, forKey: .commissionRate)) ?? 0
+        categories = (try? c.decode([Node].self, forKey: .categories)) ?? []
+    }
+
+    struct Node: Decodable, Identifiable {
+        let id: String
+        let name: String
+        let displayOrder: Int
+        let children: [Node]
+        let productCount: Int
+        let hasProducts: Bool
+
+        enum CodingKeys: String, CodingKey {
+            case id, name, displayOrder, children, productCount, hasProducts
+        }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id) ?? ""
+            name = (try? c.decodeIfPresent(String.self, forKey: .name)) ?? ""
+            displayOrder = (try? c.decode(Int.self, forKey: .displayOrder)) ?? 0
+            children = (try? c.decode([Node].self, forKey: .children)) ?? []
+            productCount = (try? c.decode(Int.self, forKey: .productCount)) ?? 0
+            hasProducts = (try? c.decode(Bool.self, forKey: .hasProducts)) ?? false
+        }
+
+        var isLeaf: Bool { children.isEmpty }
+    }
+
+    /// Depth-first flatten to the selectable leaf categories, ordered by displayOrder.
+    var leaves: [Node] {
+        var out: [Node] = []
+        func walk(_ nodes: [Node]) {
+            for node in nodes.sorted(by: { $0.displayOrder < $1.displayOrder }) {
+                if node.isLeaf {
+                    if node.hasProducts || node.productCount > 0 { out.append(node) }
+                } else {
+                    walk(node.children)
+                }
+            }
+        }
+        walk(categories)
+        return out
+    }
+}
+
+/// `data` block of GET api/common/vas/products.
+struct VasProductsData: Decodable {
+    let products: [Product]
+
+    enum CodingKeys: String, CodingKey { case products }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        products = (try? c.decode([Product].self, forKey: .products)) ?? []
+    }
+
+    struct Product: Decodable, Identifiable {
+        let id: String
+        let sku: String?
+        let name: String?
+        let description: String?
+        let price: Double
+        let brand: String?
+        let displayOrder: Int
+        let isAdHoc: Bool
+
+        enum CodingKeys: String, CodingKey {
+            case id, sku, name, description, price, brand, displayOrder, isAdHoc
+        }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id) ?? ""
+            sku = JSONDecoding.flexString(c, key: .sku)
+            name = try? c.decodeIfPresent(String.self, forKey: .name)
+            description = try? c.decodeIfPresent(String.self, forKey: .description)
+            price = (try? c.decode(Double.self, forKey: .price)) ?? 0
+            brand = try? c.decodeIfPresent(String.self, forKey: .brand)
+            displayOrder = (try? c.decode(Int.self, forKey: .displayOrder)) ?? 0
+            isAdHoc = (try? c.decode(Bool.self, forKey: .isAdHoc)) ?? false
+        }
+    }
+}

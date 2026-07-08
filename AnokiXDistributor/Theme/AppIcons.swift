@@ -54,7 +54,8 @@ enum AppIcons {
         "ic_pdf": "doc.richtext.fill",
         "ic_finance_report": "chart.line.uptrend.xyaxis",
         "ic_ctr": "cursorarrow.click",
-        "ic_chat": "bubble.left.fill"
+        "ic_chat": "bubble.left.fill",
+        "ic_vas": "antenna.radiowaves.left.and.right"
     ]
 
     static func symbol(_ name: String) -> UIImage? {

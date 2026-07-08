@@ -426,6 +426,45 @@ final class ApiClient {
         postAuthed("api/distributor/stores/update", form: form, type: StoreDetailData.self, completion: completion)
     }
 
+    // MARK: Airtime & VAS (Limes, common)
+
+    /// VAS dashboard: recent transactions + KPI summary (spend/count today, commission this
+    /// month, wallet balance) — api/common/vas/transactions.
+    func getVasTransactions(page: Int, perPage: Int,
+                            completion: @escaping (Result<VasTransactionsData, ApiError>) -> Void) {
+        let q = ["page": String(page), "per_page": String(perPage)]
+        getAuthed("api/common/vas/transactions", query: q, type: VasTransactionsData.self, completion: completion)
+    }
+
+    /// The Limes VAS category tree (api/common/vas/categories). Flatten via `leaves`.
+    func getVasCategories(completion: @escaping (Result<VasCategoriesData, ApiError>) -> Void) {
+        getAuthed("api/common/vas/categories", query: nil, type: VasCategoriesData.self, completion: completion)
+    }
+
+    /// Purchasable products for one leaf category (api/common/vas/products).
+    func getVasProducts(category: String, page: Int, limit: Int,
+                        completion: @escaping (Result<VasProductsData, ApiError>) -> Void) {
+        let q = ["category": category, "page": String(page), "limit": String(limit)]
+        getAuthed("api/common/vas/products", query: q, type: VasProductsData.self, completion: completion)
+    }
+
+    /// Buy a VAS product (api/common/vas/purchase). Paid from the anokiX wallet; the server
+    /// debits and forwards to Limes. Only status/message decide success — the failure path
+    /// carries the network's reason (e.g. inactive subscriber), and `data` is null.
+    func purchaseVas(productId: String, msisdn: String, amount: Double, sku: String, name: String,
+                     category: String, completion: @escaping (Result<Void, ApiError>) -> Void) {
+        let form = [
+            "product_id": productId, "msisdn": msisdn, "amount": String(amount),
+            "sku": sku, "name": name, "category": category,
+            // Postman collection sends earn_commission=1 so the distributor accrues their VAS commission.
+            "earn_commission": "1"
+        ]
+        Http.postForm(baseUrl: Self.baseURL, path: "api/common/vas/purchase", form: form,
+                      token: session.token) { [weak self] r in
+            self?.deliverStatus(r, completion: completion)
+        }
+    }
+
     // MARK: - Internals
 
     private func getAuthed<T: Decodable>(_ path: String, query: [String: String]?, type: T.Type,
