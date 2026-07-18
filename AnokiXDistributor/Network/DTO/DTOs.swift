@@ -34,6 +34,25 @@ struct LoginData: Decodable {
     let portalType: String?
     let portalInfo: PortalInfo?
 
+    // Pending-approval branch: when the distributor account is still awaiting approval the
+    // login call returns status=true with no token; these fields describe the application
+    // under review instead (see PendingApprovalViewController).
+    let pendingApproval: Bool?
+    let accountStatus: String?
+    let registrationStatus: String?
+    let submittedAt: String?
+    let reference: String?
+    let businessName: String?
+    let wallet: Wallet?
+
+    struct Wallet: Decodable {
+        let status: String?
+        let accountNumber: String?
+        let activatedAt: String?
+        let lastError: String?
+        let configured: Bool?
+    }
+
     struct User: Decodable {
         let id: String?
         let firstName: String?
@@ -48,6 +67,27 @@ struct LoginData: Decodable {
     /// to the uploaded logo (may be nil/empty when none was set).
     struct PortalInfo: Decodable {
         let companyLogoUrl: String?
+    }
+}
+
+// MARK: - Wallet
+
+/// data block of GET /api/common/wallet — the distributor's anokiX (IMB) wallet.
+/// Only the fields the dashboard wallet card + detail panel consume are modelled.
+struct WalletData: Decodable {
+    let status: String?
+    let accountNumber: String?
+    let activatedAt: String?
+    let configured: Bool?
+    let paymentsEnabled: Bool?
+    let balance: Balance?
+
+    struct Balance: Decodable {
+        let current: Double?
+        let available: Double?
+        let pending: Double?
+        let asOf: String?
+        let stale: Bool?
     }
 }
 

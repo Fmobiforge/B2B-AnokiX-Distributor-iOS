@@ -93,6 +93,14 @@ final class LoginViewController: UIViewController {
             guard let self = self else { return }
             switch result {
             case .success(let data):
+                // Account awaiting approval: no token is issued — show the review screen
+                // instead of proceeding into the app.
+                if data.pendingApproval == true {
+                    self.loginButton.isEnabled = true
+                    self.loginButton.setTitle(S.loginButton, for: .normal)
+                    PendingApprovalViewController.open(from: self, data: data)
+                    return
+                }
                 SessionManager.shared.token = data.token ?? ""
                 if let user = data.user {
                     SessionManager.shared.setUser(firstName: user.firstName, lastName: user.lastName,

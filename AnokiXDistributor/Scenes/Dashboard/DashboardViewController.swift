@@ -85,12 +85,25 @@ final class DashboardViewController: BaseMainViewController {
 
     private var currencySymbol = "R"
 
+    private var wallet: WalletData?
+    private weak var walletCard: UIControl?
+    private weak var walletBalanceLabel: UILabel?
+
     override func loadData() {
         // Render a light skeleton, then replace everything with the live dashboard payload.
         renderAll(nil)
         ApiClient.shared.getDashboard { [weak self] result in
             guard let self = self, case .success(let data) = result else { return }
             self.renderAll(data.dashboard)
+        }
+        loadWallet()
+    }
+
+    private func loadWallet() {
+        ApiClient.shared.getWallet { [weak self] result in
+            guard let self = self, case .success(let data) = result else { return }
+            self.wallet = data
+            self.applyWallet()
         }
     }
 
@@ -100,6 +113,8 @@ final class DashboardViewController: BaseMainViewController {
         stack.arrangedSubviews.forEach { $0.removeFromSuperview() }
 
         if let symbol = d?.meta?.currency?.symbol, !symbol.isEmpty { currencySymbol = symbol }
+
+        renderWalletCard()
 
         let summary = d?.summaryCards ?? MockData.fallbackSummaryCards
         renderSummaryCards(summary)
@@ -116,7 +131,8 @@ final class DashboardViewController: BaseMainViewController {
         renderRevenue(total: rev?.formattedTotal ?? "R1,245,600.00",
                       trendLabel: rev?.trend?.label ?? "↑ 18.6% from previous period",
                       compare: d?.meta?.comparePeriodLabel ?? "vs previous period",
-                      values: rev?.chart?.values ?? [12, 18, 14, 22, 19, 27, 24])
+                      values: rev?.chart?.values ?? [12, 18, 14, 22, 19, 27, 24],
+                      labels: rev?.chart?.labels ?? [])
 
         let catData = d?.topSellingCategories
         let cats = catData?.items?.map {
@@ -128,7 +144,7 @@ final class DashboardViewController: BaseMainViewController {
 
         let orders = d?.recentOrders?.items?.map {
             RecentOrderRow(orderId: $0.orderId ?? "", trader: $0.trader ?? "",
-                           amount: $0.formattedAmount ?? "", date: $0.formattedDate ?? "",
+                           amount: $0.formattedAmount ?? "", date: Self.friendlyOrderDate($0),
                            statusLabel: $0.statusLabel ?? "", statusColor: AppColors.fromHex($0.statusColor))
         } ?? MockData.orders().prefix(5).map {
             RecentOrderRow(orderId: $0.orderId, trader: $0.traderName, amount: $0.amount,
@@ -140,6 +156,107 @@ final class DashboardViewController: BaseMainViewController {
     private func addSectionTitle(_ text: String) {
         let label = UILabel.make(text, font: AppFonts.bold(15), color: AppColors.textPrimary)
         stack.addArrangedSubview(label)
+    }
+
+    // MARK: Wallet
+
+    /// The tappable wallet balance card, always the first item in the stack. Hidden until
+    /// the (separately loaded) wallet balance arrives.
+    private func renderWalletCard() {
+        let card = UIControl()
+        StyleKit.styleCard(card)
+        card.addTarget(self, action: #selector(walletCardTapped), for: .touchUpInside)
+
+        let tile = UIView()
+        tile.backgroundColor = AppColors.purplePrimary
+        tile.layer.cornerRadius = AppMetrics.radiusLG
+        tile.constrainSize(42)
+        let icon = UIImageView(image: UIImage(systemName: "creditcard.fill"))
+        icon.tintColor = .white
+        icon.contentMode = .scaleAspectFit
+        icon.forAutoLayout()
+        tile.addSubview(icon)
+        NSLayoutConstraint.activate([
+            icon.centerXAnchor.constraint(equalTo: tile.centerXAnchor),
+            icon.centerYAnchor.constraint(equalTo: tile.centerYAnchor),
+            icon.widthAnchor.constraint(equalToConstant: 21),
+            icon.heightAnchor.constraint(equalToConstant: 21)
+        ])
+
+        let caption = UILabel.make("Wallet Balance", font: AppFonts.regular(12), color: AppColors.textSecondary)
+        let balance = UILabel.make("—", font: AppFonts.bold(20), color: AppColors.textPrimary)
+        let middle = UIStackView.vertical(spacing: 1, alignment: .leading)
+        middle.addArrangedSubview(caption)
+        middle.addArrangedSubview(balance)
+
+        let chevron = UIImageView(image: UIImage(systemName: "chevron.down"))
+        chevron.tintColor = AppColors.textTertiary
+        chevron.contentMode = .scaleAspectFit
+        chevron.constrainSize(16)
+        let poweredBy = UILabel.make("anokiX · IMB", font: AppFonts.light(10), color: AppColors.textTertiary)
+        let right = UIStackView.vertical(spacing: 6, alignment: .trailing)
+        right.addArrangedSubview(chevron)
+        right.addArrangedSubview(poweredBy)
+
+        let row = UIStackView.horizontal(spacing: 12, alignment: .center)
+        row.isUserInteractionEnabled = false
+        row.addArrangedSubview(tile)
+        row.addArrangedSubview(middle)
+        row.addArrangedSubview(UIView())
+        row.addArrangedSubview(right)
+        row.forAutoLayout()
+        card.addSubview(row)
+        row.pinEdges(to: card, insets: UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14))
+
+        stack.insertArrangedSubview(card, at: 0)
+        walletCard = card
+        walletBalanceLabel = balance
+        applyWallet()
+    }
+
+    private func applyWallet() {
+        guard let available = wallet?.balance?.available else {
+            walletCard?.isHidden = true
+            return
+        }
+        walletBalanceLabel?.text = formatMoney(available)
+        walletCard?.isHidden = false
+    }
+
+    @objc private func walletCardTapped() {
+        guard let wallet = wallet else { return }
+        let vc = WalletDetailViewController(wallet: wallet, currencySymbol: currencySymbol) { [weak self] updated in
+            self?.wallet = updated
+            self?.applyWallet()
+        }
+        if let sheet = vc.sheetPresentationController {
+            sheet.detents = [.medium()]
+            sheet.prefersGrabberVisible = true
+            sheet.preferredCornerRadius = 20
+        }
+        present(vc, animated: true)
+    }
+
+    private func formatMoney(_ value: Double) -> String {
+        WalletFormat.money(currencySymbol, value)
+    }
+
+    /// Recent-order timestamp: the API's `formattedDate` is a broken epoch, so format the
+    /// raw `date` ("dd/MM/yyyy HH:mm:ss") into a readable label.
+    static func friendlyOrderDate(_ order: DashboardData.RecentOrder) -> String {
+        if let raw = order.date, !raw.isEmpty {
+            let input = DateFormatter()
+            input.dateFormat = "dd/MM/yyyy HH:mm:ss"
+            input.locale = Locale(identifier: "en_US_POSIX")
+            if let date = input.date(from: raw) {
+                let out = DateFormatter()
+                out.dateFormat = "dd MMM yyyy, HH:mm"
+                out.locale = Locale(identifier: "en_US_POSIX")
+                return out.string(from: date)
+            }
+            return raw
+        }
+        return order.formattedDate ?? ""
     }
 
     // MARK: Summary KPI cards (top, horizontally scrollable)
@@ -266,15 +383,14 @@ final class DashboardViewController: BaseMainViewController {
         rows.forEach { stack.addArrangedSubview($0) }
     }
 
-    private func renderRevenue(total: String, trendLabel: String, compare: String, values: [Double]) {
+    private func renderRevenue(total: String, trendLabel: String, compare: String,
+                               values: [Double], labels: [String]) {
         let card = UIView()
         StyleKit.styleCard(card)
         let titleLabel = UILabel.title(S.revenueOverview)
-        let periodPill = makePeriodPill("This week")
         let header = UIStackView.horizontal(spacing: 8, alignment: .center)
         header.addArrangedSubview(titleLabel)
         header.addArrangedSubview(UIView())
-        header.addArrangedSubview(periodPill)
 
         let totalLabel = UILabel.make(total, font: AppFonts.bold(AppMetrics.textKpiValue), color: AppColors.textPrimary)
         let up = !trendLabel.contains("↓")
@@ -292,41 +408,19 @@ final class DashboardViewController: BaseMainViewController {
         amountRow.addArrangedSubview(UIView())
 
         let compareLabel = UILabel.make(compare, font: AppFonts.light(AppMetrics.textLabel), color: AppColors.textSecondary)
-        let spark = SparklineView()
-        spark.backgroundColor = .clear
-        spark.constrainHeight(90)
-        spark.values = values
+        let chart = RevenueChartView()
+        chart.backgroundColor = .clear
+        chart.currencySymbol = currencySymbol
+        chart.values = values
+        chart.labels = labels
+        chart.constrainHeight(170)
 
         let body = UIStackView.vertical(spacing: 10, alignment: .fill)
-        [header, amountRow, compareLabel, spark].forEach { body.addArrangedSubview($0) }
+        [header, amountRow, compareLabel, chart].forEach { body.addArrangedSubview($0) }
         body.forAutoLayout()
         card.addSubview(body)
         body.pinEdges(to: card, insets: UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14))
         stack.addArrangedSubview(card)
-    }
-
-    private func makePeriodPill(_ title: String) -> UIView {
-        let pill = UIControl()
-        pill.backgroundColor = AppColors.purpleLight
-        pill.layer.cornerRadius = 16
-        let label = UILabel.make(title, font: AppFonts.regular(AppMetrics.textBodySM), color: AppColors.purplePrimary)
-        let chevron = UIImageView(image: UIImage(systemName: "chevron.right"))
-        chevron.tintColor = AppColors.purplePrimary
-        chevron.contentMode = .scaleAspectFit
-        let row = UIStackView.horizontal(spacing: 4, alignment: .center)
-        row.isUserInteractionEnabled = false
-        row.addArrangedSubview(label)
-        row.addArrangedSubview(chevron)
-        row.forAutoLayout()
-        pill.addSubview(row)
-        NSLayoutConstraint.activate([
-            chevron.widthAnchor.constraint(equalToConstant: 14),
-            pill.heightAnchor.constraint(equalToConstant: 32),
-            row.leadingAnchor.constraint(equalTo: pill.leadingAnchor, constant: 10),
-            row.trailingAnchor.constraint(equalTo: pill.trailingAnchor, constant: -10),
-            row.centerYAnchor.constraint(equalTo: pill.centerYAnchor)
-        ])
-        return pill
     }
 
     private func renderCategories(_ items: [CategoryRow], centerMain: String?) {

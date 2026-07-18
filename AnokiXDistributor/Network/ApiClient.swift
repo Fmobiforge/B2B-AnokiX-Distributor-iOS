@@ -67,6 +67,11 @@ final class ApiClient {
         getAuthed("api/distributor/dashboard", query: nil, type: DashboardData.self, completion: completion)
     }
 
+    /// The distributor's anokiX (IMB) wallet — balance shown on the dashboard.
+    func getWallet(completion: @escaping (Result<WalletData, ApiError>) -> Void) {
+        getAuthed("api/common/wallet", query: nil, type: WalletData.self, completion: completion)
+    }
+
     func getStores(keyword: String, completion: @escaping (Result<StoresData, ApiError>) -> Void) {
         let q = ["offset": "0", "page_size": "50", "keyword": keyword]
         getAuthed("api/distributor/stores/all", query: q, type: StoresData.self, completion: completion)
