@@ -73,7 +73,7 @@ struct LoginData: Decodable {
 // MARK: - Wallet
 
 /// data block of GET /api/common/wallet — the distributor's anokiX (IMB) wallet.
-/// Only the fields the dashboard wallet card + detail panel consume are modelled.
+/// Consumed by the dashboard wallet card + detail panel and Settings → Business → Wallet.
 struct WalletData: Decodable {
     let status: String?
     let accountNumber: String?
@@ -88,6 +88,16 @@ struct WalletData: Decodable {
         let pending: Double?
         let asOf: String?
         let stale: Bool?
+        let transactions: [Transaction]?
+    }
+
+    /// One movement on the wallet ledger. `amount` arrives as a signed string.
+    struct Transaction: Decodable {
+        let date: String?
+        let amount: String?
+        let transactionId: Int64?
+        let proofOfPayment: Bool?
+        let pending: Bool?
     }
 }
 

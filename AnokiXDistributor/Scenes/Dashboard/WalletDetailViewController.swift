@@ -175,6 +175,29 @@ enum WalletFormat {
         return symbol + s
     }
 
+    /// ZA money: `R 40 168,50` — space thousands, comma decimals, sign kept.
+    /// Used by the Settings → Business wallet step, which mirrors the web portal.
+    static func zaMoney(_ value: Double?) -> String {
+        let v = value ?? 0
+        let digits = money.string(from: NSNumber(value: abs(v)))
+            ?? String(format: "%.2f", abs(v))
+        let za = digits.replacingOccurrences(of: ",", with: " ")
+            .replacingOccurrences(of: ".", with: ",")
+        return (v < 0 ? "R -" : "R ") + za
+    }
+
+    /// ISO-8601 ledger timestamp → "15 Jul 2026, 15:58"; falls back to the raw value.
+    static func ledgerDate(_ iso: String?) -> String {
+        guard let iso = iso, !iso.isEmpty else { return "" }
+        let parser = ISO8601DateFormatter()
+        parser.formatOptions = [.withInternetDateTime]
+        guard let date = parser.date(from: iso) else { return iso }
+        let out = DateFormatter()
+        out.dateFormat = "dd MMM yyyy, HH:mm"
+        out.locale = Locale(identifier: "en_US_POSIX")
+        return out.string(from: date)
+    }
+
     /// "HH:mm" (device-local) from an ISO-8601 timestamp; "" if unparseable.
     static func asOfTime(_ iso: String?) -> String {
         guard let iso = iso, !iso.isEmpty else { return "" }

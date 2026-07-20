@@ -6,7 +6,8 @@ import UniformTypeIdentifiers
 /// Settings → Business: a 7-step editor (Company · Business · Contacts · Location · Documents ·
 /// Service · Wallet) pre-filled from GET api/distributor/business/profile. Each step has its own
 /// Save Changes button that posts just that step's fields to api/distributor/business/profile/update
-/// (multipart). Wallet is informational only. Port of the Android SettingsBusinessActivity.
+/// (multipart). Wallet is read-only and comes from GET api/common/wallet. Port of the Android
+/// SettingsBusinessActivity.
 final class SettingsBusinessViewController: BaseSecondaryViewController,
     GMSMapViewDelegate, UITableViewDataSource, UITableViewDelegate, UIDocumentPickerDelegate {
 
@@ -114,6 +115,20 @@ final class SettingsBusinessViewController: BaseSecondaryViewController,
     }
     private var dayRows: [DayRow] = []
 
+    // Wallet (read-only, from api/common/wallet)
+    private var wallet: WalletData?
+    private let walletStatusPill = UILabel()
+    private let walletStatusIcon = UIImageView(image: UIImage(systemName: "checkmark.circle.fill"))
+    private var walletPillBox: UIStackView?
+    private let walletRefreshIcon = UIImageView(image: UIImage(systemName: "arrow.clockwise"))
+    private let walletAccountLabel = UILabel()
+    private let walletActivatedLabel = UILabel()
+    private let walletAvailableLabel = UILabel()
+    private let walletCurrentLabel = UILabel()
+    private let walletPendingLabel = UILabel()
+    private let walletTransactionsStack = UIStackView.vertical(spacing: 0, alignment: .fill)
+    private let walletEmptyLabel = UILabel()
+
     // MARK: - Setup
 
     override func setupContent(in container: UIView) {
@@ -205,6 +220,7 @@ final class SettingsBusinessViewController: BaseSecondaryViewController,
                 self.toast(error.message.isEmpty ? "Failed to load business profile." : error.message)
             }
         }
+        loadWallet()
     }
 
     // MARK: - Stepper
@@ -709,31 +725,223 @@ final class SettingsBusinessViewController: BaseSecondaryViewController,
         wIcon.constrainSize(26)
         let wText = UIStackView.vertical(spacing: 2, alignment: .leading)
         wText.addArrangedSubview(UILabel.make("anokiX Wallet", font: AppFonts.bold(14), color: AppColors.textPrimary))
-        wText.addArrangedSubview(UILabel.make("Manage payments, credit and rewards from one place.",
+        wText.addArrangedSubview(UILabel.make("Your IMB business account — balances, payments and rewards in one place.",
                                               font: AppFonts.regular(12), color: AppColors.textSecondary, lines: 0))
         banner.addArrangedSubview(wIcon)
         banner.addArrangedSubview(wText)
         stack.addArrangedSubview(banner)
 
-        for benefit in ["Faster payments", "Access to credit", "Insurance solutions", "Rewards & cashback", "Business growth tools"] {
-            let check = UIImageView(image: UIImage(systemName: "checkmark.circle.fill"))
-            check.tintColor = AppColors.success
-            check.contentMode = .scaleAspectFit
-            check.constrainSize(18)
-            let row = UIStackView.horizontal(spacing: 10, alignment: .center)
-            row.addArrangedSubview(check)
-            row.addArrangedSubview(UILabel.make(benefit, font: AppFonts.regular(14), color: AppColors.textPrimary))
-            stack.addArrangedSubview(row)
+        // Status pill + Refresh.
+        walletStatusPill.font = AppFonts.bold(12)
+        walletStatusPill.text = "Loading…"
+        walletStatusPill.textColor = AppColors.textSecondary
+        walletStatusIcon.isHidden = true
+        walletStatusPill.textAlignment = .center
+        walletStatusPill.layer.cornerRadius = 6
+        walletStatusPill.layer.masksToBounds = true
+        walletStatusPill.setContentHuggingPriority(.required, for: .horizontal)
+        walletStatusIcon.contentMode = .scaleAspectFit
+        walletStatusIcon.tintColor = AppColors.success
+        walletStatusIcon.constrainSize(13)
+        let pillBox = UIStackView.horizontal(spacing: 6, alignment: .center)
+        pillBox.isLayoutMarginsRelativeArrangement = true
+        pillBox.layoutMargins = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
+        pillBox.addArrangedSubview(walletStatusIcon)
+        pillBox.addArrangedSubview(walletStatusPill)
+        pillBox.backgroundColor = AppColors.successBg
+        pillBox.layer.cornerRadius = 6
+        walletPillBox = pillBox
+
+        let refreshControl = UIControl()
+        refreshControl.addTarget(self, action: #selector(walletRefreshTapped), for: .touchUpInside)
+        walletRefreshIcon.tintColor = AppColors.textSecondary
+        walletRefreshIcon.contentMode = .scaleAspectFit
+        walletRefreshIcon.constrainSize(16)
+        let refreshRow = UIStackView.horizontal(spacing: 6, alignment: .center)
+        refreshRow.isUserInteractionEnabled = false
+        refreshRow.addArrangedSubview(walletRefreshIcon)
+        refreshRow.addArrangedSubview(UILabel.make("Refresh", font: AppFonts.regular(13), color: AppColors.textPrimary))
+        refreshRow.forAutoLayout()
+        refreshControl.addSubview(refreshRow)
+        refreshRow.pinEdges(to: refreshControl, insets: UIEdgeInsets(top: 6, left: 6, bottom: 6, right: 6))
+
+        let statusRow = UIStackView.horizontal(spacing: 8, alignment: .center)
+        statusRow.addArrangedSubview(pillBox)
+        statusRow.addArrangedSubview(UIView())
+        statusRow.addArrangedSubview(refreshControl)
+        stack.addArrangedSubview(statusRow)
+
+        // IMB account number panel.
+        walletAccountLabel.font = AppFonts.bold(19)
+        walletAccountLabel.textColor = AppColors.textPrimary
+        walletAccountLabel.text = "—"
+        walletActivatedLabel.font = AppFonts.regular(11)
+        walletActivatedLabel.textColor = AppColors.textSecondary
+        walletActivatedLabel.isHidden = true
+
+        let accountPanel = UIStackView.vertical(spacing: 4, alignment: .fill)
+        accountPanel.isLayoutMarginsRelativeArrangement = true
+        accountPanel.layoutMargins = UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14)
+        accountPanel.backgroundColor = AppColors.surfaceVariant
+        accountPanel.layer.cornerRadius = 10
+        accountPanel.layer.borderWidth = 1
+        accountPanel.layer.borderColor = AppColors.border.cgColor
+        accountPanel.addArrangedSubview(UILabel.make("IMB Account Number", font: AppFonts.regular(12), color: AppColors.textSecondary))
+        accountPanel.addArrangedSubview(walletAccountLabel)
+        accountPanel.addArrangedSubview(walletActivatedLabel)
+        stack.addArrangedSubview(accountPanel)
+
+        // Balances: Available full width, then Current / Pending side by side.
+        walletAvailableLabel.font = AppFonts.bold(22)
+        walletAvailableLabel.textColor = AppColors.success
+        walletCurrentLabel.font = AppFonts.bold(17)
+        walletCurrentLabel.textColor = AppColors.textPrimary
+        walletPendingLabel.font = AppFonts.bold(17)
+        walletPendingLabel.textColor = AppColors.warning
+        [walletAvailableLabel, walletCurrentLabel, walletPendingLabel].forEach { $0.text = "—" }
+
+        stack.addArrangedSubview(balanceTile(walletAvailableLabel, "Available"))
+        let pairRow = UIStackView.horizontal(spacing: 10, alignment: .fill)
+        pairRow.distribution = .fillEqually
+        pairRow.addArrangedSubview(balanceTile(walletCurrentLabel, "Current"))
+        pairRow.addArrangedSubview(balanceTile(walletPendingLabel, "Pending"))
+        stack.addArrangedSubview(pairRow)
+
+        // Recent transactions table.
+        stack.addArrangedSubview(UILabel.make("Recent Transactions", font: AppFonts.bold(14), color: AppColors.textPrimary))
+
+        let head = UIStackView.horizontal(spacing: 8, alignment: .center)
+        head.isLayoutMarginsRelativeArrangement = true
+        head.layoutMargins = UIEdgeInsets(top: 9, left: 12, bottom: 9, right: 12)
+        head.backgroundColor = AppColors.surfaceVariant
+        head.addArrangedSubview(UILabel.make("Date", font: AppFonts.regular(12), color: AppColors.textSecondary))
+        head.addArrangedSubview(UIView())
+        head.addArrangedSubview(UILabel.make("Amount", font: AppFonts.regular(12), color: AppColors.textSecondary))
+        stack.addArrangedSubview(head)
+        stack.addArrangedSubview(walletTransactionsStack)
+
+        walletEmptyLabel.font = AppFonts.regular(13)
+        walletEmptyLabel.textColor = AppColors.textSecondary
+        walletEmptyLabel.textAlignment = .center
+        walletEmptyLabel.text = "No transactions yet."
+        walletEmptyLabel.isHidden = true
+        stack.addArrangedSubview(walletEmptyLabel)
+
+        return card(stack)
+    }
+
+    private func balanceTile(_ value: UILabel, _ caption: String) -> UIView {
+        let tile = UIStackView.vertical(spacing: 2, alignment: .fill)
+        tile.isLayoutMarginsRelativeArrangement = true
+        tile.layoutMargins = UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14)
+        tile.backgroundColor = AppColors.surface
+        tile.layer.cornerRadius = AppMetrics.radiusLG
+        tile.layer.borderWidth = 1
+        tile.layer.borderColor = AppColors.border.cgColor
+        tile.addArrangedSubview(value)
+        tile.addArrangedSubview(UILabel.make(caption, font: AppFonts.regular(12), color: AppColors.textSecondary))
+        return tile
+    }
+
+    // MARK: - Wallet data
+
+    /// GET api/common/wallet — balances, IMB account details and the recent ledger.
+    private func loadWallet(spin: Bool = false) {
+        if spin {
+            let rotate = CABasicAnimation(keyPath: "transform.rotation")
+            rotate.fromValue = 0
+            rotate.toValue = 2 * Double.pi
+            rotate.duration = 0.6
+            walletRefreshIcon.layer.add(rotate, forKey: "spin")
+        }
+        ApiClient.shared.getWallet { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let data):
+                self.wallet = data
+                self.applyWallet(data)
+            case .failure:
+                if self.wallet == nil {           // keep whatever we already show
+                    self.setWalletPill(active: false, text: "Could not load your wallet.")
+                }
+            }
+        }
+    }
+
+    private func applyWallet(_ data: WalletData) {
+        let active = data.status?.lowercased() == "active"
+        setWalletPill(active: active, text: active ? "Active" : "Not active")
+
+        let number = data.accountNumber ?? ""
+        walletAccountLabel.text = number.isEmpty ? "—" : number
+        if let activated = data.activatedAt, !activated.isEmpty {
+            walletActivatedLabel.isHidden = false
+            walletActivatedLabel.text = "Activated \(activated)"
+        } else {
+            walletActivatedLabel.isHidden = true
         }
 
-        let comingSoon = UILabel.make("Wallet management coming soon", font: AppFonts.bold(15), color: .white, align: .center)
-        comingSoon.backgroundColor = AppColors.purplePrimary
-        comingSoon.alpha = 0.6
-        comingSoon.layer.cornerRadius = AppMetrics.radiusMD
-        comingSoon.layer.masksToBounds = true
-        comingSoon.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        stack.addArrangedSubview(comingSoon)
-        return card(stack)
+        let b = data.balance
+        walletAvailableLabel.text = WalletFormat.zaMoney(b?.available)
+        walletCurrentLabel.text = WalletFormat.zaMoney(b?.current)
+        walletPendingLabel.text = WalletFormat.zaMoney(b?.pending)
+
+        walletTransactionsStack.arrangedSubviews.forEach {
+            walletTransactionsStack.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+        let transactions = b?.transactions ?? []
+        walletEmptyLabel.isHidden = !transactions.isEmpty
+        for tx in transactions {
+            walletTransactionsStack.addArrangedSubview(transactionRow(tx))
+        }
+    }
+
+    private func setWalletPill(active: Bool, text: String) {
+        walletStatusPill.text = text
+        walletStatusPill.textColor = active ? AppColors.success : AppColors.warning
+        walletPillBox?.backgroundColor = active ? AppColors.successBg : AppColors.warningBg
+        walletStatusIcon.isHidden = !active
+    }
+
+    private func transactionRow(_ tx: WalletData.Transaction) -> UIView {
+        let amount = Double(tx.amount ?? "") ?? 0
+        let value = UILabel.make(WalletFormat.zaMoney(amount), font: AppFonts.bold(13),
+                                 color: amount < 0 ? AppColors.danger : AppColors.textPrimary)
+        value.setContentHuggingPriority(.required, for: .horizontal)
+
+        let row = UIStackView.horizontal(spacing: 8, alignment: .center)
+        row.isLayoutMarginsRelativeArrangement = true
+        row.layoutMargins = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+        row.addArrangedSubview(UILabel.make(WalletFormat.ledgerDate(tx.date),
+                                            font: AppFonts.regular(13), color: AppColors.textPrimary))
+        row.addArrangedSubview(UIView())
+        if tx.pending == true {
+            let flag = UILabel.make("Pending", font: AppFonts.regular(11), color: AppColors.warning, align: .center)
+            flag.setContentHuggingPriority(.required, for: .horizontal)
+            let flagBox = UIStackView.horizontal(spacing: 0, alignment: .center)
+            flagBox.isLayoutMarginsRelativeArrangement = true
+            flagBox.layoutMargins = UIEdgeInsets(top: 2, left: 6, bottom: 2, right: 6)
+            flagBox.backgroundColor = AppColors.warningBg
+            flagBox.layer.cornerRadius = 6
+            flagBox.addArrangedSubview(flag)
+            flagBox.setContentHuggingPriority(.required, for: .horizontal)
+            row.addArrangedSubview(flagBox)
+        }
+        row.addArrangedSubview(value)
+
+        let hairline = UIView()
+        hairline.backgroundColor = AppColors.borderLight
+        hairline.constrainHeight(1)
+
+        let wrapper = UIStackView.vertical(spacing: 0, alignment: .fill)
+        wrapper.addArrangedSubview(row)
+        wrapper.addArrangedSubview(hairline)
+        return wrapper
+    }
+
+    @objc private func walletRefreshTapped() {
+        loadWallet(spin: true)
     }
 
     // MARK: - Bind from profile
