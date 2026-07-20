@@ -139,13 +139,13 @@ enum MockData {
                 compareLabel: nil, sparkline: spark, color: color)
         }
         return [
-            card("total_revenue", "Total Revenue", "R1,245,600.00", "↑ 18.6%", "purple",
+            card("total_revenue", "Total Revenue", "R0.00", "↑ 0.0%", "purple",
                  [4.2, 3.8, 5.1, 4.7, 5.6, 4.9, 6.2]),
-            card("total_orders", "Total Orders", "1,286", "↑ 15.3%", "blue",
+            card("total_orders", "Total Orders", "0", "↑ 0.0%", "blue",
                  [9.8, 10.2, 10.5, 11, 11.5, 12, 12.86]),
-            card("active_traders", "Active Traders", "2,453", "↑ 21.4%", "green",
+            card("active_traders", "Active Traders", "0", "↑ 0.0%", "green",
                  [21, 21.5, 22, 22.8, 23.2, 23.8, 24.53]),
-            card("products_sold", "Products Sold", "24,560", "↑ 12.7%", "orange",
+            card("products_sold", "Products Sold", "0", "↑ 0.0%", "orange",
                  [20.1, 20.8, 21.4, 22, 22.9, 23.6, 24.56])
         ]
     }
