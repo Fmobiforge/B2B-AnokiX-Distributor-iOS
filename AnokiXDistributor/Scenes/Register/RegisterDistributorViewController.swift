@@ -21,7 +21,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
 
     private let stepKeys = [S.rStepCompany, S.rStepBusiness, S.rStepContacts, S.rStepLocation,
                             S.rStepDocuments, S.rStepService, S.rStepWallet, S.rStepTerms]
-    private let stepLocation = 3, stepDocuments = 4, stepService = 5, stepTerms = 7
+    private let stepLocation = 3, stepDocuments = 4, stepService = 5, stepWallet = 6, stepTerms = 7
     private var currentStep = 0
 
     private static let logoKey = "__logo__"
@@ -154,6 +154,57 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
     private let walletNowRadio = UIImageView()
     private let walletLaterRadio = UIImageView()
     private var createWalletNow = true
+
+    // Wallet › signing-owner identity + residential address (only sent when "Create Wallet Now")
+    private let walletIdTypeLabels = ["SA ID Number", "Passport", "Asylum Document"]
+    private let walletIdTypeCodes = ["ID", "passport", "asylum"]
+    private let walletGenderOptions = ["Male", "Female", "Other"]
+    private let walletProvinceLabels = ["Eastern Cape", "Free State", "Gauteng", "Limpopo",
+                                        "Mpumalanga", "Northern Cape", "Kwa-Zulu Natal",
+                                        "North West", "Western Cape"]
+    private let walletProvinceCodes = ["ZA-EC", "ZA-FS", "ZA-GP", "ZA-LP", "ZA-MP",
+                                       "ZA-NC", "ZA-KZN", "ZA-NW", "ZA-WC"]
+
+    private var walletIdTypeCode = "ID"
+    private var walletGender: String?
+    private var walletProvinceCode: String?
+    private var walletDobIso: String?
+    private var walletPassportExpIso: String?
+    private var walletUssd = true
+    private var walletInternet = true
+    private var walletCrossBorder = false
+    private var walletSaIdValid = false
+
+    private let walletInfoPanel = UIStackView.vertical(spacing: 12, alignment: .fill)
+    private let walletIdTypeButton = UIButton(type: .system)
+    private let walletIdNumberTitle = UILabel.make("SA ID Number", font: AppFonts.regular(13), color: AppColors.textPrimary)
+    private let walletIdNumberField = UITextField()
+    private let walletIdError = UILabel.make("", font: AppFonts.regular(11), color: AppColors.danger, lines: 0)
+    private let walletIdHint = UILabel.make("Date of birth and gender read from the ID number.",
+                                            font: AppFonts.regular(11), color: AppColors.success, lines: 0)
+    private let walletPassportGroup = UIStackView.vertical(spacing: 12, alignment: .fill)
+    private let walletPassportCountryField = UITextField()
+    private let walletPassportExpButton = UIButton(type: .system)
+    private let walletDobButton = UIButton(type: .system)
+    private let walletGenderButton = UIButton(type: .system)
+    private let walletStreetField = UITextField()
+    private let walletSuburbField = UITextField()
+    private let walletCityField = UITextField()
+    private let walletProvinceButton = UIButton(type: .system)
+    private let walletPostCodeField = UITextField()
+    private var walletUssdTile: UIView!
+    private var walletInternetTile: UIView!
+    private var walletCrossBorderTile: UIView!
+    private let walletUssdCheck = UIImageView()
+    private let walletInternetCheck = UIImageView()
+    private let walletCrossBorderCheck = UIImageView()
+
+    private lazy var walletIsoFormatter: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; f.locale = Locale(identifier: "en_US_POSIX"); return f
+    }()
+    private lazy var walletReadableFormatter: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "MM/dd/yyyy"; f.locale = Locale(identifier: "en_US_POSIX"); return f
+    }()
 
     // Terms
     private var termCheckboxes: [UIButton] = []
@@ -455,6 +506,8 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         case stepService:
             if selectedCoverage == nil { return fail("Please select your distribution coverage.") }
             return true
+        case stepWallet:
+            return validateWallet()
         case stepTerms:
             if termCheckboxes.contains(where: { !$0.isSelected }) {
                 return fail("Please accept all terms to continue.")
@@ -463,6 +516,27 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         default:
             return true
         }
+    }
+
+    /// Wallet step: nothing required when "Activate Later"; full identity + address otherwise.
+    private func validateWallet() -> Bool {
+        if !createWalletNow { return true }
+        if text(walletIdNumberField).isEmpty { return fail("Please enter the owner's ID / document number.") }
+        if walletIdTypeCode == "ID" && !walletSaIdValid {
+            return fail("Please enter a valid 13-digit South African ID number.")
+        }
+        if walletIdTypeCode == "passport" {
+            if text(walletPassportCountryField).isEmpty { return fail("Please enter the passport country.") }
+            if walletPassportExpIso == nil { return fail("Please select the passport expiry date.") }
+        }
+        if walletDobIso == nil { return fail("Please select the date of birth.") }
+        if walletGender == nil { return fail("Please select a gender.") }
+        if text(walletStreetField).isEmpty { return fail("Please enter the street address.") }
+        if text(walletSuburbField).isEmpty { return fail("Please enter the suburb.") }
+        if text(walletCityField).isEmpty { return fail("Please enter the city.") }
+        if walletProvinceCode == nil { return fail("Please select a province.") }
+        if text(walletPostCodeField).isEmpty { return fail("Please enter the postal code.") }
+        return true
     }
 
     private func fail(_ message: String) -> Bool {
@@ -990,8 +1064,345 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         panel.addArrangedSubview(walletOptionRow(radio: walletNowRadio, title: "Create Wallet Now", now: true))
         panel.addArrangedSubview(walletOptionRow(radio: walletLaterRadio, title: "Activate Later", now: false))
         stack.addArrangedSubview(panel)
+
+        buildWalletInfoPanel()
+        stack.addArrangedSubview(walletInfoPanel)
+
         setWallet(true)
+        applyIdType()
         return stack
+    }
+
+    /// Builds the signing-owner identity + residential-address + wallet-access section
+    /// shown only when "Create Wallet Now" is selected (design Register7-new1..3).
+    private func buildWalletInfoPanel() {
+        // Owner verification notice.
+        let noticeIcon = UIImageView(image: UIImage(systemName: "checkmark.shield.fill"))
+        noticeIcon.tintColor = AppColors.purplePrimary
+        noticeIcon.contentMode = .scaleAspectFit
+        noticeIcon.constrainSize(18)
+        noticeIcon.setContentHuggingPriority(.required, for: .horizontal)
+        let noticeText = UILabel.make(
+            "IMB opens the account in the name of the signing owner, not the company — so it needs their ID and home address. A company registration number cannot be used here.",
+            font: AppFonts.regular(12), color: AppColors.purpleDark, lines: 0)
+        let noticeRow = UIStackView.horizontal(spacing: 10, alignment: .top)
+        noticeRow.isLayoutMarginsRelativeArrangement = true
+        noticeRow.layoutMargins = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+        noticeRow.addArrangedSubview(noticeIcon)
+        noticeRow.addArrangedSubview(noticeText)
+        let notice = UIView()
+        notice.backgroundColor = AppColors.purpleLight
+        notice.layer.cornerRadius = AppMetrics.radiusMD
+        noticeRow.forAutoLayout()
+        notice.addSubview(noticeRow)
+        noticeRow.pinEdges(to: notice)
+        walletInfoPanel.addArrangedSubview(notice)
+
+        // Signing Owner Identity.
+        walletInfoPanel.addArrangedSubview(UILabel.make("Signing Owner Identity", font: AppFonts.bold(15), color: AppColors.purpleDark))
+
+        configurePickerButton(walletIdTypeButton, placeholder: "Select ID type")
+        setPickerTitle(walletIdTypeButton, "SA ID Number")
+        walletIdTypeButton.addAction(UIAction { [weak self] _ in self?.pickIdType() }, for: .touchUpInside)
+        walletInfoPanel.addArrangedSubview(labeledControl("ID Type", walletIdTypeButton))
+
+        StyleKit.styleInput(walletIdNumberField)
+        walletIdNumberField.placeholder = "13-digit ID number"
+        walletIdNumberField.keyboardType = .numberPad
+        walletIdNumberField.addTarget(self, action: #selector(walletIdNumberChanged), for: .editingChanged)
+        let idNumberStack = UIStackView.vertical(spacing: 5, alignment: .fill)
+        idNumberStack.addArrangedSubview(walletIdNumberTitle)
+        idNumberStack.addArrangedSubview(walletIdNumberField)
+        idNumberStack.addArrangedSubview(walletIdError)
+        idNumberStack.addArrangedSubview(walletIdHint)
+        walletIdError.isHidden = true
+        walletIdHint.isHidden = true
+        walletInfoPanel.addArrangedSubview(idNumberStack)
+
+        // Passport-only fields.
+        StyleKit.styleInput(walletPassportCountryField)
+        walletPassportCountryField.placeholder = "e.g. ZA"
+        walletPassportCountryField.autocapitalizationType = .allCharacters
+        let countryHint = UILabel.make("Two-letter country code.", font: AppFonts.regular(11), color: AppColors.textSecondary)
+        let countryStack = UIStackView.vertical(spacing: 5, alignment: .fill)
+        countryStack.addArrangedSubview(UILabel.make("Passport Country", font: AppFonts.regular(13), color: AppColors.textPrimary))
+        countryStack.addArrangedSubview(walletPassportCountryField)
+        countryStack.addArrangedSubview(countryHint)
+        walletPassportGroup.addArrangedSubview(countryStack)
+
+        configurePickerButton(walletPassportExpButton, placeholder: "Select date")
+        walletPassportExpButton.addAction(UIAction { [weak self] _ in
+            guard let self = self else { return }
+            self.pickWalletDate(current: self.walletPassportExpIso) { iso in
+                self.walletPassportExpIso = iso
+                self.setPickerTitle(self.walletPassportExpButton, self.readableDate(iso))
+            }
+        }, for: .touchUpInside)
+        walletPassportGroup.addArrangedSubview(labeledControl("Passport Expiry Date", walletPassportExpButton))
+        walletInfoPanel.addArrangedSubview(walletPassportGroup)
+
+        // Date of birth.
+        configurePickerButton(walletDobButton, placeholder: "Select date")
+        walletDobButton.addAction(UIAction { [weak self] _ in
+            guard let self = self, self.walletIdTypeCode != "ID" else { return }
+            self.pickWalletDate(current: self.walletDobIso) { iso in
+                self.walletDobIso = iso
+                self.setPickerTitle(self.walletDobButton, self.readableDate(iso))
+            }
+        }, for: .touchUpInside)
+        walletInfoPanel.addArrangedSubview(labeledControl("Date of Birth", walletDobButton))
+
+        // Gender.
+        configurePickerButton(walletGenderButton, placeholder: "Select gender")
+        walletGenderButton.addAction(UIAction { [weak self] _ in
+            guard let self = self, self.walletIdTypeCode != "ID" else { return }
+            let picker = RegisterOptionPickerViewController(title: "Gender", options: self.walletGenderOptions) { [weak self] index in
+                guard let self = self else { return }
+                self.walletGender = self.walletGenderOptions[index]
+                self.setPickerTitle(self.walletGenderButton, self.walletGenderOptions[index])
+            }
+            self.present(UINavigationController(rootViewController: picker), animated: true)
+        }, for: .touchUpInside)
+        walletInfoPanel.addArrangedSubview(labeledControl("Gender", walletGenderButton))
+
+        // Residential Address.
+        walletInfoPanel.addArrangedSubview(UILabel.make("Residential Address", font: AppFonts.bold(15), color: AppColors.purpleDark))
+        walletInfoPanel.addArrangedSubview(fieldGroup("Street Address", walletStreetField, placeholder: "17 New Haven Ave"))
+        walletInfoPanel.addArrangedSubview(fieldGroup("Suburb", walletSuburbField, placeholder: "Bethesda"))
+        walletInfoPanel.addArrangedSubview(fieldGroup("City", walletCityField, placeholder: "Cape Town"))
+
+        configurePickerButton(walletProvinceButton, placeholder: "Select province")
+        walletProvinceButton.addAction(UIAction { [weak self] _ in
+            guard let self = self else { return }
+            let picker = RegisterOptionPickerViewController(title: "Province", options: self.walletProvinceLabels) { [weak self] index in
+                guard let self = self else { return }
+                self.walletProvinceCode = self.walletProvinceCodes[index]
+                self.setPickerTitle(self.walletProvinceButton, self.walletProvinceLabels[index])
+            }
+            self.present(UINavigationController(rootViewController: picker), animated: true)
+        }, for: .touchUpInside)
+        walletInfoPanel.addArrangedSubview(labeledControl("Province", walletProvinceButton))
+        walletInfoPanel.addArrangedSubview(fieldGroup("Postal Code", walletPostCodeField, placeholder: "8001", keyboard: .numberPad))
+
+        // Wallet Access.
+        walletInfoPanel.addArrangedSubview(UILabel.make("Wallet Access", font: AppFonts.bold(15), color: AppColors.purpleDark))
+        walletUssdTile = walletAccessTile(check: walletUssdCheck, title: "USSD access",
+            sub: "Check balances and transact from any phone, no data needed.",
+            action: #selector(toggleWalletUssd))
+        walletInternetTile = walletAccessTile(check: walletInternetCheck, title: "Online & app access",
+            sub: "Use the anokiX app and web portal.", action: #selector(toggleWalletInternet))
+        walletCrossBorderTile = walletAccessTile(check: walletCrossBorderCheck, title: "Cross-border payments",
+            sub: "Send and receive outside South Africa.", action: #selector(toggleWalletCrossBorder))
+        walletInfoPanel.addArrangedSubview(walletUssdTile)
+        walletInfoPanel.addArrangedSubview(walletInternetTile)
+        walletInfoPanel.addArrangedSubview(walletCrossBorderTile)
+        renderAccessTile(walletUssdTile, walletUssdCheck, walletUssd)
+        renderAccessTile(walletInternetTile, walletInternetCheck, walletInternet)
+        renderAccessTile(walletCrossBorderTile, walletCrossBorderCheck, walletCrossBorder)
+    }
+
+    /// A label stacked above a tap-to-open picker button.
+    private func labeledControl(_ label: String, _ control: UIView) -> UIStackView {
+        let stack = UIStackView.vertical(spacing: 5, alignment: .fill)
+        stack.addArrangedSubview(UILabel.make(label, font: AppFonts.regular(13), color: AppColors.textPrimary))
+        stack.addArrangedSubview(control)
+        return stack
+    }
+
+    private func walletAccessTile(check: UIImageView, title: String, sub: String, action: Selector) -> UIView {
+        check.contentMode = .scaleAspectFit
+        check.constrainSize(22)
+        check.setContentHuggingPriority(.required, for: .horizontal)
+        let titleLabel = UILabel.make(title, font: AppFonts.bold(14), color: AppColors.textPrimary)
+        let subLabel = UILabel.make(sub, font: AppFonts.regular(12), color: AppColors.textSecondary, lines: 0)
+        let textStack = UIStackView.vertical(spacing: 2, alignment: .fill)
+        textStack.addArrangedSubview(titleLabel)
+        textStack.addArrangedSubview(subLabel)
+        let row = UIStackView.horizontal(spacing: 12, alignment: .center)
+        row.isLayoutMarginsRelativeArrangement = true
+        row.layoutMargins = UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14)
+        row.addArrangedSubview(check)
+        row.addArrangedSubview(textStack)
+        let tile = UIView()
+        tile.layer.cornerRadius = AppMetrics.radiusMD
+        tile.layer.borderWidth = 1
+        row.forAutoLayout()
+        tile.addSubview(row)
+        row.pinEdges(to: tile)
+        tile.isUserInteractionEnabled = true
+        tile.addGestureRecognizer(UITapGestureRecognizer(target: self, action: action))
+        return tile
+    }
+
+    @objc private func toggleWalletUssd() {
+        walletUssd.toggle()
+        renderAccessTile(walletUssdTile, walletUssdCheck, walletUssd)
+    }
+    @objc private func toggleWalletInternet() {
+        walletInternet.toggle()
+        renderAccessTile(walletInternetTile, walletInternetCheck, walletInternet)
+    }
+    @objc private func toggleWalletCrossBorder() {
+        walletCrossBorder.toggle()
+        renderAccessTile(walletCrossBorderTile, walletCrossBorderCheck, walletCrossBorder)
+    }
+
+    private func renderAccessTile(_ tile: UIView, _ check: UIImageView, _ on: Bool) {
+        tile.backgroundColor = on ? AppColors.purpleLight : AppColors.surface
+        tile.layer.borderColor = (on ? UIColor(hex: 0xC9B6F6) : AppColors.border).cgColor
+        check.image = UIImage(systemName: on ? "checkmark.square.fill" : "square")
+        check.tintColor = on ? AppColors.purplePrimary : AppColors.textTertiary
+    }
+
+    private func pickIdType() {
+        let picker = RegisterOptionPickerViewController(title: "ID Type", options: walletIdTypeLabels) { [weak self] index in
+            guard let self = self else { return }
+            self.walletIdTypeCode = self.walletIdTypeCodes[index]
+            self.setPickerTitle(self.walletIdTypeButton, self.walletIdTypeLabels[index])
+            self.applyIdType()
+        }
+        present(UINavigationController(rootViewController: picker), animated: true)
+    }
+
+    @objc private func walletIdNumberChanged() {
+        if walletIdTypeCode == "ID" {
+            validateSaId(text(walletIdNumberField))
+        }
+    }
+
+    /// Reconfigures the identity fields when the ID type changes.
+    private func applyIdType() {
+        let saId = walletIdTypeCode == "ID"
+        let passport = walletIdTypeCode == "passport"
+
+        if saId {
+            walletIdNumberTitle.text = "SA ID Number"
+            walletIdNumberField.placeholder = "13-digit ID number"
+            walletIdNumberField.keyboardType = .numberPad
+        } else {
+            walletIdNumberTitle.text = passport ? "Passport Number" : "Asylum Document Number"
+            walletIdNumberField.placeholder = "Document number"
+            walletIdNumberField.keyboardType = .default
+        }
+
+        walletPassportGroup.isHidden = !passport
+
+        // DOB + gender are derived (read-only) for SA ID, manual otherwise.
+        setDerivedField(walletDobButton, editable: !saId)
+        setDerivedField(walletGenderButton, editable: !saId)
+
+        if saId {
+            validateSaId(text(walletIdNumberField))
+        } else {
+            walletSaIdValid = false
+            walletIdError.isHidden = true
+            walletIdHint.isHidden = true
+            walletDobIso = nil
+            walletGender = nil
+            resetPicker(walletDobButton, "Select date")
+            resetPicker(walletGenderButton, "Select gender")
+        }
+    }
+
+    /// Validates a South African ID and, when valid, fills DOB + gender.
+    private func validateSaId(_ id: String) {
+        walletSaIdValid = false
+        walletDobIso = nil
+        walletGender = nil
+
+        if id.isEmpty {
+            walletIdError.isHidden = true
+            walletIdHint.isHidden = true
+            resetPicker(walletDobButton, "Select date")
+            resetPicker(walletGenderButton, "Select gender")
+            return
+        }
+        if id.count != 13 || id.range(of: "^[0-9]{13}$", options: .regularExpression) == nil {
+            showIdError("A South African ID number must be 13 digits.")
+            return
+        }
+        guard let dobIso = saIdDob(id) else {
+            showIdError("The first six digits of the ID number are not a valid date.")
+            return
+        }
+        if !luhnValid(id) {
+            showIdError("This ID number is not valid.")
+            return
+        }
+        // Valid: derive DOB + gender.
+        walletSaIdValid = true
+        walletDobIso = dobIso
+        let seq = Int(id[id.index(id.startIndex, offsetBy: 6)..<id.index(id.startIndex, offsetBy: 10)]) ?? 0
+        walletGender = seq >= 5000 ? "Male" : "Female"
+        walletIdError.isHidden = true
+        walletIdHint.isHidden = false
+        setPickerTitle(walletDobButton, readableDate(dobIso))
+        setPickerTitle(walletGenderButton, walletGender ?? "")
+    }
+
+    private func showIdError(_ message: String) {
+        walletIdError.text = message
+        walletIdError.isHidden = false
+        walletIdHint.isHidden = true
+        resetPicker(walletDobButton, "Select date")
+        resetPicker(walletGenderButton, "Select gender")
+    }
+
+    /// Returns yyyy-MM-dd for a valid YYMMDD prefix, or nil if the date is invalid.
+    private func saIdDob(_ id: String) -> String? {
+        guard let yy = Int(id.prefix(2)),
+              let mm = Int(id[id.index(id.startIndex, offsetBy: 2)..<id.index(id.startIndex, offsetBy: 4)]),
+              let dd = Int(id[id.index(id.startIndex, offsetBy: 4)..<id.index(id.startIndex, offsetBy: 6)]) else { return nil }
+        if mm < 1 || mm > 12 || dd < 1 || dd > 31 { return nil }
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "UTC")!
+        let currentYy = cal.component(.year, from: Date()) % 100
+        let year = yy > currentYy ? 1900 + yy : 2000 + yy
+        var comps = DateComponents()
+        comps.year = year; comps.month = mm; comps.day = dd
+        guard let date = cal.date(from: comps),
+              cal.component(.month, from: date) == mm,
+              cal.component(.day, from: date) == dd else { return nil }
+        return walletIsoFormatter.string(from: date)
+    }
+
+    private func luhnValid(_ num: String) -> Bool {
+        var sum = 0
+        var doubleDigit = false
+        for ch in num.reversed() {
+            guard var d = ch.wholeNumberValue else { return false }
+            if doubleDigit { d *= 2; if d > 9 { d -= 9 } }
+            sum += d
+            doubleDigit.toggle()
+        }
+        return sum % 10 == 0
+    }
+
+    private func pickWalletDate(current: String?, onPick: @escaping (String) -> Void) {
+        let initial = current.flatMap { walletIsoFormatter.date(from: $0) } ?? Date()
+        let sheet = WalletDatePickerSheet(initial: initial) { [weak self] date in
+            guard let self = self else { return }
+            onPick(self.walletIsoFormatter.string(from: date))
+        }
+        present(sheet, animated: true)
+    }
+
+    private func readableDate(_ iso: String) -> String {
+        guard let date = walletIsoFormatter.date(from: iso) else { return iso }
+        return walletReadableFormatter.string(from: date)
+    }
+
+    private func resetPicker(_ button: UIButton, _ placeholder: String) {
+        guard var config = button.configuration else { return }
+        config.title = placeholder
+        config.baseForegroundColor = AppColors.textSecondary
+        button.configuration = config
+    }
+
+    /// Dims a picker button when it is derived/read-only (SA-ID DOB + gender).
+    private func setDerivedField(_ button: UIButton, editable: Bool) {
+        button.isUserInteractionEnabled = editable
+        button.alpha = editable ? 1.0 : 0.6
     }
 
     private func walletOptionRow(radio: UIImageView, title: String, now: Bool) -> UIView {
@@ -1018,6 +1429,8 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         walletNowRadio.tintColor = now ? AppColors.info : AppColors.textTertiary
         walletLaterRadio.image = UIImage(systemName: now ? "circle" : "largecircle.fill.circle")
         walletLaterRadio.tintColor = now ? AppColors.textTertiary : AppColors.info
+        // "Activate Later" hides the whole identity/address panel (design Register7-new4).
+        walletInfoPanel.isHidden = !now
     }
 
     // MARK: - Step 8: Terms
@@ -1106,7 +1519,28 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         if let coverage = selectedCoverage { form["distribution_coverage"] = coverage.lowercased() } // local/regional/national
         form["service_product_categories"] = selectedCategoryIds.map(String.init).joined(separator: ",")
         form["preferred_delivery_days"] = buildDeliveryDays()
-        form["payment_method"] = createWalletNow ? "wallet" : "later"
+
+        // ---- Wallet ----
+        form["payment_method"] = "wallet"
+        form["wallet_activation"] = createWalletNow ? "now" : "later"
+        if createWalletNow {
+            form["wallet_id_type"] = walletIdTypeCode
+            form["wallet_id_number"] = text(walletIdNumberField)
+            if walletIdTypeCode == "passport" {
+                form["wallet_passport_country"] = text(walletPassportCountryField)
+                form["wallet_passport_exp_date"] = walletPassportExpIso
+            }
+            form["wallet_dob"] = walletDobIso
+            form["wallet_gender"] = walletGender
+            form["wallet_street_address"] = text(walletStreetField)
+            form["wallet_suburb"] = text(walletSuburbField)
+            form["wallet_city"] = text(walletCityField)
+            form["wallet_province"] = walletProvinceCode
+            form["wallet_post_code"] = text(walletPostCodeField)
+            form["wallet_ussd"] = walletUssd ? "1" : "0"
+            form["wallet_internet"] = walletInternet ? "1" : "0"
+            form["wallet_cross_border"] = walletCrossBorder ? "1" : "0"
+        }
 
         var files: [Http.FilePart] = docFiles.compactMap { key, value in
             // The cropped logo from step 1 takes precedence over a doc-row logo upload.
@@ -1730,5 +2164,61 @@ final class RegisterOptionPickerViewController: UIViewController, UITableViewDat
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         dismiss(animated: true) { [weak self] in self?.onPick(indexPath.row) }
+    }
+}
+
+/// Compact bottom sheet with a wheel date picker + Done / Cancel — used by the
+/// wallet step for DOB and passport-expiry selection.
+private final class WalletDatePickerSheet: UIViewController {
+    private let onPick: (Date) -> Void
+    private let datePicker = UIDatePicker()
+
+    init(initial: Date, onPick: @escaping (Date) -> Void) {
+        self.onPick = onPick
+        super.init(nibName: nil, bundle: nil)
+        datePicker.date = initial
+        modalPresentationStyle = .pageSheet
+        if let sheet = sheetPresentationController {
+            sheet.detents = [.medium()]
+            sheet.prefersGrabberVisible = true
+        }
+    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = AppColors.surface
+        datePicker.datePickerMode = .date
+        datePicker.preferredDatePickerStyle = .wheels
+        datePicker.forAutoLayout()
+
+        let cancel = UIButton(type: .system)
+        cancel.setTitle("Cancel", for: .normal)
+        cancel.setTitleColor(AppColors.textSecondary, for: .normal)
+        cancel.addAction(UIAction { [weak self] _ in self?.dismiss(animated: true) }, for: .touchUpInside)
+        let done = UIButton(type: .system)
+        done.setTitle("Done", for: .normal)
+        done.setTitleColor(AppColors.purplePrimary, for: .normal)
+        done.titleLabel?.font = AppFonts.bold(15)
+        done.addAction(UIAction { [weak self] _ in
+            guard let self = self else { return }
+            self.dismiss(animated: true) { self.onPick(self.datePicker.date) }
+        }, for: .touchUpInside)
+
+        let bar = UIStackView.horizontal(spacing: 8, alignment: .center)
+        bar.forAutoLayout()
+        bar.addArrangedSubview(cancel)
+        bar.addArrangedSubview(UIView())
+        bar.addArrangedSubview(done)
+        view.addSubview(bar)
+        view.addSubview(datePicker)
+        NSLayoutConstraint.activate([
+            bar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
+            bar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            bar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            datePicker.topAnchor.constraint(equalTo: bar.bottomAnchor, constant: 8),
+            datePicker.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            datePicker.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
     }
 }
