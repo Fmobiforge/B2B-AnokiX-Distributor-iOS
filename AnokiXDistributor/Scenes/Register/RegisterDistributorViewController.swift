@@ -1156,12 +1156,12 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         configurePickerButton(walletGenderButton, placeholder: "Select gender")
         walletGenderButton.addAction(UIAction { [weak self] _ in
             guard let self = self, self.walletIdTypeCode != "ID" else { return }
-            let picker = RegisterOptionPickerViewController(title: "Gender", options: self.walletGenderOptions) { [weak self] index in
+            let selected = self.walletGender.flatMap { self.walletGenderOptions.firstIndex(of: $0) }
+            self.presentWalletOptionSheet(title: "Gender", options: self.walletGenderOptions, selected: selected) { [weak self] index in
                 guard let self = self else { return }
                 self.walletGender = self.walletGenderOptions[index]
                 self.setPickerTitle(self.walletGenderButton, self.walletGenderOptions[index])
             }
-            self.present(UINavigationController(rootViewController: picker), animated: true)
         }, for: .touchUpInside)
         walletInfoPanel.addArrangedSubview(labeledControl("Gender", walletGenderButton))
 
@@ -1174,12 +1174,12 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         configurePickerButton(walletProvinceButton, placeholder: "Select province")
         walletProvinceButton.addAction(UIAction { [weak self] _ in
             guard let self = self else { return }
-            let picker = RegisterOptionPickerViewController(title: "Province", options: self.walletProvinceLabels) { [weak self] index in
+            let selected = self.walletProvinceCode.flatMap { self.walletProvinceCodes.firstIndex(of: $0) }
+            self.presentWalletOptionSheet(title: "Province", options: self.walletProvinceLabels, selected: selected) { [weak self] index in
                 guard let self = self else { return }
                 self.walletProvinceCode = self.walletProvinceCodes[index]
                 self.setPickerTitle(self.walletProvinceButton, self.walletProvinceLabels[index])
             }
-            self.present(UINavigationController(rootViewController: picker), animated: true)
         }, for: .touchUpInside)
         walletInfoPanel.addArrangedSubview(labeledControl("Province", walletProvinceButton))
         walletInfoPanel.addArrangedSubview(fieldGroup("Postal Code", walletPostCodeField, placeholder: "8001", keyboard: .numberPad))
@@ -1255,13 +1255,20 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
     }
 
     private func pickIdType() {
-        let picker = RegisterOptionPickerViewController(title: "ID Type", options: walletIdTypeLabels) { [weak self] index in
+        let selected = walletIdTypeCodes.firstIndex(of: walletIdTypeCode)
+        presentWalletOptionSheet(title: "ID Type", options: walletIdTypeLabels, selected: selected) { [weak self] index in
             guard let self = self else { return }
             self.walletIdTypeCode = self.walletIdTypeCodes[index]
             self.setPickerTitle(self.walletIdTypeButton, self.walletIdTypeLabels[index])
             self.applyIdType()
         }
-        present(UINavigationController(rootViewController: picker), animated: true)
+    }
+
+    /// Presents the theme-safe bottom-sheet single-select picker used across the wallet step.
+    private func presentWalletOptionSheet(title: String, options: [String], selected: Int?,
+                                          onPick: @escaping (Int) -> Void) {
+        present(WalletOptionSheet(title: title, options: options, selectedIndex: selected, onPick: onPick),
+                animated: true)
     }
 
     @objc private func walletIdNumberChanged() {
@@ -2134,6 +2141,9 @@ final class RegisterOptionPickerViewController: UIViewController, UITableViewDat
         self.onPick = onPick
         super.init(nibName: nil, bundle: nil)
         self.title = title
+        // The app uses a fixed light palette; pin the appearance so system dark mode
+        // doesn't turn the default cell backgrounds dark under the light text.
+        overrideUserInterfaceStyle = .light
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
@@ -2144,6 +2154,7 @@ final class RegisterOptionPickerViewController: UIViewController, UITableViewDat
                                                            target: self, action: #selector(close))
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.backgroundColor = AppColors.surface
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "opt")
         tableView.forAutoLayout()
         view.addSubview(tableView)
@@ -2159,11 +2170,109 @@ final class RegisterOptionPickerViewController: UIViewController, UITableViewDat
         cell.textLabel?.text = options[indexPath.row]
         cell.textLabel?.font = AppFonts.regular(15)
         cell.textLabel?.textColor = AppColors.textPrimary
+        cell.backgroundColor = AppColors.surface
         return cell
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         dismiss(animated: true) { [weak self] in self?.onPick(indexPath.row) }
+    }
+}
+
+/// Theme-safe bottom-sheet single-select picker used by the wallet step
+/// (ID Type / Gender / Province). Mirrors the app's other bottom sheets and pins
+/// its own colors + appearance so it stays legible regardless of system dark mode.
+private final class WalletOptionSheet: UIViewController {
+    private let options: [String]
+    private let selectedIndex: Int?
+    private let onPick: (Int) -> Void
+
+    init(title: String, options: [String], selectedIndex: Int?, onPick: @escaping (Int) -> Void) {
+        self.options = options
+        self.selectedIndex = selectedIndex
+        self.onPick = onPick
+        super.init(nibName: nil, bundle: nil)
+        self.title = title
+        overrideUserInterfaceStyle = .light
+        modalPresentationStyle = .pageSheet
+        if let sheet = sheetPresentationController {
+            let contentHeight = 60 + CGFloat(options.count) * 52 + 20  // header + rows + padding
+            sheet.detents = [.custom { context in min(contentHeight, context.maximumDetentValue * 0.9) }]
+            sheet.prefersGrabberVisible = true
+            sheet.preferredCornerRadius = 20
+        }
+    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = AppColors.surface
+
+        let titleLabel = UILabel.make(title, font: AppFonts.bold(16), color: AppColors.textPrimary)
+
+        let list = UIStackView.vertical(spacing: 0, alignment: .fill)
+        for (index, option) in options.enumerated() {
+            list.addArrangedSubview(optionRow(option, index: index))
+            if index < options.count - 1 { list.addArrangedSubview(separator()) }
+        }
+
+        let content = UIStackView.vertical(spacing: 0, alignment: .fill)
+        content.isLayoutMarginsRelativeArrangement = true
+        content.layoutMargins = UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
+        let titleRow = UIStackView.vertical(spacing: 0, alignment: .fill)
+        titleRow.isLayoutMarginsRelativeArrangement = true
+        titleRow.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 14, right: 20)
+        titleRow.addArrangedSubview(titleLabel)
+        content.addArrangedSubview(titleRow)
+        content.addArrangedSubview(list)
+
+        let scroll = UIScrollView()
+        scroll.forAutoLayout()
+        content.forAutoLayout()
+        scroll.addSubview(content)
+        view.addSubview(scroll)
+        scroll.pinEdges(to: view, useSafeArea: true)
+        NSLayoutConstraint.activate([
+            content.topAnchor.constraint(equalTo: scroll.topAnchor),
+            content.leadingAnchor.constraint(equalTo: scroll.leadingAnchor),
+            content.trailingAnchor.constraint(equalTo: scroll.trailingAnchor),
+            content.bottomAnchor.constraint(equalTo: scroll.bottomAnchor),
+            content.widthAnchor.constraint(equalTo: scroll.widthAnchor)
+        ])
+    }
+
+    private func optionRow(_ text: String, index: Int) -> UIView {
+        let label = UILabel.make(text, font: AppFonts.regular(15),
+                                 color: index == selectedIndex ? AppColors.purplePrimary : AppColors.textPrimary)
+        let row = UIStackView.horizontal(spacing: 12, alignment: .center)
+        row.isUserInteractionEnabled = false   // let the container UIControl receive taps
+        row.isLayoutMarginsRelativeArrangement = true
+        row.layoutMargins = UIEdgeInsets(top: 15, left: 20, bottom: 15, right: 20)
+        row.addArrangedSubview(label)
+        row.addArrangedSubview(UIView())
+        if index == selectedIndex {
+            let check = UIImageView(image: UIImage(systemName: "checkmark"))
+            check.tintColor = AppColors.purplePrimary
+            check.contentMode = .scaleAspectFit
+            check.setContentHuggingPriority(.required, for: .horizontal)
+            row.addArrangedSubview(check)
+        }
+        let container = UIControl()
+        container.forAutoLayout()
+        row.forAutoLayout()
+        container.addSubview(row)
+        row.pinEdges(to: container)
+        container.addAction(UIAction { [weak self] _ in
+            self?.dismiss(animated: true) { self?.onPick(index) }
+        }, for: .touchUpInside)
+        return container
+    }
+
+    private func separator() -> UIView {
+        let line = UIView()
+        line.backgroundColor = AppColors.border
+        line.constrainHeight(1)
+        return line
     }
 }
 
@@ -2177,6 +2286,7 @@ private final class WalletDatePickerSheet: UIViewController {
         self.onPick = onPick
         super.init(nibName: nil, bundle: nil)
         datePicker.date = initial
+        overrideUserInterfaceStyle = .light   // keep the wheel legible in system dark mode
         modalPresentationStyle = .pageSheet
         if let sheet = sheetPresentationController {
             sheet.detents = [.medium()]
