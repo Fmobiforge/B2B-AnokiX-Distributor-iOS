@@ -368,9 +368,6 @@ enum S {
     static let ctr = "CTR"
     static let errPromoName = "Please enter a campaign name."
 
-    // Promotion list filters
-    static let allTypes = "All Types"
-
     // Settings
     static let settingsProfileTitle = "Profile Settings"
     static let settingsProfileSub = "Update your personal account information."
