@@ -1489,6 +1489,42 @@ struct ReturnItemDTO: Decodable {
     let reason: String?
 }
 
+// MARK: - Finances (wallet ledger)
+
+struct FinancesData: Decodable {
+    let transactions: [FinanceTransactionDTO]?
+    let summary: FinanceSummaryDTO?
+}
+
+struct FinanceTransactionDTO: Decodable {
+    let id: Int
+    let reference: String?
+    let type: String?             // order_payment / invoice / payout / credit_note
+    let traderName: String?
+    let traderPhone: String?
+    let orderNumber: String?
+    let description: String?      // "Order payment · ORD000029"
+    let amount: Double?
+    let currency: String?         // "ZAR"
+    let status: String?           // paid / pending / overdue / partial
+    let paymentMethod: String?    // not yet returned by the API — reserved
+    let createdAt: String?        // "2026-07-15 13:58:09"
+
+    var resolvedTraderName: String {
+        if let n = traderName, !n.trimmingCharacters(in: .whitespaces).isEmpty { return n }
+        return "Trader"
+    }
+}
+
+struct FinanceSummaryDTO: Decodable {
+    let received: Double?
+    let receivedMonth: Double?
+    let pending: Double?
+    let commissionMonth: Double?
+    let overdue: Double?          // reserved — API does not yet return it
+    let count: Int?
+}
+
 // MARK: - Notifications (common)
 
 struct NotificationsData: Decodable {

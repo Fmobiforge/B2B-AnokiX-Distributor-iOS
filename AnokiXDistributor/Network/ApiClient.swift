@@ -295,6 +295,18 @@ final class ApiClient {
         getAuthed("api/distributor/grns", query: q, type: ReturnsData.self, completion: completion)
     }
 
+    /// Finances ledger — GET `api/distributor/finances`. Optionally scoped to a date range that
+    /// the screen drives from the range picker; returns the transaction list + KPI summary.
+    /// Status / type / method / search filtering is applied locally over the returned set.
+    func getFinances(dateFrom: String, dateTo: String,
+                     completion: @escaping (Result<FinancesData, ApiError>) -> Void) {
+        var q: [String: String] = [:]
+        if !dateFrom.isEmpty { q["date_from"] = dateFrom }
+        if !dateTo.isEmpty { q["date_to"] = dateTo }
+        getAuthed("api/distributor/finances", query: q.isEmpty ? nil : q,
+                  type: FinancesData.self, completion: completion)
+    }
+
     /// Full return detail (+ items) for the detail screen.
     func getReturnById(id: String, completion: @escaping (Result<ReturnDetailData, ApiError>) -> Void) {
         getAuthed("api/distributor/grns/get-by-id", query: ["id": id],
