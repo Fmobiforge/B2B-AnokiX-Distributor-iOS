@@ -259,15 +259,26 @@ final class DashboardViewController: BaseMainViewController {
         return order.formattedDate ?? ""
     }
 
-    // MARK: Summary KPI cards (top, horizontally scrollable)
+    // MARK: Summary KPI cards (top — matches Android item_summary_card)
 
     private func renderSummaryCards(_ cards: [DashboardData.SummaryCard]) {
+        // 1–2 cards: fill the row equally (no trailing blank). 3+: horizontal scroll at 180pt,
+        // matching Android's HorizontalScrollView + fixed-width cards.
+        if cards.count <= 2 {
+            let row = UIStackView.horizontal(spacing: 10, alignment: .fill)
+            row.distribution = .fillEqually
+            cards.forEach { row.addArrangedSubview(makeSummaryCard($0, fixedWidth: false)) }
+            stack.addArrangedSubview(row)
+            return
+        }
+
         let row = UIStackView.horizontal(spacing: 10, alignment: .fill)
-        cards.forEach { row.addArrangedSubview(makeSummaryCard($0)) }
+        cards.forEach { row.addArrangedSubview(makeSummaryCard($0, fixedWidth: true)) }
         row.forAutoLayout()
 
         let scroll = UIScrollView()
         scroll.showsHorizontalScrollIndicator = false
+        scroll.alwaysBounceHorizontal = true
         scroll.forAutoLayout()
         scroll.addSubview(row)
         NSLayoutConstraint.activate([
@@ -280,14 +291,19 @@ final class DashboardViewController: BaseMainViewController {
         stack.addArrangedSubview(scroll)
     }
 
-    private func makeSummaryCard(_ c: DashboardData.SummaryCard) -> UIView {
+    /// Compact summary card: label + icon, value, trend %, compare period, coloured underline.
+    /// Matches Android `item_summary_card.xml` (sparkline replaced by the accent bar).
+    private func makeSummaryCard(_ c: DashboardData.SummaryCard, fixedWidth: Bool) -> UIView {
         let card = UIView()
         StyleKit.styleCard(card)
+        card.clipsToBounds = true
         let accent = accentColor(c.color)
 
-        let label = UILabel.make(c.label ?? "", font: AppFonts.regular(12), color: AppColors.textSecondary)
+        let label = UILabel.make(c.label ?? "", font: AppFonts.regular(12), color: AppColors.textSecondary, lines: 1)
+        label.lineBreakMode = .byTruncatingTail
         let tile = StyleKit.iconTile(color: accent.withAlphaComponent(0.13))
         tile.constrainSize(30)
+        tile.setContentHuggingPriority(.required, for: .horizontal)
         let icon = UIImageView(image: AppIcons.symbol(iconKey(c.key)))
         icon.tintColor = accent
         icon.contentMode = .scaleAspectFit
@@ -301,36 +317,42 @@ final class DashboardViewController: BaseMainViewController {
         ])
         let topRow = UIStackView.horizontal(spacing: 8, alignment: .center)
         topRow.addArrangedSubview(label)
-        topRow.addArrangedSubview(UIView())
         topRow.addArrangedSubview(tile)
 
-        let value = UILabel.make(c.formattedValue ?? "", font: AppFonts.bold(18), color: AppColors.textPrimary)
+        let value = UILabel.make(c.formattedValue ?? "", font: AppFonts.bold(18), color: AppColors.textPrimary, lines: 1)
+        value.adjustsFontSizeToFitWidth = true
+        value.minimumScaleFactor = 0.7
 
-        let up = (c.trend?.direction ?? "up") != "down"
-        let trendColor = up ? AppColors.success : AppColors.danger
-        let trend = PaddingLabel(insets: UIEdgeInsets(top: 3, left: 8, bottom: 3, right: 8))
-        trend.text = c.trend?.label
-        trend.font = AppFonts.bold(11)
-        trend.textColor = trendColor
-        trend.backgroundColor = trendColor.withAlphaComponent(0.12)
-        trend.layer.cornerRadius = AppMetrics.radiusSM
-        trend.layer.masksToBounds = true
-        let trendRow = UIStackView.horizontal(spacing: 0, alignment: .center)
-        trendRow.addArrangedSubview(trend)
-        trendRow.addArrangedSubview(UIView())
+        let up = (c.trend?.direction ?? "up").lowercased() != "down"
+        let trend = UILabel.make(c.trend?.label ?? "", font: AppFonts.bold(12),
+                                 color: up ? AppColors.success : AppColors.danger, lines: 1)
 
-        let spark = SparklineView()
-        spark.backgroundColor = .clear
-        spark.lineColor = accent
-        spark.values = c.sparkline ?? []
-        spark.constrainHeight(40)
+        let compare = UILabel.make(c.compareLabel ?? "", font: AppFonts.light(10),
+                                   color: AppColors.textSecondary, lines: 1)
+        compare.lineBreakMode = .byTruncatingTail
+        compare.isHidden = (c.compareLabel ?? "").isEmpty
 
-        let body = UIStackView.vertical(spacing: 10, alignment: .fill)
-        [topRow, value, trendRow, spark].forEach { body.addArrangedSubview($0) }
-        body.forAutoLayout()
-        card.addSubview(body)
-        body.pinEdges(to: card, insets: UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14))
-        card.widthAnchor.constraint(equalToConstant: 168).isActive = true
+        let body = UIStackView.vertical(spacing: 6, alignment: .fill)
+        body.addArrangedSubview(topRow)
+        body.addArrangedSubview(value)
+        body.addArrangedSubview(trend)
+        body.addArrangedSubview(compare)
+        body.setCustomSpacing(2, after: trend)
+
+        // Coloured accent underline (replaces the empty sparkline), matching Android.
+        let underline = SummaryAccentBar(color: accent)
+        underline.constrainHeight(4)
+
+        let root = UIStackView.vertical(spacing: 14, alignment: .fill)
+        root.addArrangedSubview(body)
+        root.addArrangedSubview(underline)
+        root.forAutoLayout()
+        card.addSubview(root)
+        // Bottom padding is 0 so the underline sits flush with the card edge (Android).
+        root.pinEdges(to: card, insets: UIEdgeInsets(top: 14, left: 14, bottom: 0, right: 14))
+        if fixedWidth {
+            card.widthAnchor.constraint(equalToConstant: 180).isActive = true
+        }
         return card
     }
 
@@ -496,6 +518,29 @@ final class DashboardViewController: BaseMainViewController {
             card.body.addArrangedSubview(row)
         }
         stack.addArrangedSubview(card)
+    }
+}
+
+/// Gradient accent bar at the bottom of a summary KPI card (Android `summaryUnderline`).
+private final class SummaryAccentBar: UIView {
+    private let gradient = CAGradientLayer()
+
+    init(color: UIColor) {
+        super.init(frame: .zero)
+        gradient.colors = [color.cgColor, color.withAlphaComponent(0.4).cgColor]
+        gradient.startPoint = CGPoint(x: 0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 1, y: 0.5)
+        gradient.cornerRadius = 2
+        layer.addSublayer(gradient)
+        layer.cornerRadius = 2
+        layer.masksToBounds = true
+    }
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradient.frame = bounds
     }
 }
 
