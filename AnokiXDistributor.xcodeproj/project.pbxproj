@@ -624,7 +624,6 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					2FB12CB49E3825F50E1B703C = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -934,7 +933,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AnokiXDistributor/Resources/AnokiXDistributor.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W792YDC6GY;
 				INFOPLIST_FILE = AnokiXDistributor/Resources/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -942,7 +942,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.distributorapp;
 				PRODUCT_MODULE_NAME = AnokiXDistributor;
 				PRODUCT_NAME = "AnokiX Distributor";
@@ -1019,7 +1019,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AnokiXDistributor/Resources/AnokiXDistributor.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W792YDC6GY;
 				INFOPLIST_FILE = AnokiXDistributor/Resources/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -1027,7 +1028,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.distributorapp;
 				PRODUCT_MODULE_NAME = AnokiXDistributor;
 				PRODUCT_NAME = "AnokiX Distributor";
