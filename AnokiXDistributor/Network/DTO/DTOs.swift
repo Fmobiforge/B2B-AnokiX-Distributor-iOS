@@ -101,6 +101,40 @@ struct WalletData: Decodable {
     }
 }
 
+// MARK: - Wallet top-up (PayCloud)
+
+/// data block of POST /api/common/topup/create — a freshly opened PayCloud Hosted Checkout
+/// for funding the wallet. The app opens `payUrl` and then polls `TopupStatusData`.
+struct TopupCreateData: Decodable {
+    let merchantOrderNo: String?
+    let payUrl: String?
+    let amount: Double?
+    let currency: String?
+}
+
+/// data block of GET /api/common/topup/status. `status=paid` only means the card was
+/// charged; the money is in the wallet when `creditStatus == "credited"`.
+struct TopupStatusData: Decodable {
+    let merchantOrderNo: String?
+    let tradeNo: String?
+    let amount: Double?
+    let currency: String?
+    /// pending | paid | failed | cancelled
+    let status: String?
+    /// none | pending | credited | failed
+    let creditStatus: String?
+    let creditedAt: String?
+    let createdAt: String?
+
+    var isCredited: Bool { creditStatus?.lowercased() == "credited" }
+
+    /// Terminal failure — nothing more to wait for.
+    var isFailed: Bool {
+        let s = status?.lowercased()
+        return s == "failed" || s == "cancelled" || creditStatus?.lowercased() == "failed"
+    }
+}
+
 // MARK: - Dashboard
 
 struct DashboardData: Decodable {

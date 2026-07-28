@@ -98,6 +98,15 @@ struct MenuItem {
     let key: String
     let title: String
     let icon: String   // SF Symbol name
+    /// Optional second line under the title ("Powered by IMB"); nil hides it.
+    let subtitle: String?
+
+    init(key: String, title: String, icon: String, subtitle: String? = nil) {
+        self.key = key
+        self.title = title
+        self.icon = icon
+        self.subtitle = subtitle
+    }
 }
 
 struct DeliveryItem {

@@ -10,6 +10,18 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
         window = windowScene.windows.first
+        connectionOptions.urlContexts.forEach { handle($0.url) }
+    }
+
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        URLContexts.forEach { handle($0.url) }
+    }
+
+    /// PayCloud sends the user back to `anokix://wallet` after a top-up checkout; the
+    /// wallet screen listens for this and polls api/common/topup/status.
+    private func handle(_ url: URL) {
+        guard url.scheme?.lowercased() == "anokix", url.host?.lowercased() == "wallet" else { return }
+        NotificationCenter.default.post(name: WalletViewController.topupReturnNotification, object: nil)
     }
 
     static func setRoot(_ viewController: UIViewController, animated: Bool = true) {

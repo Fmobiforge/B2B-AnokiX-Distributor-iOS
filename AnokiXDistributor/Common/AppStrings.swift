@@ -427,4 +427,101 @@ enum S {
     static let notifFinanceSub = "Reminders for overdue invoices and payments."
     static let notifReportTitle = "Report Ready"
     static let notifReportSub = "Notify when scheduled reports are generated."
+
+    // MARK: anokiX wallet (drawer › anokiX wallet)
+
+    static let walletScreenTitle = "anokiX wallet"
+    static let walletScreenSubtitle = "Your IMB business account — balances, payments and settlements."
+    static let walletTotalBalance = "Total Wallet Balance"
+    static let walletAvailableBalance = "Available Balance"
+    static let walletPendingBalance = "Pending"
+    static let walletTopUp = "Top Up Wallet"
+    static let walletFooterBrand = "anokiX wallet · Powered by IMB"
+    static let walletImb = "IMB"
+    static let walletBalanceMasked = "R ••••••"
+    static let walletStaleNotice = "Showing the last known balance — the live read failed."
+    static let walletInactiveBody = "Your IMB account is not active, so balances and payments are unavailable. Finish wallet activation in Settings › Business to start transacting."
+
+    static let walletSettlementAccount = "Settlement Account"
+    static let walletManage = "Manage"
+    static let walletImbBusinessAccount = "IMB Business Account"
+    static let walletAvailableForSettlement = "Available for Settlement:"
+    static let walletViewSettlementHistory = "View Settlement History"
+
+    static let walletQuickActions = "Quick Actions"
+    static let walletActionSendMoney = "Send Money"
+    static let walletActionReceiveMoney = "Receive Money"
+    static let walletActionBuyAirtime = "Buy Airtime"
+    static let walletActionPayBills = "Pay Bills"
+    static let walletActionAddMoney = "Add Money"
+    static let walletActionMoveToBank = "Move to Bank"
+    static let walletActionQrPayment = "QR Payment"
+    static let walletActionMore = "More"
+
+    static let walletSendMoneyQuickly = "Send Money Quickly"
+    static let walletNewRecipient = "New Recipient"
+
+    static let walletRecentTransactions = "Recent Transactions"
+    static let walletMoneyReceived = "Money Received"
+    static let walletMoneySent = "Money Sent"
+    static let walletTxnSuccess = "Success"
+    static let walletTxnPending = "Pending"
+    static let walletNoTransactions = "No wallet movements yet."
+    static let walletNoTransactionsHint = "Top-ups, payments and settlements will appear here."
+
+    static let walletLoanOffers = "Loan Offers for You"
+    static let walletLoanAmount = "Loan Amount"
+    static let walletInterestRate = "Interest Rate"
+    static let walletApplyNow = "Apply Now"
+    static let walletLoanBusinessBoost = "Business Boost Loan"
+    static let walletLoanStockFinance = "Stock Finance"
+    static let walletLoanEquipmentFinance = "Equipment Finance"
+    static let walletBadgeRecommended = "Recommended"
+    static let walletBadgePopular = "Popular"
+
+    static let walletStatements = "Statements"
+    static let walletStatementToday = "Today"
+    static let walletStatementYesterday = "Yesterday"
+    static let walletStatementThisWeek = "This Week"
+    static let walletStatementThisMonth = "This Month"
+    static let walletStatementCustom = "Custom Range"
+
+    static let walletMicrofinanceTitle = "Microfinance that works for you"
+    static let walletMicrofinanceBody = "Quick approvals. Flexible repayments. Grow your business with IMB."
+    static let walletExploreMicrofinance = "Explore Microfinance"
+    static let walletNeedFunds = "Need more funds?"
+    static let walletNeedFundsSub = "Get a microloan in minutes"
+    static let walletApplyMicrofinance = "Apply for Microfinance"
+    static let walletLoadFailed = "Could not load your wallet."
+    static let walletShowLess = "Show less"
+
+    // Top-up dialog
+    static let topupTitle = "Top up your wallet"
+    static let topupBody = "Add money to your anokiX wallet with a card, QR, or bank payment. You'll be taken to our secure PayCloud checkout to complete the payment."
+    static let topupAmountLabel = "Amount (ZAR)"
+    static let topupAmountHint = "R 0.00"
+    static let topupProceed = "Proceed to payment"
+    static let topupErrAmount = "Please enter an amount to top up."
+    static let topupErrMin = "The minimum top-up is R1.00."
+    static let topupErrMax = "The maximum top-up is R500 000,00."
+    static let topupChecking = "Checking your payment…"
+    static let topupPendingNotice = "Payment received. Your wallet will be credited shortly."
+    static let topupNotCompleted = "No completed payment yet for this top-up. Nothing has been charged."
+    static let topupFailedNotice = "That payment did not go through. Nothing was charged to your wallet."
+
+    static func topupCredited(_ amount: String) -> String {
+        "Top-up successful — \(amount) added to your wallet."
+    }
+
+    static func walletComingSoon(_ feature: String) -> String {
+        "\(feature) is coming soon."
+    }
+
+    static func walletNextSettlement(_ when: String) -> String {
+        "Next Settlement: \(when)"
+    }
+
+    static func walletTxnReference(_ id: String) -> String {
+        "Reference \(id)"
+    }
 }

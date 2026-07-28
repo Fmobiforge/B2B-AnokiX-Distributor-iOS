@@ -68,8 +68,28 @@ final class ApiClient {
     }
 
     /// The distributor's anokiX (IMB) wallet — balance shown on the dashboard.
-    func getWallet(completion: @escaping (Result<WalletData, ApiError>) -> Void) {
-        getAuthed("api/common/wallet", query: nil, type: WalletData.self, completion: completion)
+    /// Pass `refresh: true` to bypass the short-lived balance cache (manual refresh button).
+    func getWallet(refresh: Bool = false, completion: @escaping (Result<WalletData, ApiError>) -> Void) {
+        getAuthed("api/common/wallet", query: refresh ? ["refresh": "1"] : nil,
+                  type: WalletData.self, completion: completion)
+    }
+
+    /// Open a PayCloud Hosted Checkout to fund the wallet (api/common/topup/create). Returns
+    /// the `pay_url` the app must open plus the `merchant_order_no` to poll afterwards.
+    func createTopup(amount: Double, returnUrl: String,
+                     completion: @escaping (Result<TopupCreateData, ApiError>) -> Void) {
+        let form = ["amount": String(format: "%.2f", amount),
+                    "return_url": returnUrl,
+                    "portal": "distributor"]
+        postAuthed("api/common/topup/create", form: form, type: TopupCreateData.self, completion: completion)
+    }
+
+    /// Poll a top-up after the user comes back from PayCloud (api/common/topup/status).
+    /// The money has landed only when `credit_status=credited`.
+    func getTopupStatus(merchantOrderNo: String,
+                        completion: @escaping (Result<TopupStatusData, ApiError>) -> Void) {
+        getAuthed("api/common/topup/status", query: ["merchant_order_no": merchantOrderNo],
+                  type: TopupStatusData.self, completion: completion)
     }
 
     func getStores(keyword: String, completion: @escaping (Result<StoresData, ApiError>) -> Void) {

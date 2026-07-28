@@ -55,7 +55,21 @@ enum AppIcons {
         "ic_finance_report": "chart.line.uptrend.xyaxis",
         "ic_ctr": "cursorarrow.click",
         "ic_chat": "bubble.left.fill",
-        "ic_vas": "antenna.radiowaves.left.and.right"
+        "ic_vas": "antenna.radiowaves.left.and.right",
+        // anokiX wallet screen
+        "ic_arrow_down_left": "arrow.down",
+        "ic_arrow_up_right": "arrow.up",
+        "ic_arrow_right_line": "arrow.right",
+        "ic_send": "paperplane.fill",
+        "ic_bank": "building.columns.fill",
+        "ic_qr_code": "qrcode",
+        "ic_receipt": "doc.plaintext.fill",
+        "ic_card": "creditcard.fill",
+        "ic_wrench": "wrench.and.screwdriver.fill",
+        "ic_dots_horizontal": "ellipsis",
+        "ic_phone": "phone.fill",
+        "ic_refresh": "arrow.clockwise",
+        "ic_visibility_off": "eye.slash.fill"
     ]
 
     static func symbol(_ name: String) -> UIImage? {

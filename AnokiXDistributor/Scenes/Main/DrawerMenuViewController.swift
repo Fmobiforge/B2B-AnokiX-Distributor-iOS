@@ -173,6 +173,13 @@ final class DrawerMenuViewController: UIViewController, UITableViewDataSource, U
         return cell
     }
 
+    /// Branded rows carry a "Powered by …" second line and need the extra height.
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        items[indexPath.row].subtitle == nil
+            ? AppMetrics.drawerItemHeight
+            : DrawerMenuCell.subtitleRowHeight
+    }
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         let key = items[indexPath.row].key

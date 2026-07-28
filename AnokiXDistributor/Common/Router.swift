@@ -11,6 +11,7 @@ enum Router {
         case "airtime": return AirtimeViewController()
         case "promotions": return PromotionsViewController()
         case "finances": return FinancesViewController()
+        case "wallet": return WalletViewController()
         case "reports": return ReportsViewController()
         case "deliveries": return DeliveriesViewController()
         case "returns": return ReturnsViewController()
