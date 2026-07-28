@@ -68,8 +68,7 @@ enum AppIcons {
         "ic_wrench": "wrench.and.screwdriver.fill",
         "ic_dots_horizontal": "ellipsis",
         "ic_phone": "phone.fill",
-        "ic_refresh": "arrow.clockwise",
-        "ic_visibility_off": "eye.slash.fill"
+        "ic_refresh": "arrow.clockwise"
     ]
 
     static func symbol(_ name: String) -> UIImage? {
