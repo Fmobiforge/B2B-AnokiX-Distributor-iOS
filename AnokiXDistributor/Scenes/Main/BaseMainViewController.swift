@@ -1,4 +1,5 @@
 import UIKit
+import UserNotifications
 
 /// Base for bottom-tab screens. Chrome + content containers are in Main.storyboard.
 /// Subclasses override `setupChromeHeader()` only when chrome is not already in the storyboard.
@@ -111,6 +112,20 @@ class BaseMainViewController: UIViewController {
             }
             badge.text = count > 99 ? "99+" : "\(count)"
             badge.isHidden = count == 0
+            Self.applyAppIconBadge(count)
+        }
+    }
+
+    /// Keeps the springboard badge in step with the bell.
+    ///
+    /// The server sends `aps.badge` as the unread total at send time, so iOS is only
+    /// correct until the user reads something in-app — without this the icon keeps
+    /// showing the old count until the next push arrives.
+    private static func applyAppIconBadge(_ count: Int) {
+        if #available(iOS 16.0, *) {
+            UNUserNotificationCenter.current().setBadgeCount(count) { _ in }
+        } else {
+            UIApplication.shared.applicationIconBadgeNumber = count
         }
     }
 

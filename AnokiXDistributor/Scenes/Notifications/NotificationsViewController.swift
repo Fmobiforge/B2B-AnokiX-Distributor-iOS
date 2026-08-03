@@ -2,8 +2,9 @@ import UIKit
 
 /// Notifications — live feed from GET api/common/notifications (filter all/unread, paged).
 /// KPI cards (total/read/unread/important), All/Unread tabs, "Mark all as read", and
-/// tap-to-open: tapping a row marks it read (POST .../read) and routes to the related
-/// screen (order → order detail, return → GRN detail, delivery → deliveries, stock → products).
+/// tap-to-open: tapping a row marks it read (POST .../read) and routes to the related screen
+/// via `PushManager.navigate`, the same resolver a push tap uses
+/// (see `FCM-settings/3-Event-Catalogue.md`).
 final class NotificationsViewController: BaseSecondaryViewController {
 
     override var screenTitle: String { S.notifications }
@@ -386,54 +387,68 @@ final class NotificationsViewController: BaseSecondaryViewController {
         }
     }
 
-    /// Open the screen related to the notification's type/route.
+    /// Open the screen related to the notification's type/route. Delegates to
+    /// `PushManager.navigate` so a row tap and a push tap for the same payload always land
+    /// on the same screen. `fallbackToFeed` is false — we are already on the feed, so an
+    /// unroutable row simply does nothing.
     private func navigate(_ n: NotificationDTO) {
-        let type = n.type ?? ""
-        let route = n.data?.route
-        if type.hasPrefix("order") || route == "order" {
-            if let id = n.data?.orderId, id > 0 {
-                navigationController?.pushViewController(OrderDetailViewController(orderId: String(id)), animated: true)
-            }
-        } else if type.hasPrefix("return") || route == "return" {
-            if let id = n.data?.grnId, id > 0 {
-                navigationController?.pushViewController(ReturnDetailViewController(returnId: String(id)), animated: true)
-            } else {
-                navigationController?.pushViewController(ReturnsViewController(), animated: true)
-            }
-        } else if type.hasPrefix("delivery") || route == "delivery" {
-            navigationController?.pushViewController(DeliveriesViewController(), animated: true)
-        } else if type.hasPrefix("stock") || route == "inventory" {
-            navigationController?.pushViewController(ProductsViewController(), animated: true)
-        }
+        PushManager.shared.navigate(Self.route(for: n), fallbackToFeed: false)
     }
 
     // MARK: - Mapping / helpers
 
+    private static func route(for n: NotificationDTO) -> PushRoute {
+        PushRoute.resolve(type: n.type, route: n.data?.route, ids: n.data?.ids ?? PushIds())
+    }
+
     private struct NotifMeta { let icon: String; let tile: UIColor; let tint: UIColor; let action: String }
 
+    /// Icon, accent and action label per destination — keyed off the same `PushRoute` the
+    /// tap uses, so the row's affordance and where it actually goes can never disagree.
     private static func meta(for n: NotificationDTO) -> NotifMeta {
-        let type = n.type ?? ""
-        let route = n.data?.route
-        if type.hasPrefix("return") || route == "return" {
+        switch route(for: n) {
+        case .returnDetail:
             return NotifMeta(icon: "arrow.uturn.backward", tile: AppColors.warningBg, tint: AppColors.warning, action: S.viewReturns)
-        } else if type.hasPrefix("delivery") || route == "delivery" {
+        case .delivery:
             return NotifMeta(icon: "shippingbox.fill", tile: AppColors.infoBg, tint: AppColors.info, action: S.viewDelivery)
-        } else if type.hasPrefix("stock") || route == "inventory" {
+        case .products:
             return NotifMeta(icon: "archivebox.fill", tile: AppColors.infoBg, tint: AppColors.info, action: S.viewInventory)
-        } else if type.hasPrefix("order") || route == "order" {
+        case .order:
             return NotifMeta(icon: "bag.fill", tile: AppColors.purpleLight, tint: AppColors.purplePrimary, action: S.viewOrder)
+        case .finance:
+            return NotifMeta(icon: "creditcard.fill", tile: AppColors.successBg, tint: AppColors.success, action: S.viewFinances)
+        case .wallet:
+            return NotifMeta(icon: "wallet.pass.fill", tile: AppColors.successBg, tint: AppColors.success, action: S.viewWallet)
+        case .vas:
+            return NotifMeta(icon: "antenna.radiowaves.left.and.right", tile: AppColors.infoBg, tint: AppColors.info, action: S.viewAirtime)
+        case .promotion:
+            return NotifMeta(icon: "tag.fill", tile: AppColors.purpleLight, tint: AppColors.purplePrimary, action: S.viewPromotion)
+        case .report:
+            return NotifMeta(icon: "chart.bar.fill", tile: AppColors.infoBg, tint: AppColors.info, action: S.viewReport)
+        case .traders:
+            return NotifMeta(icon: "person.2.fill", tile: AppColors.purpleLight, tint: AppColors.purplePrimary, action: S.viewTrader)
+        case .settings, .notifications:
+            return NotifMeta(icon: "bell.fill", tile: AppColors.purpleLight, tint: AppColors.purplePrimary, action: "")
         }
-        return NotifMeta(icon: "bell.fill", tile: AppColors.purpleLight, tint: AppColors.purplePrimary, action: "")
     }
 
     /// Important = any return decision, or an order whose status is Failed/Cancelled.
+    ///
+    /// The comparison is case-insensitive and also reads `status_key`: the push contract
+    /// uses machine values ("cancelled", "out_for_delivery") while the portal uses display
+    /// case, and a row built from either source has to raise the same flag.
     private static func isImportant(_ n: NotificationDTO) -> Bool {
         guard let type = n.type else { return false }
         if type == "return.decision" { return true }
-        if type == "order.status", let s = n.data?.status {
-            return s == "Failed" || s == "Cancelled"
+        if type == "order.status" {
+            return isFailedOrCancelled(n.data?.status) || isFailedOrCancelled(n.data?.statusKey)
         }
         return false
+    }
+
+    private static func isFailedOrCancelled(_ status: String?) -> Bool {
+        guard let s = status?.trimmingCharacters(in: .whitespaces).lowercased() else { return false }
+        return s == "failed" || s == "cancelled" || s == "canceled"
     }
 
     /// Recent (< 24h) → "x hours/minutes ago"; older → "dd MMM yyyy, HH:mm".

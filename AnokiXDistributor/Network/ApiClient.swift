@@ -424,14 +424,16 @@ final class ApiClient {
         }
     }
 
-    /// Update the 5 notification toggles (api/common/preferences/update, JSON body).
+    /// Update the 6 notification toggles (api/common/preferences/update, JSON body). The key
+    /// set matches the Trader app exactly so one backend gate serves both portals — see
+    /// `FCM-settings/3-Event-Catalogue.md` §7.
     func updateNotificationPrefs(orderAlerts: Bool, lowStockAlerts: Bool, deliveryUpdates: Bool,
-                                 financeReminders: Bool, reportReady: Bool,
+                                 promotionAlerts: Bool, financeReminders: Bool, reportReady: Bool,
                                  completion: @escaping (Result<Void, ApiError>) -> Void) {
         let notifications: [String: Any] = [
             "orderAlerts": orderAlerts, "lowStockAlerts": lowStockAlerts,
-            "deliveryUpdates": deliveryUpdates, "financeReminders": financeReminders,
-            "reportReady": reportReady
+            "deliveryUpdates": deliveryUpdates, "promotionAlerts": promotionAlerts,
+            "financeReminders": financeReminders, "reportReady": reportReady
         ]
         postPreferences(["notifications": notifications], completion: completion)
     }

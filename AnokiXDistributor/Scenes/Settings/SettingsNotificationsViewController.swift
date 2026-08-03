@@ -8,6 +8,7 @@ final class SettingsNotificationsViewController: BaseSettingsFormViewController 
     private let orderSwitch = UISwitch()
     private let lowStockSwitch = UISwitch()
     private let deliverySwitch = UISwitch()
+    private let promotionSwitch = UISwitch()
     private let financeSwitch = UISwitch()
     private let reportSwitch = UISwitch()
 
@@ -18,6 +19,8 @@ final class SettingsNotificationsViewController: BaseSettingsFormViewController 
         stack.addArrangedSubview(preferenceRow(S.notifLowStockTitle, S.notifLowStockSub, lowStockSwitch))
         stack.addArrangedSubview(divider())
         stack.addArrangedSubview(preferenceRow(S.notifDeliveryTitle, S.notifDeliverySub, deliverySwitch))
+        stack.addArrangedSubview(divider())
+        stack.addArrangedSubview(preferenceRow(S.notifPromotionTitle, S.notifPromotionSub, promotionSwitch))
         stack.addArrangedSubview(divider())
         stack.addArrangedSubview(preferenceRow(S.notifFinanceTitle, S.notifFinanceSub, financeSwitch))
         stack.addArrangedSubview(divider())
@@ -31,7 +34,7 @@ final class SettingsNotificationsViewController: BaseSettingsFormViewController 
     private var isSaving = false
 
     override func loadData() {
-        [orderSwitch, lowStockSwitch, deliverySwitch, financeSwitch, reportSwitch]
+        [orderSwitch, lowStockSwitch, deliverySwitch, promotionSwitch, financeSwitch, reportSwitch]
             .forEach { $0.onTintColor = AppColors.purplePrimary }
 
         ApiClient.shared.getPreferences { [weak self] result in
@@ -40,6 +43,7 @@ final class SettingsNotificationsViewController: BaseSettingsFormViewController 
             self.orderSwitch.isOn = p?.notif(.orderAlerts) ?? true
             self.lowStockSwitch.isOn = p?.notif(.lowStockAlerts) ?? true
             self.deliverySwitch.isOn = p?.notif(.deliveryUpdates) ?? true
+            self.promotionSwitch.isOn = p?.notif(.promotionAlerts) ?? true
             self.financeSwitch.isOn = p?.notif(.financeReminders) ?? true
             self.reportSwitch.isOn = p?.notif(.reportReady) ?? true
         }
@@ -52,6 +56,7 @@ final class SettingsNotificationsViewController: BaseSettingsFormViewController 
             orderAlerts: orderSwitch.isOn,
             lowStockAlerts: lowStockSwitch.isOn,
             deliveryUpdates: deliverySwitch.isOn,
+            promotionAlerts: promotionSwitch.isOn,
             financeReminders: financeSwitch.isOn,
             reportReady: reportSwitch.isOn) { [weak self] result in
             guard let self = self else { return }

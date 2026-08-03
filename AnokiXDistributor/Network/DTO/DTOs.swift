@@ -1582,16 +1582,46 @@ struct NotificationDTO: Decodable {
     var isRead: Bool?
 }
 
+/// The `data` object — only the fields used for navigation and the "important" flag are
+/// modelled. See `FCM-settings/3-Event-Catalogue.md` §3.1 for the full field
+/// dictionary; unmodelled keys are ignored.
 struct NotificationPayload: Decodable {
+    /// "order" | "delivery" | "grv" | "return" | "invoice" | "finance" | "wallet"
+    /// | "inventory" | "vas" | "promotion" | "product" | "marketplace" | "report"
+    /// | "trader" | "settings" | "notifications".
     let route: String?
     let orderId: Int?
     let orderNumber: String?
     let grnId: Int?
     let grnNumber: String?
+    let grvId: Int?
+    let grvNumber: String?
     let deliveryId: Int?
+    let invoiceId: Int?
+    let invoiceNumber: String?
     let productId: Int?
+    let promotionId: Int?
+    let traderId: Int?
+    let transactionId: Int?
+    /// Order status — "Cancelled" or the machine form "cancelled"; drives `isImportant`.
     let status: String?
+    /// Machine form of `status` when the server sends both, e.g. "out_for_delivery".
+    let statusKey: String?
     let decision: String?
+
+    /// The feed's numeric ids in the shape the shared `PushRoute.resolve` expects.
+    var ids: PushIds {
+        PushIds(orderId: PushIds.id(orderId),
+                grnId: PushIds.id(grnId),
+                grvId: PushIds.id(grvId),
+                deliveryId: PushIds.id(deliveryId),
+                invoiceId: PushIds.id(invoiceId),
+                productId: PushIds.id(productId),
+                promotionId: PushIds.id(promotionId),
+                traderId: PushIds.id(traderId),
+                transactionId: PushIds.id(transactionId),
+                notificationId: nil)
+    }
 }
 
 struct NotificationPagination: Decodable {
@@ -1641,18 +1671,23 @@ struct PreferencesData: Decodable {
             case .orderAlerts: return n.orderAlerts ?? true
             case .lowStockAlerts: return n.lowStockAlerts ?? true
             case .deliveryUpdates: return n.deliveryUpdates ?? true
+            case .promotionAlerts: return n.promotionAlerts ?? true
             case .financeReminders: return n.financeReminders ?? true
             case .reportReady: return n.reportReady ?? true
             }
         }
     }
 
-    enum NotificationKey { case orderAlerts, lowStockAlerts, deliveryUpdates, financeReminders, reportReady }
+    /// The six keys both portals persist — see `FCM-settings/3-Event-Catalogue.md` §7.
+    enum NotificationKey {
+        case orderAlerts, lowStockAlerts, deliveryUpdates, promotionAlerts, financeReminders, reportReady
+    }
 
     struct NotificationFlags: Decodable {
         let orderAlerts: Bool?
         let lowStockAlerts: Bool?
         let deliveryUpdates: Bool?
+        let promotionAlerts: Bool?
         let financeReminders: Bool?
         let reportReady: Bool?
     }
