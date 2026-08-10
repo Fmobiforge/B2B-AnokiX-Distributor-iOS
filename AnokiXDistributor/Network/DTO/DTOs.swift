@@ -1956,3 +1956,157 @@ struct VasProductsData: Decodable {
         }
     }
 }
+
+/// `data` block of GET api/common/vas/customers — the end-customers this distributor has
+/// onboarded into the Limes CRM.
+struct VasCustomersData: Decodable {
+    let customers: [Customer]
+    let total: Int
+
+    enum CodingKeys: String, CodingKey { case customers, total }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        customers = (try? c.decode([Customer].self, forKey: .customers)) ?? []
+        total = (try? c.decode(Int.self, forKey: .total)) ?? 0
+    }
+
+    struct Customer: Decodable, Identifiable {
+        let id: String
+        let limesAccountId: String?
+        let title: String?
+        let firstname: String?
+        let lastname: String?
+        let idType: String?
+        let idNumber: String?
+        let email: String?
+        let phone: String?
+        let city: String?
+        let status: String?
+        let createdAt: String?
+
+        enum CodingKeys: String, CodingKey {
+            case id, limesAccountId, title, firstname, lastname, idType, idNumber,
+                 email, phone, city, status, createdAt
+        }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id) ?? UUID().uuidString
+            limesAccountId = JSONDecoding.flexString(c, key: .limesAccountId)
+            title = try? c.decodeIfPresent(String.self, forKey: .title)
+            firstname = try? c.decodeIfPresent(String.self, forKey: .firstname)
+            lastname = try? c.decodeIfPresent(String.self, forKey: .lastname)
+            idType = try? c.decodeIfPresent(String.self, forKey: .idType)
+            idNumber = JSONDecoding.flexString(c, key: .idNumber)
+            email = try? c.decodeIfPresent(String.self, forKey: .email)
+            phone = JSONDecoding.flexString(c, key: .phone)
+            city = try? c.decodeIfPresent(String.self, forKey: .city)
+            status = try? c.decodeIfPresent(String.self, forKey: .status)
+            createdAt = try? c.decodeIfPresent(String.self, forKey: .createdAt)
+        }
+
+        /// "Mr Tam Ho" — the title is optional, so it is only prefixed when present.
+        var displayName: String {
+            let parts = [title, firstname, lastname]
+                .compactMap { $0?.trimmingCharacters(in: .whitespaces) }
+                .filter { !$0.isEmpty }
+            return parts.isEmpty ? "—" : parts.joined(separator: " ")
+        }
+    }
+}
+
+/// `data` block of GET api/common/vas/subscription-products — the SIM subscription products
+/// the "Assign a SIM" form offers. `inHand` products take an ICCID and activate immediately.
+struct VasSubscriptionProductsData: Decodable {
+    let configured: Bool
+    let products: [Product]
+
+    enum CodingKeys: String, CodingKey { case configured, products }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        configured = (try? c.decode(Bool.self, forKey: .configured)) ?? false
+        products = (try? c.decode([Product].self, forKey: .products)) ?? []
+    }
+
+    struct Product: Decodable, Identifiable {
+        let id: String
+        let name: String?
+        let sku: String?
+        let description: String?
+        let inHand: Bool
+        let category: String?
+
+        enum CodingKeys: String, CodingKey { case id, name, sku, description, inHand, category }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id) ?? ""
+            name = try? c.decodeIfPresent(String.self, forKey: .name)
+            sku = JSONDecoding.flexString(c, key: .sku)
+            description = try? c.decodeIfPresent(String.self, forKey: .description)
+            inHand = (try? c.decode(Bool.self, forKey: .inHand)) ?? false
+            category = try? c.decodeIfPresent(String.self, forKey: .category)
+        }
+
+        /// "Mobile Contract Package · SIM in hand" — what the product dropdown shows.
+        var label: String {
+            let base = (name?.trimmingCharacters(in: .whitespaces)).flatMap { $0.isEmpty ? nil : $0 } ?? id
+            return base + (inHand ? " · SIM in hand" : " · SIM on order")
+        }
+    }
+}
+
+/// `data` block of GET api/common/vas/subscriptions — the SIMs this merchant has activated.
+/// `msisdn` may be null: Limes allocates the number from a tenant pool and reports it once,
+/// so a SIM activated while that pool was empty has none until a sync recovers it.
+struct VasSubscriptionsData: Decodable {
+    let subscriptions: [Subscription]
+
+    enum CodingKeys: String, CodingKey { case subscriptions }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        subscriptions = (try? c.decode([Subscription].self, forKey: .subscriptions)) ?? []
+    }
+
+    struct Subscription: Decodable, Identifiable {
+        let id: String
+        let limesSubscriptionId: String?
+        let productId: String?
+        let iccid: String?
+        let msisdn: String?
+        let status: String?
+        let createdAt: String?
+
+        enum CodingKeys: String, CodingKey {
+            case id, limesSubscriptionId, productId, iccid, msisdn, status, createdAt
+        }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id) ?? UUID().uuidString
+            limesSubscriptionId = JSONDecoding.flexString(c, key: .limesSubscriptionId)
+            productId = JSONDecoding.flexString(c, key: .productId)
+            iccid = JSONDecoding.flexString(c, key: .iccid)
+            msisdn = JSONDecoding.flexString(c, key: .msisdn)
+            status = try? c.decodeIfPresent(String.self, forKey: .status)
+            createdAt = try? c.decodeIfPresent(String.self, forKey: .createdAt)
+        }
+    }
+}
+
+/// `data` block of POST api/common/vas/onboard-customer. The endpoint upserts by ID number,
+/// so a retry reports `alreadyExists` rather than failing.
+struct VasOnboardCustomerData: Decodable {
+    let customer: Customer?
+
+    struct Customer: Decodable {
+        let id: String?
+        let status: String?
+        let alreadyExists: Bool
+
+        enum CodingKeys: String, CodingKey { case id, status, alreadyExists }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            status = try? c.decodeIfPresent(String.self, forKey: .status)
+            alreadyExists = (try? c.decode(Bool.self, forKey: .alreadyExists)) ?? false
+        }
+    }
+}

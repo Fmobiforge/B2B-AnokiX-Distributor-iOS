@@ -504,6 +504,94 @@ final class ApiClient {
         }
     }
 
+    /// Register an end-customer in the Limes CRM (api/common/vas/onboard-customer). Step 1 of
+    /// signing someone up to a SIM subscription; upserts by ID number, so a retry reports
+    /// `alreadyExists` rather than creating a duplicate.
+    func onboardVasCustomer(form: [String: String],
+                            completion: @escaping (Result<VasOnboardCustomerData, ApiError>) -> Void) {
+        postAuthed("api/common/vas/onboard-customer", form: form,
+                   type: VasOnboardCustomerData.self, completion: completion)
+    }
+
+    /// Build — but do not send — the JSON body an onboard would POST to Limes
+    /// (api/common/vas/onboard-customer/preview). Runs no validation, so a half-filled form
+    /// still previews. The body is arbitrary JSON, so it is rendered to text here rather than
+    /// forced through Codable.
+    func previewVasOnboard(form: [String: String],
+                           completion: @escaping (Result<String, ApiError>) -> Void) {
+        Http.postForm(baseUrl: Self.baseURL, path: "api/common/vas/onboard-customer/preview",
+                      form: form, token: session.token) { r in
+            var result: Result<String, ApiError>
+            if let body = r.body, !body.isEmpty {
+                let envelope = JSON(parseJSON: body)
+                if envelope["status"].boolValue {
+                    let data = envelope["data"]
+                    var text = "\(data["method"].string ?? "POST") "
+                        + (data["base_url"].string ?? "") + (data["endpoint"].string ?? "") + "\n"
+                    for header in data["headers"].arrayValue { text += header.stringValue + "\n" }
+                    text += "\n" + (data["body"].rawString(.utf8, options: [.prettyPrinted]) ?? "{}")
+                    result = .success(text)
+                } else {
+                    result = .failure(ApiError(message: envelope["message"].string ?? "Request failed"))
+                }
+            } else {
+                result = .failure(ApiError(message: "Network error (HTTP \(r.code))"))
+            }
+            DispatchQueue.main.async { completion(result) }
+        }
+    }
+
+    /// End-customers this distributor has onboarded (api/common/vas/customers).
+    func getVasCustomers(search: String, limit: Int,
+                         completion: @escaping (Result<VasCustomersData, ApiError>) -> Void) {
+        let q = ["search": search, "limit": String(limit)]
+        getAuthed("api/common/vas/customers", query: q, type: VasCustomersData.self, completion: completion)
+    }
+
+    /// SIM subscription products offered by the "Assign a SIM" form (never hardcode these).
+    func getVasSubscriptionProducts(
+        completion: @escaping (Result<VasSubscriptionProductsData, ApiError>) -> Void) {
+        getAuthed("api/common/vas/subscription-products", query: nil,
+                  type: VasSubscriptionProductsData.self, completion: completion)
+    }
+
+    /// SIMs already activated by this distributor, with the MSISDN Limes assigned to each.
+    func getVasSubscriptions(completion: @escaping (Result<VasSubscriptionsData, ApiError>) -> Void) {
+        getAuthed("api/common/vas/subscriptions", query: nil,
+                  type: VasSubscriptionsData.self, completion: completion)
+    }
+
+    /// Activate a SIM / create a subscription (api/common/vas/subscribe). An eSIM carries no
+    /// ICCID, so `e_sim=1` is sent instead of the serial; a physical "SIM in hand" sends its
+    /// ICCID and activates immediately.
+    func subscribeVas(productId: String, iccid: String, eSim: Bool,
+                      completion: @escaping (Result<Void, ApiError>) -> Void) {
+        var form = ["product_id": productId]
+        if eSim { form["e_sim"] = "1" } else { form["iccid"] = iccid }
+        Http.postForm(baseUrl: Self.baseURL, path: "api/common/vas/subscribe", form: form,
+                      token: session.token) { [weak self] r in
+            self?.deliverStatus(r, completion: completion)
+        }
+    }
+
+    /// Provision custom/variable-value bundles straight onto a number
+    /// (api/common/vas/dynamic-services) — the path Limes recommends over order/create for
+    /// amounts the fixed catalog cannot express. Expects a JSON body; the charge is the sum
+    /// of `priceInCents`.
+    func provisionVasDynamicServices(msisdn: String, services: [[String: Any]],
+                                     completion: @escaping (Result<Void, ApiError>) -> Void) {
+        let json: [String: Any] = [
+            "msisdn": msisdn,
+            // Postman collection sends earn_commission=1 so the distributor accrues commission.
+            "earn_commission": 1,
+            "services": services
+        ]
+        Http.postJson(baseUrl: Self.baseURL, path: "api/common/vas/dynamic-services", json: json,
+                      token: session.token) { [weak self] r in
+            self?.deliverStatus(r, completion: completion)
+        }
+    }
+
     // MARK: - Internals
 
     private func getAuthed<T: Decodable>(_ path: String, query: [String: String]?, type: T.Type,
