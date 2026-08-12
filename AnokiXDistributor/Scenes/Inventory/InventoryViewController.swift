@@ -29,33 +29,17 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
         }
     }
 
+    // Only the tabs, search and filters stay put; the title, KPI cards and donut ride in
+    // the list header so the stock cards always keep the remaining height.
     private let collectionView = UICollectionView(
-        frame: .zero, collectionViewLayout: AdaptiveGridLayout.make(estimatedHeight: 168))
+        frame: .zero,
+        collectionViewLayout: AdaptiveGridLayout.make(estimatedHeight: 168, headerEstimatedHeight: 380))
     private let addStockButton = UIButton(type: .system)
 
-    private let stockValueCard = InventoryKpiCard(
-        title: "Total Stock Value", icon: "ic_package", tint: AppColors.purplePrimary,
-        tile: AppColors.purpleLight, caption: "On-hand cost value")
-    private let unitsCard = InventoryKpiCard(
-        title: "Total Units in Stock", icon: "ic_inventory", tint: AppColors.success,
-        tile: AppColors.successBg, caption: "Sellable units")
-    private let lowCard = InventoryKpiCard(
-        title: "Low Stock Items", icon: "ic_warning_box", tint: AppColors.warning,
-        tile: AppColors.warningBg, caption: "At or below reorder level")
-    private let outCard = InventoryKpiCard(
-        title: "Out of Stock Items", icon: "ic_cancel_circle", tint: AppColors.danger,
-        tile: AppColors.dangerBg, caption: "Nothing on hand")
-    private let movementsCard = InventoryKpiCard(
-        title: "Stock Movement", icon: "ic_finance_report", tint: AppColors.info,
-        tile: AppColors.infoBg, caption: "Last 7 days")
-    private let donutChart = DonutChartView()
-    private let donutLegend = UIStackView.vertical(spacing: 3, alignment: .fill)
     private let categoryPill = FilterPillButton(title: "All Categories")
     private let brandPill = FilterPillButton(title: "All Brands")
     private let countLabel = UILabel.make(font: AppFonts.regular(AppMetrics.textCaption),
                                           color: AppColors.textSecondary)
-    private let emptyLabel = UILabel.make(font: AppFonts.regular(AppMetrics.textBody),
-                                          color: AppColors.textSecondary, align: .center, lines: 0)
 
     private var tabViews: [ProductTabView] = []
     private var rows: [InventoryPageData.Row] = []
@@ -63,6 +47,8 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
     private var warehouses: [InventoryPageData.Warehouse] = []
     private var movedProductIds: Set<String> = []
     private var chart: [InventoryPageData.ChartSlice] = []
+    private var summary: InventorySummaryData.Summary?
+    private var emptyMessage: String?
     private var selectedTab: Tab = .all
     private var query = ""
     private var category = ""
@@ -100,8 +86,11 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
         collectionView.backgroundColor = AppColors.background
         collectionView.alwaysBounceVertical = true
         collectionView.keyboardDismissMode = .onDrag
-        collectionView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 88, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 88, right: 0)
         collectionView.register(InventoryItemCell.self, forCellWithReuseIdentifier: "InventoryItemCell")
+        collectionView.register(InventorySummaryHeaderView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: InventorySummaryHeaderView.reuseIdentifier)
 
         StyleKit.stylePrimaryButton(addStockButton, fontSize: 13)
         addStockButton.setTitle("  Add Stock", for: .normal)
@@ -109,9 +98,8 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
         addStockButton.addTarget(self, action: #selector(addStockTapped), for: .touchUpInside)
 
         let divider = ListScreenLayout.hairline()
-        [chrome, divider, collectionView, emptyLabel, addStockButton].forEach { $0.forAutoLayout() }
-        emptyLabel.isHidden = true
-        container.addSubviews(chrome, divider, collectionView, emptyLabel, addStockButton)
+        [chrome, divider, collectionView, addStockButton].forEach { $0.forAutoLayout() }
+        container.addSubviews(chrome, divider, collectionView, addStockButton)
 
         NSLayoutConstraint.activate([
             chrome.topAnchor.constraint(equalTo: container.topAnchor),
@@ -124,9 +112,6 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
             collectionView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-            emptyLabel.topAnchor.constraint(equalTo: collectionView.topAnchor, constant: 40),
-            emptyLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 32),
-            emptyLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -32),
             addStockButton.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -16),
             addStockButton.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -16),
             addStockButton.heightAnchor.constraint(equalToConstant: 48)
@@ -135,31 +120,8 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
         applyFilters()   // paints the tab selection before the first response lands
     }
 
-    /// KPI cards + donut, then the tabs, search and filter pills.
+    /// The pinned bar: stock tabs, keyword search, filter pills and the result count.
     private func buildChrome() -> UIView {
-        let kpiRow = UIStackView.horizontal(spacing: 8, alignment: .fill)
-        [stockValueCard, unitsCard, lowCard, outCard, movementsCard].forEach { kpiRow.addArrangedSubview($0) }
-        let kpiScroll = horizontalScroll(containing: kpiRow)
-
-        donutChart.forAutoLayout()
-        donutChart.strokeWidth = 11
-        NSLayoutConstraint.activate([
-            donutChart.widthAnchor.constraint(equalToConstant: 104),
-            donutChart.heightAnchor.constraint(equalToConstant: 104)
-        ])
-        let donutCard = StyleKit.cardView()
-        let donutRow = UIStackView.horizontal(spacing: 16, alignment: .center)
-        donutRow.addArrangedSubview(donutChart)
-        donutRow.addArrangedSubview(donutLegend)
-        let donutStack = UIStackView.vertical(spacing: 12, alignment: .fill)
-        donutStack.addArrangedSubview(UILabel.make("Inventory Summary",
-                                                   font: AppFonts.bold(AppMetrics.textTitle),
-                                                   color: AppColors.topTitle))
-        donutStack.addArrangedSubview(donutRow)
-        donutStack.forAutoLayout()
-        donutCard.addSubview(donutStack)
-        donutStack.pinEdges(to: donutCard, insets: UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14))
-
         // Seven tabs never fit across a phone, so they scroll like the Products screen.
         let tabRow = UIStackView.horizontal(spacing: 18, alignment: .fill)
         tabViews = Tab.allCases.map { tab in
@@ -190,7 +152,7 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
         countRow.addArrangedSubview(countLabel)
 
         return ListScreenLayout.surfaceSection(
-            [kpiScroll, donutCard, tabScroll, searchBar, pillRow, countRow],
+            [tabScroll, searchBar, pillRow, countRow],
             spacing: 10,
             insets: UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16))
     }
@@ -224,10 +186,9 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
                 self.rows = data.rows ?? []
                 self.warehouses = data.warehouses ?? []
                 self.chart = data.chart ?? []
+                self.summary = data.summary
                 self.movedProductIds = Set((data.movements ?? []).compactMap { $0.productId })
-                self.bindSummary(data.summary)
-                self.bindDonut()
-                self.applyFilters()
+                self.applyFilters()   // reloads the rows and the summary header above them
             case .failure(let error):
                 self.toast(error.message)
             }
@@ -240,52 +201,6 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
         loadPage()
     }
 
-    private func bindSummary(_ summary: InventorySummaryData.Summary?) {
-        let units = summary?.totalUnits ?? 0
-        stockValueCard.set("R" + format(Int64(summary?.totalStockValue ?? 0)))
-        unitsCard.set(format(units))
-        lowCard.set("\(summary?.lowStockCount ?? 0)")
-        outCard.set("\(summary?.outOfStockCount ?? 0)")
-        movementsCard.set("\(summary?.movementsThisWeek ?? 0)")
-        // The donut hole carries the headline number the cards break down.
-        donutChart.setCenterText(main: format(units), sub: "units")
-    }
-
-    /// Donut + legend from the chart slices the API returns (In Stock / Low / Out / Damaged).
-    private func bindDonut() {
-        donutLegend.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        let total = chart.reduce(0) { $0 + max(0, $1.value ?? 0) }
-        guard !chart.isEmpty, total > 0 else {
-            donutChart.setData(values: [1], colors: [AppColors.border])
-            return
-        }
-        donutChart.setData(values: chart.map { CGFloat(max(0, $0.value ?? 0)) },
-                           colors: chart.map { UIColor.fromHexString($0.color, fallback: AppColors.purplePrimary) })
-        for slice in chart {
-            let percent = Int(((slice.value ?? 0) / total * 100).rounded())
-            donutLegend.addArrangedSubview(legendRow(
-                color: UIColor.fromHexString(slice.color, fallback: AppColors.purplePrimary),
-                title: slice.type ?? "", value: "\(percent)%"))
-        }
-    }
-
-    private func legendRow(color: UIColor, title: String, value: String) -> UIView {
-        let dot = UIView()
-        dot.backgroundColor = color
-        dot.layer.cornerRadius = 4
-        dot.constrainSize(8)
-        let titleLabel = UILabel.make(title, font: AppFonts.regular(AppMetrics.textBodySM),
-                                      color: AppColors.textSecondary)
-        let valueLabel = UILabel.make(value, font: AppFonts.bold(AppMetrics.textBodySM),
-                                      color: AppColors.textPrimary)
-        let row = UIStackView.horizontal(spacing: 8, alignment: .center)
-        row.addArrangedSubview(dot)
-        row.addArrangedSubview(titleLabel)
-        row.addArrangedSubview(UIView())
-        row.addArrangedSubview(valueLabel)
-        return row
-    }
-
     // MARK: Filtering
 
     private func applyFilters() {
@@ -294,10 +209,11 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
             tabViews[index].set(title: tab.title, selected: tab == selectedTab)
         }
         countLabel.text = "\(filtered.count) of \(rows.count) items"
-        emptyLabel.text = rows.isEmpty
-            ? "No stock yet. Tap Add Stock to receive your first delivery."
-            : "No stock matches your search or filters."
-        emptyLabel.isHidden = !filtered.isEmpty
+        // The empty line lives in the header so it sits below the summary, never over it.
+        emptyMessage = filtered.isEmpty
+            ? (rows.isEmpty ? "No stock yet. Tap Add Stock to receive your first delivery."
+                            : "No stock matches your search or filters.")
+            : nil
         collectionView.reloadData()
     }
 
@@ -439,5 +355,18 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         openDetails(filtered[indexPath.row], startOnHistory: false)
+    }
+
+    func collectionView(_ collectionView: UICollectionView,
+                        viewForSupplementaryElementOfKind kind: String,
+                        at indexPath: IndexPath) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionHeader,
+              let header = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind, withReuseIdentifier: InventorySummaryHeaderView.reuseIdentifier,
+                for: indexPath) as? InventorySummaryHeaderView else {
+            return UICollectionReusableView()
+        }
+        header.configure(summary: summary, chart: chart, emptyMessage: emptyMessage)
+        return header
     }
 }

@@ -31,7 +31,48 @@ enum AdaptiveGridLayout {
 
     /// A compositional layout whose section recomputes its column count on every
     /// layout pass, so rotation and iPad multitasking resize correctly.
-    /// - Parameter estimatedHeight: a rough row height used for self-sizing.
+    /// - Parameters:
+    ///   - estimatedHeight: a rough row height used for self-sizing.
+    ///   - headerEstimatedHeight: when set, the section gets a self-sizing top header —
+    ///     used to scroll page summaries with the list instead of pinning them above it.
+    static func make(estimatedHeight: CGFloat = 96,
+                     headerEstimatedHeight: CGFloat?) -> UICollectionViewCompositionalLayout {
+        let base = make(estimatedHeight: estimatedHeight)
+        guard let headerHeight = headerEstimatedHeight else { return base }
+
+        let config = UICollectionViewCompositionalLayoutConfiguration()
+        config.scrollDirection = .vertical
+
+        return UICollectionViewCompositionalLayout(sectionProvider: { _, environment in
+            let available = environment.container.effectiveContentSize.width
+            let columns = columns(for: available)
+
+            let item = NSCollectionLayoutItem(layoutSize: .init(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalHeight(1.0)))
+
+            let group = NSCollectionLayoutGroup.horizontal(
+                layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                  heightDimension: .estimated(estimatedHeight)),
+                repeatingSubitem: item,
+                count: columns)
+            group.interItemSpacing = .fixed(columnSpacing)
+
+            let section = NSCollectionLayoutSection(group: group)
+            section.interGroupSpacing = lineSpacing
+            section.contentInsets = NSDirectionalEdgeInsets(
+                top: 0, leading: edgeInset, bottom: lineSpacing, trailing: edgeInset)
+            section.boundarySupplementaryItems = [
+                NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .estimated(headerHeight)),
+                    elementKind: UICollectionView.elementKindSectionHeader,
+                    alignment: .top)
+            ]
+            return section
+        }, configuration: config)
+    }
+
     static func make(estimatedHeight: CGFloat = 96) -> UICollectionViewCompositionalLayout {
         let config = UICollectionViewCompositionalLayoutConfiguration()
         config.scrollDirection = .vertical
