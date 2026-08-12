@@ -339,6 +339,80 @@ struct StockHistoryData: Decodable {
     let total: Int?
 }
 
+// MARK: - Card machine (PayCloud POS)
+
+/// data block of GET /api/common/pos/terminals — the card machines linked to this
+/// account. `configured` is false when the portal has no PayCloud credentials.
+struct PosTerminalsData: Decodable {
+    let configured: Bool?
+    let terminals: [Terminal]?
+
+    struct Terminal: Decodable {
+        let id: Int64
+        let terminalSn: String?
+        let label: String?
+        let storeNo: String?
+        let isActive: Bool?
+        let lastUsedAt: String?
+
+        /// Falls back to the serial when the machine was saved without a name.
+        var displayName: String {
+            let name = label?.trimmingCharacters(in: .whitespaces) ?? ""
+            return name.isEmpty ? (terminalSn ?? "") : name
+        }
+        var active: Bool { isActive ?? false }
+    }
+}
+
+/// data block of GET /api/common/pos/payments — every payment pushed to a card machine,
+/// newest first, with its pagination envelope.
+struct PosPaymentsData: Decodable {
+    let payments: [Payment]?
+    let pagination: Pagination?
+
+    struct Payment: Decodable {
+        let id: Int64?
+        let merchantOrderNo: String?
+        let terminalSn: String?
+        let amount: Double?
+        let currency: String?
+        /// "paid" / "failed" / "pending" / …
+        let status: String?
+        let cardNo: String?
+        let description: String?
+        let lastError: String?
+        let paidAt: String?
+        let createdAt: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = try? c.decode(Int64.self, forKey: .id)
+            merchantOrderNo = JSONDecoding.flexString(c, key: .merchantOrderNo)
+            terminalSn = try c.decodeIfPresent(String.self, forKey: .terminalSn)
+            amount = Double(JSONDecoding.flexString(c, key: .amount) ?? "")
+            currency = try c.decodeIfPresent(String.self, forKey: .currency)
+            status = try c.decodeIfPresent(String.self, forKey: .status)
+            cardNo = JSONDecoding.flexString(c, key: .cardNo)
+            description = try c.decodeIfPresent(String.self, forKey: .description)
+            lastError = try c.decodeIfPresent(String.self, forKey: .lastError)
+            paidAt = try c.decodeIfPresent(String.self, forKey: .paidAt)
+            createdAt = try c.decodeIfPresent(String.self, forKey: .createdAt)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, merchantOrderNo, terminalSn, amount, currency, status
+            case cardNo, description, lastError, paidAt, createdAt
+        }
+    }
+
+    struct Pagination: Decodable {
+        let page: Int?
+        let perPage: Int?
+        let total: Int?
+        let totalPages: Int?
+    }
+}
+
 // MARK: - Products
 
 struct ProductsData: Decodable {

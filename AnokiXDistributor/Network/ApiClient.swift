@@ -248,6 +248,44 @@ final class ApiClient {
         getAuthed("api/distributor/inventory/summary", query: nil, type: InventorySummaryData.self, completion: completion)
     }
 
+    // MARK: Card machine (PayCloud POS)
+
+    /// Card machines linked to this account (api/common/pos/terminals).
+    func getPosTerminals(completion: @escaping (Result<PosTerminalsData, ApiError>) -> Void) {
+        getAuthed("api/common/pos/terminals", query: nil, type: PosTerminalsData.self, completion: completion)
+    }
+
+    /// Payments pushed to a card machine, newest first (api/common/pos/payments).
+    func getPosPayments(page: Int, perPage: Int,
+                        completion: @escaping (Result<PosPaymentsData, ApiError>) -> Void) {
+        let q = ["page": String(page), "per_page": String(perPage)]
+        getAuthed("api/common/pos/payments", query: q, type: PosPaymentsData.self, completion: completion)
+    }
+
+    /// Links a card machine by the serial printed on the device.
+    func addPosTerminal(terminalSn: String, label: String,
+                        completion: @escaping (Result<String, ApiError>) -> Void) {
+        var form = ["terminal_sn": terminalSn]
+        if !label.isEmpty { form["label"] = label }
+        postMessage("api/common/pos/terminals", form: form, completion: completion)
+    }
+
+    /// Unlinks a card machine (api/common/pos/terminals/remove).
+    func removePosTerminal(terminalId: Int64,
+                           completion: @escaping (Result<String, ApiError>) -> Void) {
+        postMessage("api/common/pos/terminals/remove",
+                    form: ["terminal_id": String(terminalId)], completion: completion)
+    }
+
+    /// Pushes an amount to a card machine so the customer can tap / insert / swipe there.
+    /// Card details never reach the app.
+    func sendPosPayment(amount: String, terminalId: Int64, description: String,
+                        completion: @escaping (Result<String, ApiError>) -> Void) {
+        var form = ["amount": amount, "terminal_id": String(terminalId)]
+        if !description.isEmpty { form["description"] = description }
+        postMessage("api/common/pos/payments", form: form, completion: completion)
+    }
+
     /// Everything the Inventory screen needs: summary, rows, chart, movements, warehouses.
     func getInventoryPage(completion: @escaping (Result<InventoryPageData, ApiError>) -> Void) {
         getAuthed("api/distributor/inventory/page", query: nil, type: InventoryPageData.self, completion: completion)
