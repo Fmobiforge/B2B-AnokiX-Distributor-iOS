@@ -97,6 +97,15 @@ final class ApiClient {
         getAuthed("api/distributor/stores/all", query: q, type: StoresData.self, completion: completion)
     }
 
+    /// Soft-deletes a store (is_closed=1). Like products/delete the response carries
+    /// no store object, so only the status/message matter.
+    func deleteStore(id: String, completion: @escaping (Result<Void, ApiError>) -> Void) {
+        Http.postForm(baseUrl: Self.baseURL, path: "api/distributor/stores/delete",
+                      form: ["id": id], token: session.token) { [weak self] r in
+            self?.deliverStatus(r, completion: completion)
+        }
+    }
+
     func getTraders(search: String, completion: @escaping (Result<TradersData, ApiError>) -> Void) {
         getTraders(search: search, status: "", registrationStatus: "", completion: completion)
     }

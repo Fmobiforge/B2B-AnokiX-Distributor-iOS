@@ -21,6 +21,10 @@ final class AddEditStoreViewController: BaseSecondaryViewController, GMSMapViewD
         isEditMode ? "Edit Store - \(storeName ?? "")" : S.addStore
     }
 
+    /// Delete lives in the title bar in edit mode — same as the product editor.
+    override var trailingIcon: String? { isEditMode ? "ic_delete" : nil }
+    override func trailingTapped() { confirmDelete() }
+
     // Step containers
     private let step1 = UIStackView.vertical(spacing: 12, alignment: .fill)
     private let step2 = UIStackView.vertical(spacing: 12, alignment: .fill)
@@ -371,6 +375,29 @@ final class AddEditStoreViewController: BaseSecondaryViewController, GMSMapViewD
         }
         isEditMode ? ApiClient.shared.updateStore(form: form, completion: handler)
                    : ApiClient.shared.createStore(form: form, completion: handler)
+    }
+
+    @objc private func confirmDelete() {
+        guard let id = storeId, !id.isEmpty else { return }
+        let name = text(nameField).isEmpty ? (storeName ?? "this store") : text(nameField)
+        let alert = UIAlertController(
+            title: "Delete store?",
+            message: "This will close \"\(name)\" and remove it from your store list.",
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
+            ApiClient.shared.deleteStore(id: id) { result in
+                guard let self = self else { return }
+                switch result {
+                case .success:
+                    self.onSaved?()
+                    self.navigationController?.popViewController(animated: true)
+                case .failure(let error):
+                    self.toast(error.message)
+                }
+            }
+        })
+        present(alert, animated: true)
     }
 
     // MARK: Map (Google Maps — same as Android AddEditStoreActivity)
