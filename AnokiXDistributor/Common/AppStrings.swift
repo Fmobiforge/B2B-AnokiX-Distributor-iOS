@@ -136,6 +136,12 @@ enum S {
     static let addStore = "Add Store"
     static let followersLabel = "Followers"
     static let reviewsLabel = "Reviews"
+    static let searchStores = "Search name, address or tags…"
+    static let noStoresYet = "No stores yet. Tap Add Store to create your first one."
+    static let noStoresFound = "No stores match your search."
+    static func storesCount(_ count: Int) -> String {
+        count == 1 ? "1 Store" : "\(count) Stores"
+    }
 
     // Order tabs
     static let tabAll = "All"

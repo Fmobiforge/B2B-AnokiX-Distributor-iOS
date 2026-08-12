@@ -20,8 +20,20 @@ enum ApiMapper {
                       followerCount: s.followerCount ?? 0,
                       reviewCount: s.reviewCount ?? 0,
                       status: "Active",
-                      area: safe(s.address))
+                      area: safe(s.address),
+                      tags: splitTags(s.tagList))
         }
+    }
+
+    /// Splits the comma-separated tag_list the API returns into display chips.
+    private static func splitTags(_ tagList: String?) -> [String] {
+        guard let tagList = tagList else { return [] }
+        var tags: [String] = []
+        for part in tagList.split(separator: ",") {
+            let tag = part.trimmingCharacters(in: .whitespaces)
+            if !tag.isEmpty && !tags.contains(tag) { tags.append(tag) }
+        }
+        return tags
     }
 
     // MARK: Traders

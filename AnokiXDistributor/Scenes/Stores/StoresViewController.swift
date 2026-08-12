@@ -1,6 +1,7 @@
 import UIKit
 
-/// Port of StoresActivity + activity_stores.xml. Search, status filter, filter icon, store cards.
+/// Port of StoresActivity + activity_stores.xml. Search over name / address / tags,
+/// a store-count pill and the store cards.
 final class StoresViewController: BaseSecondaryViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
     override var screenTitle: String { S.stores }
@@ -8,28 +9,33 @@ final class StoresViewController: BaseSecondaryViewController, UICollectionViewD
     override var trailingIcon: String? { "ic_add" }
 
     private let collectionView = UICollectionView(
-        frame: .zero, collectionViewLayout: AdaptiveGridLayout.make(estimatedHeight: 100))
+        frame: .zero, collectionViewLayout: AdaptiveGridLayout.make(estimatedHeight: 128))
     private var allItems: [StoreItem] = []
     private var filtered: [StoreItem] = []
-    private var selectedStatus = S.allStatus
     private var search = ""
-    private var statusPill: FilterPillButton!
+    private let countPill = PaddingLabel(insets: UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12))
+    private let emptyLabel = UILabel.make(S.noStoresYet, font: AppFonts.regular(AppMetrics.textBody),
+                                          color: AppColors.textSecondary, align: .center, lines: 0)
 
     override func setupContent(in container: UIView) {
-        let searchBar = SearchBarView(placeholder: "Search stores…", height: 42)
+        let searchBar = SearchBarView(placeholder: S.searchStores, height: 42)
         searchBar.onChange = { [weak self] text in self?.search = text; self?.applyFilters() }
 
-        statusPill = FilterPillButton(title: selectedStatus)
-        statusPill.addTarget(self, action: #selector(pickStatus), for: .touchUpInside)
-        let filterButton = FilterIconButton.make()
+        countPill.font = AppFonts.bold(AppMetrics.textBodySM)
+        countPill.textColor = AppColors.purplePrimary
+        countPill.backgroundColor = AppColors.purpleLight
+        countPill.layer.cornerRadius = AppMetrics.radiusSM
+        countPill.layer.masksToBounds = true
+        countPill.setContentHuggingPriority(.required, for: .horizontal)
+        countPill.setContentCompressionResistancePriority(.required, for: .horizontal)
 
-        let filterRow = UIStackView.horizontal(spacing: 8, alignment: .center)
-        filterRow.addArrangedSubview(statusPill)
-        filterRow.addArrangedSubview(filterButton)
+        let searchRow = UIStackView.horizontal(spacing: 8, alignment: .center)
+        searchRow.addArrangedSubview(searchBar)
+        searchRow.addArrangedSubview(countPill)
 
         let chrome = ListScreenLayout.surfaceSection(
-            [searchBar, filterRow],
-            spacing: 10,
+            [searchRow],
+            spacing: 0,
             insets: UIEdgeInsets(top: AppMetrics.screenPaddingVertical, left: 16, bottom: 12, right: 16)
         )
 
@@ -42,15 +48,24 @@ final class StoresViewController: BaseSecondaryViewController, UICollectionViewD
         collectionView.registerNib(StoreCell.self)
 
         _ = embedSecondaryListChrome(in: container, chrome: chrome, listView: collectionView)
+
+        emptyLabel.isHidden = true
+        emptyLabel.forAutoLayout()
+        container.addSubview(emptyLabel)
+        NSLayoutConstraint.activate([
+            emptyLabel.topAnchor.constraint(equalTo: collectionView.topAnchor, constant: 48),
+            emptyLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 32),
+            emptyLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -32)
+        ])
+
+        applyFilters()
     }
 
     override func loadData() {
-        //allItems = MockData.storeItems()
-        applyFilters()
         ApiClient.shared.getStores(keyword: "") { [weak self] result in
             guard let self = self, case .success(let data) = result else { return }
-            let mapped = ApiMapper.toStoreItems(data)
-            if !mapped.isEmpty { self.allItems = mapped; self.applyFilters() }
+            self.allItems = ApiMapper.toStoreItems(data)
+            self.applyFilters()
         }
     }
 
@@ -62,25 +77,17 @@ final class StoresViewController: BaseSecondaryViewController, UICollectionViewD
         navigationController?.pushViewController(editor, animated: true)
     }
 
-    @objc private func pickStatus() {
-        let sheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        for status in MockData.filterStatus {
-            sheet.addAction(UIAlertAction(title: status, style: .default) { [weak self] _ in
-                self?.selectedStatus = status
-                self?.statusPill.setTitle(status)
-                self?.applyFilters()
-            })
-        }
-        sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        present(sheet, animated: true)
-    }
-
+    /// Local search over name, address and tags — mirrors the web store list search.
     private func applyFilters() {
-        filtered = allItems.filter { item in
-            let matchesStatus = selectedStatus == S.allStatus || item.status == selectedStatus
-            let matchesSearch = search.isEmpty || item.name.localizedCaseInsensitiveContains(search)
-            return matchesStatus && matchesSearch
+        let needle = search.trimmingCharacters(in: .whitespaces)
+        filtered = needle.isEmpty ? allItems : allItems.filter { item in
+            item.name.localizedCaseInsensitiveContains(needle)
+                || item.address.localizedCaseInsensitiveContains(needle)
+                || item.tags.contains { $0.localizedCaseInsensitiveContains(needle) }
         }
+        countPill.text = S.storesCount(filtered.count)
+        emptyLabel.text = allItems.isEmpty ? S.noStoresYet : S.noStoresFound
+        emptyLabel.isHidden = !filtered.isEmpty
         collectionView.reloadData()
     }
 

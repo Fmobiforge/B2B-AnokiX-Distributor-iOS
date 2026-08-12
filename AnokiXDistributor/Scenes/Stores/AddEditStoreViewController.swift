@@ -27,9 +27,6 @@ final class AddEditStoreViewController: BaseSecondaryViewController, GMSMapViewD
     private let stepperLabel = UILabel.make(font: AppFonts.bold(12), color: AppColors.purplePrimary)
 
     // Step 1 fields
-    private let statsRow = UIStackView.horizontal(spacing: 12, alignment: .fill)
-    private let followerValue = UILabel.make("0", font: AppFonts.bold(18), color: AppColors.textPrimary)
-    private let reviewValue = UILabel.make("0", font: AppFonts.bold(18), color: AppColors.textPrimary)
     private var clickCollect = true
     private var clickDeliver = true
     private let collectCard = UIView()
@@ -122,15 +119,6 @@ final class AddEditStoreViewController: BaseSecondaryViewController, GMSMapViewD
         step1.addArrangedSubview(UILabel.headline("Store Information"))
         step1.addArrangedSubview(UILabel.make("Set fulfillment options and enter your store profile details.",
                                               font: AppFonts.regular(12), color: AppColors.textSecondary))
-
-        // Followers / Reviews stats (edit mode only)
-        statsRow.distribution = .fillEqually
-        statsRow.addArrangedSubview(statCard(title: S.followersLabel, value: followerValue,
-                                             icon: "ic_traders", bg: AppColors.infoBg, tint: AppColors.info))
-        statsRow.addArrangedSubview(statCard(title: S.reviewsLabel, value: reviewValue,
-                                             icon: "ic_chat", bg: AppColors.warningBg, tint: AppColors.warning))
-        statsRow.isHidden = true
-        step1.addArrangedSubview(statsRow)
 
         // Fulfillment cards
         let fulfillmentRow = UIStackView.horizontal(spacing: 12, alignment: .fill)
@@ -241,9 +229,6 @@ final class AddEditStoreViewController: BaseSecondaryViewController, GMSMapViewD
     /// Show list-row data immediately while the detail API loads (matches Android UX).
     private func prefillFromListItem() {
         guard let item = listItem else { return }
-        statsRow.isHidden = false
-        followerValue.text = "\(item.followerCount)"
-        reviewValue.text = "\(item.reviewCount)"
         nameField.text = item.name
         addressSearchField.text = item.address
         header?.setTitle("Edit Store - \(item.name)")
@@ -280,9 +265,6 @@ final class AddEditStoreViewController: BaseSecondaryViewController, GMSMapViewD
         if let name = s.name, !name.isEmpty {
             header?.setTitle("Edit Store - \(name)")
         }
-        statsRow.isHidden = false
-        followerValue.text = "\(s.followerCount ?? listItem?.followerCount ?? 0)"
-        reviewValue.text = "\(s.reviewCount ?? listItem?.reviewCount ?? 0)"
         nameField.text = s.name
         buildingField.text = s.buildingNumber
         contactField.text = s.contactNumber
@@ -682,34 +664,6 @@ final class AddEditStoreViewController: BaseSecondaryViewController, GMSMapViewD
     }
 
     // MARK: View builders
-
-    private func statCard(title: String, value: UILabel, icon: String, bg: UIColor, tint: UIColor) -> UIView {
-        let card = StyleKit.cardView()
-        let tile = StyleKit.iconTile(color: bg)
-        tile.constrainSize(36)
-        let iconView = UIImageView(image: AppIcons.symbol(icon))
-        iconView.tintColor = tint
-        iconView.contentMode = .scaleAspectFit
-        iconView.forAutoLayout()
-        tile.addSubview(iconView)
-        NSLayoutConstraint.activate([
-            iconView.centerXAnchor.constraint(equalTo: tile.centerXAnchor),
-            iconView.centerYAnchor.constraint(equalTo: tile.centerYAnchor),
-            iconView.widthAnchor.constraint(equalToConstant: 20),
-            iconView.heightAnchor.constraint(equalToConstant: 20)
-        ])
-        let label = UILabel.make(title, font: AppFonts.regular(12), color: AppColors.textSecondary)
-        let textStack = UIStackView.vertical(spacing: 0, alignment: .leading)
-        textStack.addArrangedSubview(value)
-        textStack.addArrangedSubview(label)
-        let row = UIStackView.horizontal(spacing: 10, alignment: .center)
-        row.forAutoLayout()
-        row.addArrangedSubview(tile)
-        row.addArrangedSubview(textStack)
-        card.addSubview(row)
-        row.pinEdges(to: card, insets: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12))
-        return card
-    }
 
     private func configureFulfillmentCard(_ card: UIView, title: String, subtitle: String) {
         card.layer.cornerRadius = AppMetrics.radiusMD

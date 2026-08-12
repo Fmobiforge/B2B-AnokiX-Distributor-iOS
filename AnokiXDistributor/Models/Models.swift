@@ -11,6 +11,7 @@ struct StoreItem {
     let reviewCount: Int
     let status: String
     let area: String
+    var tags: [String] = []
 }
 
 struct TraderItem {
