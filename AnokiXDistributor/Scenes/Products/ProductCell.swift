@@ -1,7 +1,8 @@
 import UIKit
 
-/// item_product.xml — 70×70 image/placeholder, name, "SKU: …", "Category: …", price,
-/// top-right stock badge + chevron. Shared by the Products tab and the standalone Products screen.
+/// item_product.xml — 64×64 image/placeholder, name + status badge, SKU, category chip,
+/// brand, price and the stock count + stock badge. Shared by the Products tab and the
+/// standalone Products screen.
 final class ProductCell: UICollectionViewCell {
 
     private let cardView = UIView()
@@ -9,11 +10,13 @@ final class ProductCell: UICollectionViewCell {
     private let placeholderIcon = UIImageView()
     private let thumbImageView = UIImageView()
     private let nameLabel = UILabel()
+    private let statusBadge = PaddingLabel(insets: UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8))
     private let skuLabel = UILabel()
-    private let categoryLabel = UILabel()
+    private let categoryChip = PaddingLabel(insets: UIEdgeInsets(top: 3, left: 8, bottom: 3, right: 8))
+    private let brandLabel = UILabel()
     private let priceLabel = UILabel()
-    private let statusBadge = PaddingLabel(insets: UIEdgeInsets(top: 3, left: 8, bottom: 3, right: 8))
-    private let chevronView = UIImageView()
+    private let stockLabel = UILabel()
+    private let stockBadge = PaddingLabel(insets: UIEdgeInsets(top: 3, left: 8, bottom: 3, right: 8))
     private var imageTask: URLSessionDataTask?
     private var didBuild = false
 
@@ -38,70 +41,93 @@ final class ProductCell: UICollectionViewCell {
         backgroundColor = .clear
 
         StyleKit.styleCard(cardView)
-        cardView.translatesAutoresizingMaskIntoConstraints = false
+        cardView.forAutoLayout()
         contentView.addSubview(cardView)
 
-        imageContainer.backgroundColor = AppColors.surfaceVariant
-        imageContainer.layer.cornerRadius = AppMetrics.radiusLG
+        imageContainer.backgroundColor = AppColors.purpleLight
+        imageContainer.layer.cornerRadius = AppMetrics.radiusSM
         imageContainer.layer.masksToBounds = true
-        imageContainer.translatesAutoresizingMaskIntoConstraints = false
+        imageContainer.forAutoLayout()
 
         placeholderIcon.image = UIImage(systemName: "bag")
         placeholderIcon.tintColor = AppColors.purplePrimary
         placeholderIcon.contentMode = .scaleAspectFit
-        placeholderIcon.translatesAutoresizingMaskIntoConstraints = false
+        placeholderIcon.forAutoLayout()
 
         thumbImageView.contentMode = .scaleAspectFill
         thumbImageView.layer.masksToBounds = true
         thumbImageView.isHidden = true
-        thumbImageView.translatesAutoresizingMaskIntoConstraints = false
+        thumbImageView.forAutoLayout()
 
         imageContainer.addSubview(placeholderIcon)
         imageContainer.addSubview(thumbImageView)
 
-        nameLabel.font = AppFonts.bold(13)
+        nameLabel.font = AppFonts.bold(AppMetrics.textBody)
         nameLabel.textColor = AppColors.textPrimary
-        nameLabel.numberOfLines = 1
+        nameLabel.numberOfLines = 2
         nameLabel.lineBreakMode = .byTruncatingTail
+
+        StyleKit.styleBadge(statusBadge)
+        statusBadge.font = AppFonts.regular(AppMetrics.textMicro)
+        statusBadge.setContentHuggingPriority(.required, for: .horizontal)
+        statusBadge.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        let titleRow = UIStackView.horizontal(spacing: 8, alignment: .top)
+        titleRow.addArrangedSubview(nameLabel)
+        titleRow.addArrangedSubview(statusBadge)
 
         skuLabel.font = AppFonts.regular(AppMetrics.textCaption)
         skuLabel.textColor = AppColors.textSecondary
         skuLabel.numberOfLines = 1
         skuLabel.lineBreakMode = .byTruncatingTail
 
-        categoryLabel.font = AppFonts.regular(AppMetrics.textCaption)
-        categoryLabel.textColor = AppColors.textSecondary
-        categoryLabel.numberOfLines = 1
-        categoryLabel.lineBreakMode = .byTruncatingTail
+        categoryChip.font = AppFonts.regular(AppMetrics.textMicro)
+        categoryChip.textColor = AppColors.textSecondary
+        categoryChip.backgroundColor = AppColors.borderLight
+        categoryChip.layer.cornerRadius = AppMetrics.radiusSM
+        categoryChip.layer.borderWidth = 1
+        categoryChip.layer.borderColor = AppColors.border.cgColor
+        categoryChip.layer.masksToBounds = true
+        categoryChip.setContentHuggingPriority(.required, for: .horizontal)
 
-        priceLabel.font = AppFonts.bold(13)
+        brandLabel.font = AppFonts.regular(AppMetrics.textMicro)
+        brandLabel.textColor = AppColors.textTertiary
+        brandLabel.numberOfLines = 1
+        brandLabel.lineBreakMode = .byTruncatingTail
+
+        let metaRow = UIStackView.horizontal(spacing: 8, alignment: .center)
+        metaRow.addArrangedSubview(categoryChip)
+        metaRow.addArrangedSubview(brandLabel)
+
+        priceLabel.font = AppFonts.bold(AppMetrics.textBody)
         priceLabel.textColor = AppColors.purplePrimary
+        priceLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
-        let textStack = UIStackView(arrangedSubviews: [nameLabel, skuLabel, categoryLabel, priceLabel])
-        textStack.axis = .vertical
-        textStack.alignment = .fill
-        textStack.spacing = 2
-        textStack.setCustomSpacing(4, after: categoryLabel)
-        textStack.translatesAutoresizingMaskIntoConstraints = false
+        stockLabel.font = AppFonts.bold(AppMetrics.textCaption)
+        stockLabel.textColor = AppColors.textPrimary
+        stockLabel.setContentHuggingPriority(.required, for: .horizontal)
 
-        StyleKit.styleBadge(statusBadge)
+        StyleKit.styleBadge(stockBadge)
+        stockBadge.font = AppFonts.regular(AppMetrics.textMicro)
+        stockBadge.setContentHuggingPriority(.required, for: .horizontal)
+        stockBadge.setContentCompressionResistancePriority(.required, for: .horizontal)
 
-        chevronView.image = UIImage(systemName: "chevron.right")
-        chevronView.tintColor = AppColors.textTertiary
-        chevronView.contentMode = .scaleAspectFit
-        chevronView.translatesAutoresizingMaskIntoConstraints = false
+        let priceRow = UIStackView.horizontal(spacing: 6, alignment: .center)
+        priceRow.addArrangedSubview(priceLabel)
+        priceRow.addArrangedSubview(stockLabel)
+        priceRow.addArrangedSubview(stockBadge)
 
-        let rightStack = UIStackView(arrangedSubviews: [statusBadge, chevronView])
-        rightStack.axis = .vertical
-        rightStack.alignment = .trailing
-        rightStack.spacing = 8
-        rightStack.translatesAutoresizingMaskIntoConstraints = false
-        rightStack.setContentHuggingPriority(.required, for: .horizontal)
-        rightStack.setContentCompressionResistancePriority(.required, for: .horizontal)
+        let textStack = UIStackView.vertical(spacing: 3, alignment: .fill)
+        textStack.addArrangedSubview(titleRow)
+        textStack.addArrangedSubview(skuLabel)
+        textStack.addArrangedSubview(metaRow)
+        textStack.addArrangedSubview(priceRow)
+        textStack.setCustomSpacing(6, after: skuLabel)
+        textStack.setCustomSpacing(8, after: metaRow)
+        textStack.forAutoLayout()
 
         cardView.addSubview(imageContainer)
         cardView.addSubview(textStack)
-        cardView.addSubview(rightStack)
 
         NSLayoutConstraint.activate([
             cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -109,11 +135,10 @@ final class ProductCell: UICollectionViewCell {
             cardView.topAnchor.constraint(equalTo: contentView.topAnchor),
             cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
 
-            imageContainer.widthAnchor.constraint(equalToConstant: 70),
-            imageContainer.heightAnchor.constraint(equalToConstant: 70),
+            imageContainer.widthAnchor.constraint(equalToConstant: 64),
+            imageContainer.heightAnchor.constraint(equalToConstant: 64),
             imageContainer.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 12),
-            imageContainer.centerYAnchor.constraint(equalTo: cardView.centerYAnchor),
-            imageContainer.topAnchor.constraint(greaterThanOrEqualTo: cardView.topAnchor, constant: 12),
+            imageContainer.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 12),
             imageContainer.bottomAnchor.constraint(lessThanOrEqualTo: cardView.bottomAnchor, constant: -12),
 
             placeholderIcon.widthAnchor.constraint(equalToConstant: 24),
@@ -127,18 +152,9 @@ final class ProductCell: UICollectionViewCell {
             thumbImageView.bottomAnchor.constraint(equalTo: imageContainer.bottomAnchor),
 
             textStack.leadingAnchor.constraint(equalTo: imageContainer.trailingAnchor, constant: 12),
-            textStack.centerYAnchor.constraint(equalTo: cardView.centerYAnchor),
-            textStack.topAnchor.constraint(greaterThanOrEqualTo: cardView.topAnchor, constant: 12),
-            textStack.bottomAnchor.constraint(lessThanOrEqualTo: cardView.bottomAnchor, constant: -12),
-
-            rightStack.leadingAnchor.constraint(equalTo: textStack.trailingAnchor, constant: 8),
-            rightStack.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -12),
-            rightStack.centerYAnchor.constraint(equalTo: cardView.centerYAnchor),
-            rightStack.topAnchor.constraint(greaterThanOrEqualTo: cardView.topAnchor, constant: 12),
-            rightStack.bottomAnchor.constraint(lessThanOrEqualTo: cardView.bottomAnchor, constant: -12),
-
-            chevronView.widthAnchor.constraint(equalToConstant: 16),
-            chevronView.heightAnchor.constraint(equalToConstant: 16)
+            textStack.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -12),
+            textStack.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 12),
+            textStack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -12)
         ])
     }
 
@@ -152,9 +168,21 @@ final class ProductCell: UICollectionViewCell {
     func configure(_ product: ProductItem) {
         nameLabel.text = product.name
         skuLabel.text = "SKU: \(product.sku)"
-        categoryLabel.text = "Category: \(product.category)"
+
+        categoryChip.text = product.category
+        categoryChip.isHidden = product.category.isEmpty
+        brandLabel.text = product.brand
+        brandLabel.isHidden = product.brand.isEmpty
+
         priceLabel.text = product.price
-        StyleKit.applyStatusBadge(statusBadge, status: product.stockStatus)
+        stockLabel.text = NumberFormatter.localizedString(
+            from: NSNumber(value: product.stockQty), number: .decimal)
+        StyleKit.applyStatusBadge(stockBadge, status: product.stockStatus)
+
+        let statusText = product.status.isEmpty ? "Active" : product.status
+        statusBadge.text = statusText
+        statusBadge.textColor = product.isActive ? AppColors.success : AppColors.textSecondary
+        statusBadge.backgroundColor = product.isActive ? AppColors.successBg : AppColors.borderLight
 
         thumbImageView.isHidden = true
         if let urlString = product.imageUrl, let url = URL(string: urlString) {

@@ -78,7 +78,9 @@ enum S {
     static let inventoryOverview = "Inventory"
     static let inventorySubtitle = "Track stock levels and SKUs"
     static let productsTitle = "Products"
-    static let productsSubtitle = "Manage your product catalogue"
+    static let productsSubtitle = "Add, manage and update your product catalogue."
+    static let noProductsYet = "No products yet. Tap Add Product to create your first one."
+    static let noProductsMatch = "No products match your search or filters."
 
     static let stores = "Stores"
     static let traders = "Traders"

@@ -1,49 +1,89 @@
 import UIKit
 
-/// Standalone Products list from the drawer — matches activity_products / fragment search row.
+/// Standalone Products list from the drawer — KPI cards, stock tabs, keyword search
+/// and the category / brand / status filters (activity_products.xml).
 final class ProductsViewController: BaseSecondaryViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
     override var screenTitle: String { S.products }
-    override var screenSubtitle: String? { nil }
+    override var screenSubtitle: String? { S.productsSubtitle }
 
     private let collectionView = UICollectionView(
-        frame: .zero, collectionViewLayout: AdaptiveGridLayout.make(estimatedHeight: 88))
+        frame: .zero, collectionViewLayout: AdaptiveGridLayout.make(estimatedHeight: 118))
+    private let chrome = ProductsChromeView()
+    private let countLabel = UILabel.make(font: AppFonts.regular(AppMetrics.textCaption),
+                                          color: AppColors.textSecondary)
+    private let emptyLabel = UILabel.make(S.noProductsYet, font: AppFonts.regular(AppMetrics.textBody),
+                                          color: AppColors.textSecondary, align: .center, lines: 0)
     private var items: [ProductItem] = []
     private var filtered: [ProductItem] = []
 
     override func setupContent(in container: UIView) {
-        let searchRow = SearchFilterRowView(placeholder: "Search products…", height: 42)
-        searchRow.searchBar.onChange = { [weak self] text in
-            guard let self = self else { return }
-            self.filtered = text.isEmpty ? self.items
-                : self.items.filter { $0.name.localizedCaseInsensitiveContains(text) }
-            self.collectionView.reloadData()
-        }
+        chrome.presenter = self
+        chrome.onFilterChanged = { [weak self] in self?.applyFilter() }
 
-        let chrome = ListScreenLayout.surfaceSection(
-            [searchRow],
-            insets: UIEdgeInsets(top: AppMetrics.screenPaddingVertical, left: 16, bottom: 12, right: 16)
-        )
+        let countRow = UIView()
+        countRow.backgroundColor = AppColors.background
+        countLabel.forAutoLayout()
+        countRow.addSubview(countLabel)
+        countLabel.pinEdges(to: countRow, insets: UIEdgeInsets(top: 10, left: 16, bottom: 0, right: 16))
+
+        let chromeBlock = UIStackView.vertical(spacing: 0, alignment: .fill)
+        chromeBlock.addArrangedSubview(chrome)
+        chromeBlock.addArrangedSubview(countRow)
 
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.backgroundColor = AppColors.background
         collectionView.alwaysBounceVertical = true
+        collectionView.keyboardDismissMode = .onDrag
         collectionView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 16, right: 0)
         collectionView.registerNib(ProductCell.self)
 
-        _ = embedSecondaryListChrome(in: container, chrome: chrome, listView: collectionView)
+        _ = embedSecondaryListChrome(in: container, chrome: chromeBlock, listView: collectionView)
+
+        emptyLabel.isHidden = true
+        emptyLabel.forAutoLayout()
+        container.addSubview(emptyLabel)
+        NSLayoutConstraint.activate([
+            emptyLabel.topAnchor.constraint(equalTo: collectionView.topAnchor, constant: 40),
+            emptyLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 32),
+            emptyLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -32)
+        ])
     }
 
     override func loadData() {
-        items = MockData.productItems()
-        filtered = items
-        collectionView.reloadData()
+        loadProducts()
+        loadFilterOptions()
+    }
+
+    private func loadProducts() {
         ApiClient.shared.getProducts { [weak self] result in
-            guard let self = self, case .success(let data) = result else { return }
-            let mapped = ApiMapper.toProductItems(data)
-            if !mapped.isEmpty { self.items = mapped; self.filtered = mapped; self.collectionView.reloadData() }
+            guard let self = self else { return }
+            switch result {
+            case .success(let data):
+                self.items = ApiMapper.toProductItems(data)
+                self.chrome.setProducts(self.items, summary: data.summary)
+                self.applyFilter()
+            case .failure(let error):
+                self.toast(error.message)
+            }
         }
+    }
+
+    /// Categories + brands for the filter pickers; failures leave the product-derived lists.
+    private func loadFilterOptions() {
+        ApiClient.shared.getBaseInfo { [weak self] result in
+            guard let self = self, case .success(let data) = result else { return }
+            self.chrome.setBaseInfo(data)
+        }
+    }
+
+    private func applyFilter() {
+        filtered = chrome.filteredItems
+        countLabel.text = "\(filtered.count) of \(items.count) products"
+        emptyLabel.text = items.isEmpty ? S.noProductsYet : S.noProductsMatch
+        emptyLabel.isHidden = !filtered.isEmpty
+        collectionView.reloadData()
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int { filtered.count }
@@ -58,7 +98,7 @@ final class ProductsViewController: BaseSecondaryViewController, UICollectionVie
         guard indexPath.row < filtered.count else { return }
         let wizard = CreateProductViewController()
         wizard.productId = filtered[indexPath.row].id
-        wizard.onSaved = { [weak self] in self?.loadData() }
+        wizard.onSaved = { [weak self] in self?.loadProducts() }
         navigationController?.pushViewController(wizard, animated: true)
     }
 }

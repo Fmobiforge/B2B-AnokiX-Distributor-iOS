@@ -72,13 +72,24 @@ enum ApiMapper {
     static func toProductItems(_ data: ProductsData?) -> [ProductItem] {
         guard let products = data?.products else { return [] }
         return products.map { p in
-            ProductItem(id: safe(p.id),
-                        name: safe(p.name),
-                        sku: safe(p.sku),
-                        category: safe(p.categoryTitle),
-                        price: formatPrice(p.sellingPrice),
-                        stockStatus: stockStatus(p.stockValue),
-                        imageUrl: p.listImageUrl)
+            let stock = intValue(p.stockValue)
+            let reorder = intValue(p.reorderLevel)
+            return ProductItem(id: safe(p.id),
+                               name: safe(p.name),
+                               sku: safe(p.sku),
+                               category: safe(p.categoryTitle),
+                               price: formatPrice(p.sellingPrice),
+                               stockStatus: stockStatus(stock: stock, reorderLevel: reorder),
+                               imageUrl: p.listImageUrl,
+                               brand: safe(p.brandName),
+                               brandId: safe(p.brandId),
+                               categoryId: safe(p.categoryId),
+                               parentCategoryId: safe(p.parentCategoryId),
+                               parentCategory: safe(p.parentCategoryTitle),
+                               status: (p.status?.isEmpty == false) ? safe(p.status) : "Active",
+                               barcode: safe(p.barcode),
+                               stockQty: stock,
+                               reorderLevel: reorder)
         }
     }
 
@@ -194,10 +205,19 @@ enum ApiMapper {
     }
 
     private static func stockStatus(_ stockValue: String?) -> String {
-        let stock = Int(Double(stockValue ?? "0") ?? 0)
+        stockStatus(stock: intValue(stockValue), reorderLevel: 0)
+    }
+
+    /// Stock label for a product row. The distributor's own reorder level decides what
+    /// counts as low stock; without one, fall back to a flat threshold of 10 units.
+    private static func stockStatus(stock: Int, reorderLevel: Int) -> String {
         if stock <= 0 { return "Out of Stock" }
-        if stock <= 10 { return "Low Stock" }
-        return "In Stock"
+        let threshold = reorderLevel > 0 ? reorderLevel : 10
+        return stock <= threshold ? "Low Stock" : "In Stock"
+    }
+
+    private static func intValue(_ value: String?) -> Int {
+        Int(Double(value ?? "0") ?? 0)
     }
 
     private static func initials(_ name: String) -> String {

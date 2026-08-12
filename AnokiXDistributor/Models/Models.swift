@@ -35,6 +35,23 @@ struct ProductItem {
     let price: String
     let stockStatus: String
     var imageUrl: String?
+
+    // Extra list metadata — powers the category / brand / status filters and the card.
+    var brand: String = ""
+    var brandId: String = ""
+    var categoryId: String = ""
+    var parentCategoryId: String = ""
+    var parentCategory: String = ""
+    /// Product record status from the API ("Active" / "Inactive").
+    var status: String = ""
+    var barcode: String = ""
+    var stockQty: Int = 0
+    var reorderLevel: Int = 0
+
+    var isActive: Bool { status.isEmpty || status.caseInsensitiveCompare("Active") == .orderedSame }
+    var isOutOfStock: Bool { stockQty <= 0 }
+    /// In stock but at or below the reorder level the distributor configured.
+    var isLowStock: Bool { stockQty > 0 && reorderLevel > 0 && stockQty <= reorderLevel }
 }
 
 struct OrderItem {

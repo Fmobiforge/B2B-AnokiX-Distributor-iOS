@@ -237,6 +237,7 @@ struct InventorySummaryData: Decodable {
 
 struct ProductsData: Decodable {
     let products: [Product]?
+    let summary: Summary?
     let total: Int?
 
     /// The list returns flat rows (category / brand / unit denormalised onto each
@@ -249,7 +250,11 @@ struct ProductsData: Decodable {
         let sellingPrice: String?
         let stock: String?
         let stockQuantity: String?
+        let reorderLevel: String?
         let status: String?
+        let brandId: String?
+        let categoryId: String?
+        let parentCategoryId: String?
         let brandName: String?
         let categoryTitle: String?
         let parentCategoryTitle: String?
@@ -266,7 +271,11 @@ struct ProductsData: Decodable {
             sellingPrice = JSONDecoding.flexString(c, key: .sellingPrice)
             stock = JSONDecoding.flexString(c, key: .stock)
             stockQuantity = JSONDecoding.flexString(c, key: .stockQuantity)
+            reorderLevel = JSONDecoding.flexString(c, key: .reorderLevel)
             status = try c.decodeIfPresent(String.self, forKey: .status)
+            brandId = JSONDecoding.flexString(c, key: .brandId)
+            categoryId = JSONDecoding.flexString(c, key: .categoryId)
+            parentCategoryId = JSONDecoding.flexString(c, key: .parentCategoryId)
             brandName = try c.decodeIfPresent(String.self, forKey: .brandName)
             categoryTitle = try c.decodeIfPresent(String.self, forKey: .categoryTitle)
             parentCategoryTitle = try c.decodeIfPresent(String.self, forKey: .parentCategoryTitle)
@@ -276,7 +285,8 @@ struct ProductsData: Decodable {
         }
 
         private enum CodingKeys: String, CodingKey {
-            case id, name, sku, barcode, sellingPrice, stock, stockQuantity, status
+            case id, name, sku, barcode, sellingPrice, stock, stockQuantity, reorderLevel, status
+            case brandId, categoryId, parentCategoryId
             case brandName, categoryTitle, parentCategoryTitle, unitName
             case imageUrl, primaryProductImageUrl
         }
@@ -285,6 +295,22 @@ struct ProductsData: Decodable {
         var stockValue: String? { stockQuantity ?? stock }
         /// Best available list thumbnail URL.
         var listImageUrl: String? { imageUrl ?? primaryProductImageUrl }
+    }
+
+    /// KPI counters shown above the list (total / active / out of stock / low stock).
+    struct Summary: Decodable {
+        let totalProducts: Metric?
+        let activeProducts: Metric?
+        let outOfStock: Metric?
+        let lowStock: Metric?
+
+        struct Metric: Decodable {
+            let value: Int?
+            let changePercent: Double?
+            let trend: String?
+            let compareLabel: String?
+            let percentOfTotal: Double?
+        }
     }
 }
 
