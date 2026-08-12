@@ -76,7 +76,7 @@ enum S {
     static func ordersItemsHeader(_ count: Int) -> String { "Items (\(count))" }
     static func ordersProductsLabel(_ count: Int) -> String { "PRODUCTS \(count)" }
     static let inventoryOverview = "Inventory"
-    static let inventorySubtitle = "Track stock levels and SKUs"
+    static let inventorySubtitle = "Track, manage and optimise your stock in real-time."
     static let productsTitle = "Products"
     static let productsSubtitle = "Add, manage and update your product catalogue."
     static let noProductsYet = "No products yet. Tap Add Product to create your first one."
@@ -529,8 +529,12 @@ enum S {
         "Top-up successful — \(amount) added to your wallet."
     }
 
-    static func walletComingSoon(_ feature: String) -> String {
+    static func featureComingSoon(_ feature: String) -> String {
         "\(feature) is coming soon."
+    }
+
+    static func walletComingSoon(_ feature: String) -> String {
+        featureComingSoon(feature)
     }
 
     static func walletNextSettlement(_ when: String) -> String {

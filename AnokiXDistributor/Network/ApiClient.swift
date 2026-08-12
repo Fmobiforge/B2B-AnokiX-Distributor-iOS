@@ -248,6 +248,71 @@ final class ApiClient {
         getAuthed("api/distributor/inventory/summary", query: nil, type: InventorySummaryData.self, completion: completion)
     }
 
+    /// Everything the Inventory screen needs: summary, rows, chart, movements, warehouses.
+    func getInventoryPage(completion: @escaping (Result<InventoryPageData, ApiError>) -> Void) {
+        getAuthed("api/distributor/inventory/page", query: nil, type: InventoryPageData.self, completion: completion)
+    }
+
+    /// Stock ledger for one product (Inventory → item → History).
+    func getStockHistory(productId: String, limit: Int = 100,
+                         completion: @escaping (Result<StockHistoryData, ApiError>) -> Void) {
+        let q = ["product_id": productId, "limit": String(limit)]
+        getAuthed("api/distributor/inventory/history", query: q, type: StockHistoryData.self, completion: completion)
+    }
+
+    /// Sets the counted quantity for a product (Adjust Stock). The callback receives the
+    /// server's confirmation message, e.g. "Stock updated from 1000 to 950.".
+    func setStock(productId: String, quantity: Int, notes: String,
+                  completion: @escaping (Result<String, ApiError>) -> Void) {
+        var form = ["product_id": productId, "quantity": String(quantity)]
+        if !notes.isEmpty { form["notes"] = notes }
+        postMessage("api/distributor/inventory/set-stock", form: form, completion: completion)
+    }
+
+    /// Moves units between warehouses; the total on hand does not change.
+    func transferStock(productId: String, fromWarehouseId: String, toWarehouseId: String,
+                       quantity: Int, notes: String,
+                       completion: @escaping (Result<String, ApiError>) -> Void) {
+        var form = ["product_id": productId,
+                    "from_warehouse_id": fromWarehouseId,
+                    "to_warehouse_id": toWarehouseId,
+                    "quantity": String(quantity)]
+        if !notes.isEmpty { form["notes"] = notes }
+        postMessage("api/distributor/inventory/transfer", form: form, completion: completion)
+    }
+
+    /// Books new stock into a warehouse (Add Stock / Receive).
+    func receiveStock(warehouseId: String, productId: String, quantity: Int, unitCost: String,
+                      batchNumber: String, expiryDate: String,
+                      completion: @escaping (Result<String, ApiError>) -> Void) {
+        var form = ["warehouse_id": warehouseId, "product_id": productId,
+                    "quantity": String(quantity)]
+        if !unitCost.isEmpty { form["unit_cost"] = unitCost }
+        if !batchNumber.isEmpty { form["batch_number"] = batchNumber }
+        if !expiryDate.isEmpty { form["expiry_date"] = expiryDate }
+        postMessage("api/distributor/inventory/receive", form: form, completion: completion)
+    }
+
+    /// POSTs a form and hands back the envelope's `message` — the inventory mutations
+    /// echo what changed ("100 units moved.") and their `data` shape varies.
+    private func postMessage(_ path: String, form: [String: String],
+                             completion: @escaping (Result<String, ApiError>) -> Void) {
+        Http.postForm(baseUrl: Self.baseURL, path: path, form: form, token: session.token) { r in
+            var result: Result<String, ApiError>
+            if let body = r.body, !body.isEmpty {
+                let envelope = JSON(parseJSON: body)
+                if envelope["status"].boolValue {
+                    result = .success(envelope["message"].string ?? "")
+                } else {
+                    result = .failure(ApiError(message: envelope["message"].string ?? "Request failed"))
+                }
+            } else {
+                result = .failure(ApiError(message: "Network error (HTTP \(r.code))"))
+            }
+            DispatchQueue.main.async { completion(result) }
+        }
+    }
+
     // MARK: Orders
 
     /// Orders list for a status tab. Empty/null filters are omitted; `status` "all"

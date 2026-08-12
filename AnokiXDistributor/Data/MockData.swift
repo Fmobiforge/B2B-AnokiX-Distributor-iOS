@@ -103,23 +103,30 @@ enum MockData {
         ]
     }
 
+    /// Drawer navigation, in the order agreed for the new design (New-Design/Menu).
+    /// "card_machine", "warehouse_staff" and "support" have no screens yet — the drawer
+    /// handler answers those with a "coming soon" message.
     static func drawerMenuItems() -> [MenuItem] {
         [
             MenuItem(key: "home", title: "Dashboard", icon: "ic_dashboard"),
-            MenuItem(key: "orders", title: "Orders", icon: "ic_orders"),
-            MenuItem(key: "inventory", title: "Inventory", icon: "ic_inventory"),
             MenuItem(key: "stores", title: "Stores", icon: "ic_stores"),
-            MenuItem(key: "traders", title: "Traders", icon: "ic_traders"),
             MenuItem(key: "products", title: "Products", icon: "ic_shopping_bag"),
             MenuItem(key: "promotions", title: "Ads & Promotions", icon: "ic_promotions"),
+            MenuItem(key: "orders", title: "Orders", icon: "ic_orders"),
+            MenuItem(key: "deliveries", title: "Deliveries", icon: "ic_deliveries"),
+            MenuItem(key: "returns", title: "Returns", icon: "ic_returns"),
+            MenuItem(key: "inventory", title: "Inventory", icon: "ic_inventory"),
             MenuItem(key: "finances", title: "Finances", icon: "ic_finances"),
+            MenuItem(key: "card_machine", title: "Card Machine", icon: "ic_card", subtitle: "Powered by PayCloud"),
             MenuItem(key: "wallet", title: "anokiX wallet", icon: "ic_wallet", subtitle: "Powered by IMB"),
             MenuItem(key: "airtime", title: "Airtime & VAS", icon: "ic_vas", subtitle: "Powered by Limes"),
             MenuItem(key: "reports", title: "Reports", icon: "ic_reports"),
-            MenuItem(key: "deliveries", title: "Deliveries", icon: "ic_deliveries"),
-            MenuItem(key: "returns", title: "Returns", icon: "ic_returns"),
+            MenuItem(key: "traders", title: "Traders", icon: "ic_traders"),
+            MenuItem(key: "warehouse_staff", title: "Warehouse Staff", icon: "ic_person_add",
+                     subtitle: "Who can pick and pack"),
             MenuItem(key: "notifications", title: "Notifications", icon: "ic_notifications"),
-            MenuItem(key: "settings", title: "Settings", icon: "ic_settings")
+            MenuItem(key: "settings", title: "Settings", icon: "ic_settings"),
+            MenuItem(key: "support", title: "Support Centre", icon: "ic_headset")
         ]
     }
 

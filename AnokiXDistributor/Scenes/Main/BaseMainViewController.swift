@@ -175,9 +175,23 @@ class BaseMainViewController: UIViewController {
         if let tab = tabBarController as? MainTabBarController, tab.selectTab(forKey: key) {
             return
         }
-        guard let vc = Router.secondaryViewController(for: key) else { return }
+        guard let vc = Router.secondaryViewController(for: key) else {
+            // Card Machine / Warehouse Staff / Support Centre: menu entries are in place,
+            // their screens are still to come.
+            if let title = MockData.drawerMenuItems().first(where: { $0.key == key })?.title {
+                showComingSoon(title)
+            }
+            return
+        }
         vc.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(vc, animated: true)
+    }
+
+    private func showComingSoon(_ feature: String) {
+        let alert = UIAlertController(title: nil, message: S.featureComingSoon(feature),
+                                      preferredStyle: .alert)
+        present(alert, animated: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) { alert.dismiss(animated: true) }
     }
 
     func embedHeader(_ header: UIView) {

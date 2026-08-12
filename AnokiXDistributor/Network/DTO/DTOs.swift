@@ -233,6 +233,112 @@ struct InventorySummaryData: Decodable {
     }
 }
 
+/// data block of GET /api/distributor/inventory/page — everything the Inventory screen
+/// renders in one call: KPI summary, stock rows, the status donut, recent movements and
+/// the warehouse list used by the transfer / receive forms.
+struct InventoryPageData: Decodable {
+    let summary: InventorySummaryData.Summary?
+    let rows: [Row]?
+    let chart: [ChartSlice]?
+    let movements: [StockMovement]?
+    let warehouses: [Warehouse]?
+
+    struct Row: Decodable {
+        let id: Int64?
+        let productId: Int64?
+        let name: String?
+        let sku: String?
+        let barcode: String?
+        let category: String?
+        let categoryKey: String?
+        let brand: String?
+        let brandKey: String?
+        let warehouse: String?
+        let warehouseKey: String?
+        let units: Int64?
+        let capacity: Int64?
+        let stockValue: Double?
+        /// "in_stock" / "low_stock" / "out_of_stock".
+        let stockStatus: String?
+        /// Available / Reserved / Packed / Damaged / Expired counts.
+        let breakdown: [String: Int]?
+        let batchNumber: String?
+        let expiryDate: String?
+        let unitsPerCase: Int?
+        let updatedAt: String?
+        /// Server-picked swatch for the product tile, e.g. "#dc2626".
+        let imageColor: String?
+
+        func breakdownValue(_ key: String) -> Int {
+            guard let breakdown = breakdown else { return 0 }
+            if let exact = breakdown[key] { return exact }
+            return breakdown.first { $0.key.caseInsensitiveCompare(key) == .orderedSame }?.value ?? 0
+        }
+
+        var unitsOnHand: Int64 { units ?? 0 }
+        var isLowStock: Bool { stockStatus?.lowercased() == "low_stock" }
+        var isOutOfStock: Bool { stockStatus?.lowercased() == "out_of_stock" || unitsOnHand <= 0 }
+        var hasDamaged: Bool { breakdownValue("Damaged") > 0 }
+        var hasExpired: Bool { breakdownValue("Expired") > 0 }
+
+        /// Human label for the status badge.
+        var statusLabel: String {
+            if isOutOfStock { return "Out of Stock" }
+            if isLowStock { return "Low Stock" }
+            return "In Stock"
+        }
+    }
+
+    struct ChartSlice: Decodable {
+        let type: String?
+        let value: Double?
+        let color: String?
+    }
+
+    struct Warehouse: Decodable {
+        let id: String?
+        let name: String?
+        let code: String?
+        let address: String?
+        let active: String?
+    }
+}
+
+/// One row of the stock ledger — used by the inventory page ("movements") and by
+/// GET /api/distributor/inventory/history.
+struct StockMovement: Decodable {
+    let id: String?
+    let warehouseId: String?
+    let productId: String?
+    let batchId: String?
+    /// "receive" / "adjust" / "transfer_in" / "transfer_out" / …
+    let movementType: String?
+    let inventoryStatus: String?
+    let quantity: String?
+    let unitCost: String?
+    let notes: String?
+    let createdAt: String?
+    let warehouseName: String?
+    let productName: String?
+    let productSku: String?
+    let batchNumber: String?
+    let userEmail: String?
+
+    /// "receive" → "Received", "transfer_out" → "Transfer Out", …
+    var movementLabel: String {
+        guard let type = movementType, !type.isEmpty else { return "Movement" }
+        if type.caseInsensitiveCompare("receive") == .orderedSame { return "Received" }
+        return type.split(whereSeparator: { $0 == "_" || $0 == " " })
+            .map { $0.prefix(1).uppercased() + $0.dropFirst() }
+            .joined(separator: " ")
+    }
+}
+
+struct StockHistoryData: Decodable {
+    let movements: [StockMovement]?
+    let total: Int?
+}
+
 // MARK: - Products
 
 struct ProductsData: Decodable {

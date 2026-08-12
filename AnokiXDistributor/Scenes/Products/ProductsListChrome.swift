@@ -335,7 +335,12 @@ final class ProductKpiCard: UIView {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     func set(value: Int, subtitle: String) {
-        valueLabel.text = "\(value)"
+        set(text: "\(value)", subtitle: subtitle)
+    }
+
+    /// For pre-formatted values (currency, thousands separators).
+    func set(text: String, subtitle: String) {
+        valueLabel.text = text
         subtitleLabel.text = subtitle
     }
 }
