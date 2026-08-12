@@ -276,7 +276,9 @@ final class ProductsChromeView: UIView {
     }
 
     @objc private func pickStatus() {
-        var labels = ["All Status", "Active", "Inactive"]
+        // The API documents Active / Pending / InActive; anything else a product carries
+        // is appended below so the filter always covers the data on screen.
+        var labels = ["All Status", "Active", "Pending", "Inactive"]
         for item in items where !item.status.isEmpty && !labels.contains(item.status) {
             labels.append(item.status)
         }

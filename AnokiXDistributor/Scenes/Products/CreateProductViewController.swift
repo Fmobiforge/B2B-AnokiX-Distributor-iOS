@@ -669,6 +669,18 @@ final class CreateProductViewController: BaseSecondaryViewController,
         view.endEditing(true)
     }
 
+    /// Shows a promotion date returned by the API on its field and syncs the wheel to it.
+    /// Tolerates a trailing time component and skips the "0000-00-00" placeholder the
+    /// backend uses when no promotion window is set.
+    private func applyPromoDate(_ apiDate: String?, to field: UITextField, picker: UIDatePicker) {
+        let value = (apiDate ?? "").trimmingCharacters(in: .whitespaces)
+        guard let datePart = value.split(separator: " ").first.map(String.init),
+              let date = promoDateFormatter.date(from: datePart),
+              !datePart.hasPrefix("0000") else { return }
+        field.text = datePart
+        picker.date = date
+    }
+
     /// Sync the wheel to the value already in the field (e.g. when editing a product).
     func textFieldDidBeginEditing(_ textField: UITextField) {
         let picker: UIDatePicker?
@@ -845,8 +857,8 @@ final class CreateProductViewController: BaseSecondaryViewController,
         stockField.text = p.stockQuantity ?? p.stock
         reorderField.text = p.reorderLevel
         promoPriceField.text = p.promotionPrice
-        promoStartField.text = p.promotionStartDate
-        promoEndField.text = p.promotionEndDate
+        applyPromoDate(p.promotionStartDate, to: promoStartField, picker: promoStartPicker)
+        applyPromoDate(p.promotionEndDate, to: promoEndField, picker: promoEndPicker)
 
         if let b = Int64(p.brandId ?? "") { selectedBrandId = b; setPickerTitle(brandButton, brandName(b)) }
         if let pc = Int64(p.parentCategoryId ?? "") {
