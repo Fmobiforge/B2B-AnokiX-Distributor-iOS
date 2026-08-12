@@ -33,11 +33,21 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
         frame: .zero, collectionViewLayout: AdaptiveGridLayout.make(estimatedHeight: 168))
     private let addStockButton = UIButton(type: .system)
 
-    private let stockValueCard = ProductKpiCard(title: "Total Stock Value", valueColor: AppColors.purplePrimary)
-    private let unitsCard = ProductKpiCard(title: "Total Units in Stock", valueColor: AppColors.success)
-    private let lowCard = ProductKpiCard(title: "Low Stock Items", valueColor: AppColors.warning)
-    private let outCard = ProductKpiCard(title: "Out of Stock Items", valueColor: AppColors.danger)
-    private let movementsCard = ProductKpiCard(title: "Stock Movement", valueColor: AppColors.info)
+    private let stockValueCard = InventoryKpiCard(
+        title: "Total Stock Value", icon: "ic_package", tint: AppColors.purplePrimary,
+        tile: AppColors.purpleLight, caption: "On-hand cost value")
+    private let unitsCard = InventoryKpiCard(
+        title: "Total Units in Stock", icon: "ic_inventory", tint: AppColors.success,
+        tile: AppColors.successBg, caption: "Sellable units")
+    private let lowCard = InventoryKpiCard(
+        title: "Low Stock Items", icon: "ic_warning_box", tint: AppColors.warning,
+        tile: AppColors.warningBg, caption: "At or below reorder level")
+    private let outCard = InventoryKpiCard(
+        title: "Out of Stock Items", icon: "ic_cancel_circle", tint: AppColors.danger,
+        tile: AppColors.dangerBg, caption: "Nothing on hand")
+    private let movementsCard = InventoryKpiCard(
+        title: "Stock Movement", icon: "ic_finance_report", tint: AppColors.info,
+        tile: AppColors.infoBg, caption: "Last 7 days")
     private let donutChart = DonutChartView()
     private let donutLegend = UIStackView.vertical(spacing: 3, alignment: .fill)
     private let categoryPill = FilterPillButton(title: "All Categories")
@@ -132,17 +142,23 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
         let kpiScroll = horizontalScroll(containing: kpiRow)
 
         donutChart.forAutoLayout()
+        donutChart.strokeWidth = 11
         NSLayoutConstraint.activate([
-            donutChart.widthAnchor.constraint(equalToConstant: 96),
-            donutChart.heightAnchor.constraint(equalToConstant: 96)
+            donutChart.widthAnchor.constraint(equalToConstant: 104),
+            donutChart.heightAnchor.constraint(equalToConstant: 104)
         ])
         let donutCard = StyleKit.cardView()
-        let donutRow = UIStackView.horizontal(spacing: 14, alignment: .center)
+        let donutRow = UIStackView.horizontal(spacing: 16, alignment: .center)
         donutRow.addArrangedSubview(donutChart)
         donutRow.addArrangedSubview(donutLegend)
-        donutRow.forAutoLayout()
-        donutCard.addSubview(donutRow)
-        donutRow.pinEdges(to: donutCard, insets: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12))
+        let donutStack = UIStackView.vertical(spacing: 12, alignment: .fill)
+        donutStack.addArrangedSubview(UILabel.make("Inventory Summary",
+                                                   font: AppFonts.bold(AppMetrics.textTitle),
+                                                   color: AppColors.topTitle))
+        donutStack.addArrangedSubview(donutRow)
+        donutStack.forAutoLayout()
+        donutCard.addSubview(donutStack)
+        donutStack.pinEdges(to: donutCard, insets: UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14))
 
         // Seven tabs never fit across a phone, so they scroll like the Products screen.
         let tabRow = UIStackView.horizontal(spacing: 18, alignment: .fill)
@@ -225,12 +241,14 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
     }
 
     private func bindSummary(_ summary: InventorySummaryData.Summary?) {
-        stockValueCard.set(text: "R" + format(Int64(summary?.totalStockValue ?? 0)),
-                           subtitle: "On-hand cost value")
-        unitsCard.set(text: format(summary?.totalUnits ?? 0), subtitle: "Sellable units")
-        lowCard.set(value: summary?.lowStockCount ?? 0, subtitle: "At or below reorder level")
-        outCard.set(value: summary?.outOfStockCount ?? 0, subtitle: "Nothing on hand")
-        movementsCard.set(value: summary?.movementsThisWeek ?? 0, subtitle: "Last 7 days")
+        let units = summary?.totalUnits ?? 0
+        stockValueCard.set("R" + format(Int64(summary?.totalStockValue ?? 0)))
+        unitsCard.set(format(units))
+        lowCard.set("\(summary?.lowStockCount ?? 0)")
+        outCard.set("\(summary?.outOfStockCount ?? 0)")
+        movementsCard.set("\(summary?.movementsThisWeek ?? 0)")
+        // The donut hole carries the headline number the cards break down.
+        donutChart.setCenterText(main: format(units), sub: "units")
     }
 
     /// Donut + legend from the chart slices the API returns (In Stock / Low / Out / Damaged).
@@ -361,7 +379,10 @@ final class InventoryViewController: BaseMainViewController, UICollectionViewDat
     }
 
     private func openDetails(_ row: InventoryPageData.Row, startOnHistory: Bool) {
-        let detail = InventoryDetailViewController(row: row, startOnHistory: startOnHistory)
+        let detail = InventoryDetailViewController(row: row, warehouses: warehouses,
+                                                   startOnHistory: startOnHistory)
+        // The drawer can adjust or transfer stock, so refresh the list behind it.
+        detail.onStockChanged = { [weak self] in self?.loadPage() }
         detail.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(detail, animated: true)
     }
