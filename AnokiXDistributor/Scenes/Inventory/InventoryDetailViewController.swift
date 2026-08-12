@@ -32,10 +32,12 @@ final class InventoryDetailViewController: BaseSecondaryViewController {
     private let breakdownStack = UIStackView.horizontal(spacing: 8, alignment: .fill)
     private let detailsPane = UIStackView.vertical(spacing: 16, alignment: .fill)
     private let historyPane = UIStackView.vertical(spacing: 10, alignment: .fill)
-    private let historyEmpty = UILabel.make("No stock movements recorded yet.",
-                                            font: AppFonts.regular(AppMetrics.textBody),
-                                            color: AppColors.textSecondary, align: .center, lines: 0)
+    private lazy var historyEmpty = makeHistoryEmptyState()
+    /// A history fetch has been started (so we don't ask twice).
     private var historyLoaded = false
+    /// A history response has been rendered, and whether it came back empty.
+    private var historyRendered = false
+    private var historyIsEmpty = false
 
     init(row: InventoryPageData.Row, warehouses: [InventoryPageData.Warehouse], startOnHistory: Bool) {
         self.row = row
@@ -317,18 +319,52 @@ final class InventoryDetailViewController: BaseSecondaryViewController {
             }
             self.warehouses = data.warehouses ?? self.warehouses
             self.render()
+            // The ledger just changed, so drop what we rendered before re-asking.
             self.historyLoaded = false
+            self.historyRendered = false
+            self.updateHistoryEmptyState()
             if !self.historyPane.isHidden { self.loadHistory() }
         }
     }
 
     // MARK: History
 
+    /// Empty state from New-Design/Inventory/8.Empty-History.png — tray glyph + one line.
+    private func makeHistoryEmptyState() -> UIView {
+        let icon = UIImageView(image: AppIcons.symbol("ic_empty_inbox"))
+        icon.tintColor = AppColors.border
+        icon.contentMode = .scaleAspectFit
+        icon.forAutoLayout()
+        NSLayoutConstraint.activate([
+            icon.widthAnchor.constraint(equalToConstant: 52),
+            icon.heightAnchor.constraint(equalToConstant: 52)
+        ])
+
+        let message = UILabel.make("Nothing has moved for this product yet.",
+                                   font: AppFonts.regular(AppMetrics.textBody),
+                                   color: AppColors.textTertiary, align: .center, lines: 0)
+
+        let stack = UIStackView.vertical(spacing: 14, alignment: .center)
+        stack.isLayoutMarginsRelativeArrangement = true
+        stack.layoutMargins = UIEdgeInsets(top: 48, left: 32, bottom: 24, right: 32)
+        stack.addArrangedSubview(icon)
+        stack.addArrangedSubview(message)
+        stack.isHidden = true
+        return stack
+    }
+
     private func showTab(history: Bool) {
         detailsPane.isHidden = history
         historyPane.isHidden = !history
-        historyEmpty.isHidden = !history || !historyPane.arrangedSubviews.isEmpty
+        updateHistoryEmptyState()
         if history && !historyLoaded { loadHistory() }
+    }
+
+    /// The empty panel belongs to the History tab only, and only once a response has
+    /// actually come back empty — so it survives switching tabs and never flashes while
+    /// the ledger is still loading.
+    private func updateHistoryEmptyState() {
+        historyEmpty.isHidden = !(historyPane.isHidden == false && historyRendered && historyIsEmpty)
     }
 
     private func loadHistory() {
@@ -350,8 +386,9 @@ final class InventoryDetailViewController: BaseSecondaryViewController {
         for movement in movements {
             historyPane.addArrangedSubview(historyCard(movement))
         }
-        // Only surfaces on the History tab, and only when the ledger came back empty.
-        historyEmpty.isHidden = !movements.isEmpty || historyPane.isHidden
+        historyRendered = true
+        historyIsEmpty = movements.isEmpty
+        updateHistoryEmptyState()
     }
 
     private func historyCard(_ movement: StockMovement) -> UIView {

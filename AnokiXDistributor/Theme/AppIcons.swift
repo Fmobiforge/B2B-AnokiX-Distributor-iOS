@@ -69,7 +69,8 @@ enum AppIcons {
         "ic_dots_horizontal": "ellipsis",
         "ic_phone": "phone.fill",
         "ic_refresh": "arrow.clockwise",
-        "ic_headset": "headphones"
+        "ic_headset": "headphones",
+        "ic_empty_inbox": "tray"
     ]
 
     static func symbol(_ name: String) -> UIImage? {
