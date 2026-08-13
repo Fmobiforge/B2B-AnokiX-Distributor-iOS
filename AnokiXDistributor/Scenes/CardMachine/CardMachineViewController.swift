@@ -10,6 +10,8 @@ final class CardMachineViewController: BaseSecondaryViewController {
     override var screenSubtitle: String? { "Take card payments on your PayCloud terminal" }
 
     private static let perPage = 10
+    /// Quick-amount pills on the payment hero, mirroring the wallet top-up sheet.
+    private static let quickAmounts = [50, 100, 200, 500, 1000]
 
     private var terminals: [PosTerminalsData.Terminal] = []
     private var activeTerminals: [PosTerminalsData.Terminal] { terminals.filter { $0.active } }
@@ -24,9 +26,12 @@ final class CardMachineViewController: BaseSecondaryViewController {
 
     private let amountField = UITextField()
     private let referenceField = UITextField()
-    private let terminalPicker = CardMachinePickerRow(placeholder: "Select a machine")
+    private let terminalPicker = CardMachineTerminalChip()
     private let sendButton = UIButton(type: .system)
     private let paymentFormStack = UIStackView.vertical(spacing: 12, alignment: .fill)
+    private let quickAmountRow = UIStackView.horizontal(spacing: 8, alignment: .center)
+    private var quickAmountChips: [UIButton] = []
+    private let paymentCountChip = PaddingLabel(insets: UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10))
     private let noMachineBanner = UIView()
     private let bannerTitle = UILabel.make(font: AppFonts.bold(AppMetrics.textBody),
                                            color: AppColors.textPrimary, lines: 0)
@@ -59,70 +64,164 @@ final class CardMachineViewController: BaseSecondaryViewController {
 
     // MARK: Take a card payment
 
+    /// The payment panel borrows the anokiX wallet's purple hero so the two money
+    /// screens share a visual language.
     private func buildPaymentCard() -> UIView {
-        let card = StyleKit.cardView()
+        let hero = GradientCardView()
 
-        let title = UILabel.make("Take a card payment", font: AppFonts.bold(AppMetrics.textDisplay),
-                                 color: AppColors.topTitle)
-        let subtitle = UILabel.make(
-            "The amount is sent to the machine — the customer taps, inserts or swipes there. Card details never pass through this screen.",
-            font: AppFonts.regular(AppMetrics.textCaption), color: AppColors.textSecondary, lines: 0)
-
-        buildBanner()
-
-        StyleKit.styleInput(amountField)
-        amountField.placeholder = "0.00"
-        amountField.keyboardType = .decimalPad
-        amountField.font = AppFonts.bold(AppMetrics.textTitle)
-        let currency = UILabel.make("R", font: AppFonts.bold(AppMetrics.textTitle),
-                                    color: AppColors.textSecondary)
-        currency.forAutoLayout()
-        let currencyHolder = UIView()
-        currencyHolder.addSubview(currency)
-        NSLayoutConstraint.activate([
-            currencyHolder.widthAnchor.constraint(equalToConstant: 26),
-            currency.leadingAnchor.constraint(equalTo: currencyHolder.leadingAnchor, constant: 10),
-            currency.centerYAnchor.constraint(equalTo: currencyHolder.centerYAnchor)
-        ])
-        amountField.leftView = currencyHolder
-        amountField.leftViewMode = .always
-
-        StyleKit.styleInput(referenceField)
-        referenceField.placeholder = "e.g. Invoice INV-1042"
-
+        let title = UILabel.make("Take a card payment", font: AppFonts.regular(AppMetrics.textBodySM),
+                                 color: .white)
+        title.alpha = 0.9
         terminalPicker.addTarget(self, action: #selector(pickTerminal), for: .touchUpInside)
 
+        let header = UIStackView.horizontal(spacing: 10, alignment: .center)
+        header.addArrangedSubview(title)
+        header.addArrangedSubview(UIView())
+        header.addArrangedSubview(terminalPicker)
+
+        // Amount reads as the headline figure, like the wallet balance.
+        let currency = UILabel.make("R", font: AppFonts.bold(22), color: .white)
+        currency.alpha = 0.75
+        currency.setContentHuggingPriority(.required, for: .horizontal)
+        amountField.borderStyle = .none
+        amountField.backgroundColor = .clear
+        amountField.keyboardType = .decimalPad
+        amountField.font = AppFonts.bold(34)
+        amountField.textColor = .white
+        amountField.attributedPlaceholder = NSAttributedString(
+            string: "0.00", attributes: [.foregroundColor: UIColor.white.withAlphaComponent(0.5)])
+        amountField.addTarget(self, action: #selector(amountChanged), for: .editingChanged)
+
+        let amountRow = UIStackView.horizontal(spacing: 8, alignment: .lastBaseline)
+        amountRow.addArrangedSubview(currency)
+        amountRow.addArrangedSubview(amountField)
+
+        let underline = UIView()
+        underline.backgroundColor = UIColor.white.withAlphaComponent(0.25)
+        underline.constrainHeight(1)
+
+        buildQuickAmounts()
+        let quickScroll = UIScrollView()
+        quickScroll.showsHorizontalScrollIndicator = false
+        quickAmountRow.forAutoLayout()
+        quickScroll.addSubview(quickAmountRow)
+        quickScroll.forAutoLayout()
+        NSLayoutConstraint.activate([
+            quickAmountRow.topAnchor.constraint(equalTo: quickScroll.contentLayoutGuide.topAnchor),
+            quickAmountRow.leadingAnchor.constraint(equalTo: quickScroll.contentLayoutGuide.leadingAnchor),
+            quickAmountRow.trailingAnchor.constraint(equalTo: quickScroll.contentLayoutGuide.trailingAnchor),
+            quickAmountRow.bottomAnchor.constraint(equalTo: quickScroll.contentLayoutGuide.bottomAnchor),
+            quickAmountRow.heightAnchor.constraint(equalTo: quickScroll.frameLayoutGuide.heightAnchor)
+        ])
+
+        referenceField.backgroundColor = UIColor.white.withAlphaComponent(0.15)
+        referenceField.layer.cornerRadius = AppMetrics.radiusMD
+        referenceField.layer.borderWidth = 1
+        referenceField.layer.borderColor = UIColor.white.withAlphaComponent(0.25).cgColor
+        referenceField.textColor = .white
+        referenceField.font = AppFonts.regular(AppMetrics.textBody)
+        referenceField.attributedPlaceholder = NSAttributedString(
+            string: "e.g. Invoice INV-1042",
+            attributes: [.foregroundColor: UIColor.white.withAlphaComponent(0.6)])
+        referenceField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 14, height: 1))
+        referenceField.leftViewMode = .always
+        referenceField.rightView = UIView(frame: CGRect(x: 0, y: 0, width: 14, height: 1))
+        referenceField.rightViewMode = .always
+        referenceField.constrainHeight(46)
+
+        var config = UIButton.Configuration.filled()
+        config.baseBackgroundColor = .white
+        config.baseForegroundColor = AppColors.purpleDark
+        config.cornerStyle = .medium
+        config.image = UIImage(systemName: "creditcard.fill")
+        config.imagePadding = 8
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var out = incoming; out.font = AppFonts.bold(15); return out
+        }
+        sendButton.configuration = config
         sendButton.setTitle("Send to machine", for: .normal)
-        sendButton.setImage(UIImage(systemName: "creditcard"), for: .normal)
-        StyleKit.stylePrimaryButton(sendButton)
-        sendButton.configuration?.imagePadding = 8
         sendButton.constrainHeight(50)
         sendButton.addTarget(self, action: #selector(sendPayment), for: .touchUpInside)
 
-        paymentFormStack.addArrangedSubview(fieldGroup("Amount", amountField))
-        paymentFormStack.addArrangedSubview(fieldGroup("Card machine", terminalPicker))
-        paymentFormStack.addArrangedSubview(fieldGroup("Reference (optional)", referenceField))
+        buildBanner()
+
+        let secureIcon = UIImageView(image: UIImage(systemName: "checkmark.shield.fill"))
+        secureIcon.tintColor = UIColor.white.withAlphaComponent(0.75)
+        secureIcon.contentMode = .scaleAspectFit
+        secureIcon.forAutoLayout()
+        NSLayoutConstraint.activate([
+            secureIcon.widthAnchor.constraint(equalToConstant: 13),
+            secureIcon.heightAnchor.constraint(equalToConstant: 13)
+        ])
+        let secureLabel = UILabel.make("Card details never pass through this app — Powered by PayCloud",
+                                       font: AppFonts.regular(AppMetrics.textMicro),
+                                       color: UIColor.white.withAlphaComponent(0.75), lines: 0)
+        let secureRow = UIStackView.horizontal(spacing: 6, alignment: .center)
+        secureRow.addArrangedSubview(secureIcon)
+        secureRow.addArrangedSubview(secureLabel)
+
+        paymentFormStack.addArrangedSubview(amountRow)
+        paymentFormStack.addArrangedSubview(underline)
+        paymentFormStack.addArrangedSubview(quickScroll)
+        paymentFormStack.addArrangedSubview(referenceField)
         paymentFormStack.addArrangedSubview(sendButton)
-        paymentFormStack.setCustomSpacing(16, after: paymentFormStack.arrangedSubviews[2])
+        paymentFormStack.setCustomSpacing(4, after: amountRow)
+        paymentFormStack.setCustomSpacing(14, after: underline)
 
         let stack = UIStackView.vertical(spacing: 14, alignment: .fill)
-        stack.addArrangedSubview(title)
-        stack.addArrangedSubview(subtitle)
-        stack.addArrangedSubview(noMachineBanner)
+        stack.addArrangedSubview(header)
         stack.addArrangedSubview(paymentFormStack)
-        stack.setCustomSpacing(4, after: title)
+        stack.addArrangedSubview(noMachineBanner)
+        stack.addArrangedSubview(secureRow)
         stack.forAutoLayout()
-        card.addSubview(stack)
-        stack.pinEdges(to: card, insets: UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16))
-        return card
+        hero.addSubview(stack)
+        stack.pinEdges(to: hero, insets: UIEdgeInsets(top: 18, left: 18, bottom: 18, right: 18))
+        return hero
+    }
+
+    private func buildQuickAmounts() {
+        quickAmountChips = Self.quickAmounts.map { amount in
+            let chip = UIButton(type: .system)
+            var config = UIButton.Configuration.plain()
+            config.title = "R\(amount)"
+            config.baseForegroundColor = .white
+            config.background.backgroundColor = UIColor.white.withAlphaComponent(0.15)
+            config.background.strokeColor = UIColor.white.withAlphaComponent(0.3)
+            config.background.strokeWidth = 1
+            config.background.cornerRadius = 18
+            config.contentInsets = NSDirectionalEdgeInsets(top: 7, leading: 14, bottom: 7, trailing: 14)
+            config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+                var out = incoming; out.font = AppFonts.bold(12); return out
+            }
+            chip.configuration = config
+            chip.addAction(UIAction { [weak self] _ in
+                self?.amountField.text = String(amount)
+                self?.amountChanged()
+            }, for: .touchUpInside)
+            quickAmountRow.addArrangedSubview(chip)
+            return chip
+        }
+    }
+
+    /// Lights the pill that matches what is typed, so the shortcut stays honest.
+    @objc private func amountChanged() {
+        let typed = Double((amountField.text ?? "").replacingOccurrences(of: ",", with: ".")) ?? 0
+        for (index, chip) in quickAmountChips.enumerated() {
+            let match = abs(Double(Self.quickAmounts[index]) - typed) < 0.005
+            chip.configuration?.baseForegroundColor = match ? AppColors.purpleDark : .white
+            chip.configuration?.background.backgroundColor = match
+                ? .white : UIColor.white.withAlphaComponent(0.15)
+        }
     }
 
     private func buildBanner() {
-        noMachineBanner.backgroundColor = AppColors.infoBg
+        noMachineBanner.backgroundColor = UIColor.white.withAlphaComponent(0.15)
         noMachineBanner.layer.cornerRadius = AppMetrics.radiusMD
+        noMachineBanner.layer.borderWidth = 1
+        noMachineBanner.layer.borderColor = UIColor.white.withAlphaComponent(0.25).cgColor
 
         let icon = UIImageView(image: UIImage(systemName: "info.circle.fill"))
-        icon.tintColor = AppColors.info
+        icon.tintColor = .white
         icon.contentMode = .scaleAspectFit
         icon.forAutoLayout()
         NSLayoutConstraint.activate([
@@ -130,6 +229,8 @@ final class CardMachineViewController: BaseSecondaryViewController {
             icon.heightAnchor.constraint(equalToConstant: 20)
         ])
 
+        bannerTitle.textColor = .white
+        bannerBody.textColor = UIColor.white.withAlphaComponent(0.85)
         bannerTitle.text = "No card machine added yet"
         bannerBody.text = "Add one below using the serial number printed on the device."
 
@@ -144,15 +245,6 @@ final class CardMachineViewController: BaseSecondaryViewController {
         noMachineBanner.addSubview(row)
         row.pinEdges(to: noMachineBanner, insets: UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14))
         noMachineBanner.isHidden = true
-    }
-
-    private func fieldGroup(_ label: String, _ field: UIView) -> UIStackView {
-        let title = UILabel.make(label, font: AppFonts.regular(AppMetrics.textBody),
-                                 color: AppColors.textPrimary)
-        let stack = UIStackView.vertical(spacing: 5, alignment: .fill)
-        stack.addArrangedSubview(title)
-        stack.addArrangedSubview(field)
-        return stack
     }
 
     @objc private func pickTerminal() {
@@ -182,11 +274,11 @@ final class CardMachineViewController: BaseSecondaryViewController {
             presentInfo("Select a card machine."); return
         }
 
-        sendButton.isEnabled = false
+        setSending(true)
         ApiClient.shared.sendPosPayment(amount: amount, terminalId: terminal.id,
                                         description: referenceField.text ?? "") { [weak self] result in
             guard let self = self else { return }
-            self.sendButton.isEnabled = true
+            self.setSending(false)
             switch result {
             case .success(let message):
                 self.toast(message.isEmpty
@@ -194,6 +286,7 @@ final class CardMachineViewController: BaseSecondaryViewController {
                            : message)
                 self.amountField.text = ""
                 self.referenceField.text = ""
+                self.amountChanged()
             case .failure(let error):
                 // The terminal's own error ("device does not exist") lands here.
                 let alert = UIAlertController(title: "Send to machine", message: error.message,
@@ -206,44 +299,75 @@ final class CardMachineViewController: BaseSecondaryViewController {
         }
     }
 
+    /// Pushing to a terminal takes a moment — say so instead of freezing the button.
+    private func setSending(_ sending: Bool) {
+        sendButton.isEnabled = !sending
+        sendButton.alpha = sending ? 0.7 : 1
+        sendButton.setTitle(sending ? "Sending to machine…" : "Send to machine", for: .normal)
+    }
+
     // MARK: Your card machines
 
     private func buildMachinesCard() -> UIView {
         let card = StyleKit.cardView()
 
-        let title = UILabel.make("Your card machines", font: AppFonts.bold(AppMetrics.textDisplay),
-                                 color: AppColors.topTitle)
         let addButton = UIButton(type: .system)
-        addButton.setTitle("Add machine", for: .normal)
+        addButton.setTitle("Add", for: .normal)
         addButton.setImage(UIImage(systemName: "plus"), for: .normal)
         StyleKit.styleOutlinedButton(addButton, fontSize: AppMetrics.textBodySM)
         addButton.configuration?.contentInsets = NSDirectionalEdgeInsets(
-            top: 10, leading: 14, bottom: 10, trailing: 14)
-        addButton.configuration?.imagePadding = 6
+            top: 9, leading: 12, bottom: 9, trailing: 12)
+        addButton.configuration?.imagePadding = 4
         addButton.setContentHuggingPriority(.required, for: .horizontal)
         addButton.addTarget(self, action: #selector(addMachine), for: .touchUpInside)
 
-        let header = UIStackView.horizontal(spacing: 12, alignment: .center)
-        header.addArrangedSubview(title)
-        header.addArrangedSubview(UIView())
-        header.addArrangedSubview(addButton)
-
-        let subtitle = UILabel.make("Identified by the serial number printed on the device.",
-                                    font: AppFonts.regular(AppMetrics.textCaption),
-                                    color: AppColors.textSecondary, lines: 0)
+        let header = sectionHeader(icon: "creditcard.fill", tint: AppColors.purplePrimary,
+                                   tile: AppColors.purpleLight, title: "Your card machines",
+                                   subtitle: "Identified by the serial number printed on the device.",
+                                   trailing: addButton)
 
         machinesEmpty.isHidden = true
 
-        let stack = UIStackView.vertical(spacing: 6, alignment: .fill)
+        let stack = UIStackView.vertical(spacing: 8, alignment: .fill)
         stack.addArrangedSubview(header)
-        stack.addArrangedSubview(subtitle)
         stack.addArrangedSubview(machineStack)
         stack.addArrangedSubview(machinesEmpty)
-        stack.setCustomSpacing(4, after: header)
         stack.forAutoLayout()
         card.addSubview(stack)
         stack.pinEdges(to: card, insets: UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16))
         return card
+    }
+
+    /// Icon tile + title/subtitle + optional trailing control, shared by both cards.
+    private func sectionHeader(icon: String, tint: UIColor, tile: UIColor, title: String,
+                               subtitle: String, trailing: UIView?) -> UIView {
+        let tileView = StyleKit.iconTile(color: tile, radius: AppMetrics.radiusSM)
+        tileView.forAutoLayout()
+        let iconView = UIImageView(image: UIImage(systemName: icon))
+        iconView.tintColor = tint
+        iconView.contentMode = .scaleAspectFit
+        iconView.forAutoLayout()
+        tileView.addSubview(iconView)
+        NSLayoutConstraint.activate([
+            tileView.widthAnchor.constraint(equalToConstant: 32),
+            tileView.heightAnchor.constraint(equalToConstant: 32),
+            iconView.centerXAnchor.constraint(equalTo: tileView.centerXAnchor),
+            iconView.centerYAnchor.constraint(equalTo: tileView.centerYAnchor),
+            iconView.widthAnchor.constraint(equalToConstant: 17),
+            iconView.heightAnchor.constraint(equalToConstant: 17)
+        ])
+
+        let text = UIStackView.vertical(spacing: 1, alignment: .leading)
+        text.addArrangedSubview(UILabel.make(title, font: AppFonts.bold(AppMetrics.textTitle),
+                                             color: AppColors.topTitle))
+        text.addArrangedSubview(UILabel.make(subtitle, font: AppFonts.regular(AppMetrics.textMicro),
+                                             color: AppColors.textSecondary, lines: 0))
+
+        let row = UIStackView.horizontal(spacing: 10, alignment: .center)
+        row.addArrangedSubview(tileView)
+        row.addArrangedSubview(text)
+        if let trailing = trailing { row.addArrangedSubview(trailing) }
+        return row
     }
 
     private func loadTerminals() {
@@ -272,6 +396,7 @@ final class CardMachineViewController: BaseSecondaryViewController {
         // send to, so the form gives way to an explanatory banner.
         let canTakePayment = posConfigured && !activeTerminals.isEmpty
         paymentFormStack.isHidden = !canTakePayment
+        terminalPicker.isHidden = activeTerminals.isEmpty
         noMachineBanner.isHidden = canTakePayment
         bannerTitle.text = posConfigured
             ? "No card machine added yet"
@@ -290,53 +415,78 @@ final class CardMachineViewController: BaseSecondaryViewController {
     }
 
     private func machineRow(_ terminal: PosTerminalsData.Terminal) -> UIView {
-        let tile = StyleKit.iconTile(color: AppColors.purpleLight)
+        let active = terminal.active
+
+        // Muted styling once a machine is unlinked, so the live one stands out.
+        let tile = StyleKit.iconTile(color: active ? AppColors.purpleLight : AppColors.borderLight)
         tile.forAutoLayout()
         let icon = UIImageView(image: UIImage(systemName: "creditcard.fill"))
-        icon.tintColor = AppColors.purplePrimary
+        icon.tintColor = active ? AppColors.purplePrimary : AppColors.textTertiary
         icon.contentMode = .scaleAspectFit
         icon.forAutoLayout()
         tile.addSubview(icon)
         NSLayoutConstraint.activate([
-            tile.widthAnchor.constraint(equalToConstant: 38),
-            tile.heightAnchor.constraint(equalToConstant: 38),
+            tile.widthAnchor.constraint(equalToConstant: 40),
+            tile.heightAnchor.constraint(equalToConstant: 40),
             icon.centerXAnchor.constraint(equalTo: tile.centerXAnchor),
             icon.centerYAnchor.constraint(equalTo: tile.centerYAnchor),
             icon.widthAnchor.constraint(equalToConstant: 19),
             icon.heightAnchor.constraint(equalToConstant: 19)
         ])
 
+        let dot = UIView()
+        dot.backgroundColor = active ? AppColors.success : AppColors.textTertiary
+        dot.layer.cornerRadius = 3.5
+        dot.constrainSize(7)
         let name = UILabel.make(terminal.displayName, font: AppFonts.bold(AppMetrics.textBody),
                                 color: AppColors.topTitle)
+        let nameRow = UIStackView.horizontal(spacing: 6, alignment: .center)
+        nameRow.addArrangedSubview(dot)
+        nameRow.addArrangedSubview(name)
+
         let serial = UILabel()
         serial.text = terminal.terminalSn
-        serial.font = UIFont.monospacedSystemFont(ofSize: AppMetrics.textCaption, weight: .regular)
+        serial.font = UIFont.monospacedSystemFont(ofSize: AppMetrics.textMicro, weight: .regular)
         serial.textColor = AppColors.textSecondary
+
         let text = UIStackView.vertical(spacing: 2, alignment: .leading)
-        text.addArrangedSubview(name)
+        text.addArrangedSubview(nameRow)
         text.addArrangedSubview(serial)
+        text.alpha = active ? 1 : 0.6
 
         let badge = PaddingLabel(insets: UIEdgeInsets(top: 3, left: 8, bottom: 3, right: 8))
         StyleKit.styleBadge(badge)
         badge.font = AppFonts.bold(AppMetrics.textMicro)
-        badge.text = terminal.active ? "Active" : "Removed"
-        badge.textColor = terminal.active ? AppColors.success : AppColors.textSecondary
-        badge.backgroundColor = terminal.active ? AppColors.successBg : AppColors.borderLight
+        badge.text = active ? "Active" : "Removed"
+        badge.textColor = active ? AppColors.success : AppColors.textSecondary
+        badge.backgroundColor = active ? AppColors.successBg : AppColors.borderLight
+        badge.setContentHuggingPriority(.required, for: .horizontal)
 
-        let trailing = UIStackView.vertical(spacing: 6, alignment: .trailing)
+        let trailing = UIStackView.horizontal(spacing: 8, alignment: .center)
         trailing.addArrangedSubview(badge)
-        if terminal.active {
+        if active {
             let remove = UIButton(type: .system)
-            remove.setTitle("Remove", for: .normal)
-            remove.setTitleColor(AppColors.danger, for: .normal)
-            remove.titleLabel?.font = AppFonts.bold(AppMetrics.textCaption)
+            var config = UIButton.Configuration.plain()
+            config.image = UIImage(systemName: "trash")
+            config.baseForegroundColor = AppColors.danger
+            config.background.backgroundColor = AppColors.surfaceVariant
+            config.background.strokeColor = AppColors.border
+            config.background.strokeWidth = 1
+            config.background.cornerRadius = 17
+            config.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)
+            remove.configuration = config
+            remove.forAutoLayout()
+            NSLayoutConstraint.activate([
+                remove.widthAnchor.constraint(equalToConstant: 34),
+                remove.heightAnchor.constraint(equalToConstant: 34)
+            ])
             remove.addAction(UIAction { [weak self] _ in self?.confirmRemove(terminal) }, for: .touchUpInside)
             trailing.addArrangedSubview(remove)
         }
 
         let row = UIStackView.horizontal(spacing: 12, alignment: .center)
         row.isLayoutMarginsRelativeArrangement = true
-        row.layoutMargins = UIEdgeInsets(top: 14, left: 0, bottom: 14, right: 0)
+        row.layoutMargins = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
         row.addArrangedSubview(tile)
         row.addArrangedSubview(text)
         row.addArrangedSubview(UIView())
@@ -402,11 +552,17 @@ final class CardMachineViewController: BaseSecondaryViewController {
     private func buildPaymentsCard() -> UIView {
         let card = StyleKit.cardView()
 
-        let title = UILabel.make("Card machine payments", font: AppFonts.bold(AppMetrics.textDisplay),
-                                 color: AppColors.topTitle)
-        let subtitle = UILabel.make("Every payment taken on a machine, newest first.",
-                                    font: AppFonts.regular(AppMetrics.textCaption),
-                                    color: AppColors.textSecondary, lines: 0)
+        StyleKit.styleBadge(paymentCountChip)
+        paymentCountChip.font = AppFonts.bold(AppMetrics.textMicro)
+        paymentCountChip.textColor = AppColors.purplePrimary
+        paymentCountChip.backgroundColor = AppColors.purpleLight
+        paymentCountChip.setContentHuggingPriority(.required, for: .horizontal)
+        paymentCountChip.isHidden = true
+
+        let header = sectionHeader(icon: "doc.plaintext.fill", tint: AppColors.info,
+                                   tile: AppColors.infoBg, title: "Card machine payments",
+                                   subtitle: "Every payment taken on a machine, newest first.",
+                                   trailing: paymentCountChip)
 
         let emptyIcon = UIImageView(image: AppIcons.symbol("ic_empty_inbox"))
         emptyIcon.tintColor = AppColors.border
@@ -443,13 +599,11 @@ final class CardMachineViewController: BaseSecondaryViewController {
         paginationRow.addArrangedSubview(nextButton)
         paginationRow.isHidden = true
 
-        let stack = UIStackView.vertical(spacing: 10, alignment: .fill)
-        stack.addArrangedSubview(title)
-        stack.addArrangedSubview(subtitle)
+        let stack = UIStackView.vertical(spacing: 12, alignment: .fill)
+        stack.addArrangedSubview(header)
         stack.addArrangedSubview(paymentStack)
         stack.addArrangedSubview(paymentsEmpty)
         stack.addArrangedSubview(paginationRow)
-        stack.setCustomSpacing(4, after: title)
         stack.forAutoLayout()
         card.addSubview(stack)
         stack.pinEdges(to: card, insets: UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16))
@@ -497,6 +651,8 @@ final class CardMachineViewController: BaseSecondaryViewController {
             paymentStack.addArrangedSubview(paymentRow(payment))
         }
         paymentsEmpty.isHidden = !payments.isEmpty
+        paymentCountChip.text = "\(totalPayments)"
+        paymentCountChip.isHidden = totalPayments == 0
 
         paginationRow.isHidden = totalPayments == 0
         if totalPayments > 0 {
@@ -552,9 +708,24 @@ final class CardMachineViewController: BaseSecondaryViewController {
             stack.setCustomSpacing(8, after: stack.arrangedSubviews[stack.arrangedSubviews.count - 2])
         }
 
+        // Colour rail down the left edge so the outcome reads at a glance.
+        let rail = UIView()
+        rail.backgroundColor = colors.fg
+        rail.forAutoLayout()
+
         stack.forAutoLayout()
-        card.addSubview(stack)
-        stack.pinEdges(to: card, insets: UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14))
+        card.addSubviews(rail, stack)
+        NSLayoutConstraint.activate([
+            rail.leadingAnchor.constraint(equalTo: card.leadingAnchor),
+            rail.topAnchor.constraint(equalTo: card.topAnchor),
+            rail.bottomAnchor.constraint(equalTo: card.bottomAnchor),
+            rail.widthAnchor.constraint(equalToConstant: 3),
+            stack.leadingAnchor.constraint(equalTo: rail.trailingAnchor, constant: 11),
+            stack.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -14),
+            stack.topAnchor.constraint(equalTo: card.topAnchor, constant: 13),
+            stack.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -13)
+        ])
+        card.clipsToBounds = true
         return card
     }
 
@@ -608,50 +779,81 @@ final class CardMachineViewController: BaseSecondaryViewController {
     }
 }
 
-/// Bordered select row matching the text inputs beside it (ProductDropdown on Android).
-final class CardMachinePickerRow: UIControl {
+/// Purple gradient panel — the wallet balance hero (bg_wallet_balance_card on Android).
+final class GradientCardView: UIView {
 
-    private let placeholder: String
+    private let gradient = CAGradientLayer()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        layer.cornerRadius = AppMetrics.radiusXL
+        layer.masksToBounds = true
+        gradient.colors = [UIColor(hex: 0x7C3AED).cgColor,
+                           UIColor(hex: 0x6D3AEA).cgColor,
+                           UIColor(hex: 0x5B21B6).cgColor]
+        gradient.startPoint = CGPoint(x: 0, y: 0)
+        gradient.endPoint = CGPoint(x: 1, y: 1)
+        layer.insertSublayer(gradient, at: 0)
+    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradient.frame = bounds
+    }
+}
+
+/// Glass chip on the payment hero showing (and switching) the target machine.
+final class CardMachineTerminalChip: UIControl {
+
     private let label = UILabel()
 
-    init(placeholder: String) {
-        self.placeholder = placeholder
-        super.init(frame: .zero)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = UIColor.white.withAlphaComponent(0.2)
+        layer.cornerRadius = AppMetrics.radiusSM
 
-        backgroundColor = AppColors.surface
-        layer.cornerRadius = AppMetrics.radiusMD
-        layer.borderWidth = 1
-        layer.borderColor = AppColors.border.cgColor
+        let icon = UIImageView(image: UIImage(systemName: "creditcard.fill"))
+        icon.tintColor = .white
+        icon.contentMode = .scaleAspectFit
+        icon.forAutoLayout()
 
-        label.text = placeholder
-        label.font = AppFonts.regular(AppMetrics.textBody)
-        label.textColor = AppColors.textSecondary
+        label.text = "Select a machine"
+        label.font = AppFonts.bold(AppMetrics.textCaption)
+        label.textColor = .white
         label.lineBreakMode = .byTruncatingTail
         label.forAutoLayout()
 
         let chevron = UIImageView(image: UIImage(systemName: "chevron.down"))
-        chevron.tintColor = AppColors.textSecondary
+        chevron.tintColor = .white
         chevron.contentMode = .scaleAspectFit
         chevron.forAutoLayout()
 
-        addSubviews(label, chevron)
+        let row = UIStackView.horizontal(spacing: 6, alignment: .center)
+        row.isUserInteractionEnabled = false
+        row.addArrangedSubview(icon)
+        row.addArrangedSubview(label)
+        row.addArrangedSubview(chevron)
+        row.forAutoLayout()
+        addSubview(row)
+
         NSLayoutConstraint.activate([
-            heightAnchor.constraint(equalToConstant: 48),
-            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            label.centerYAnchor.constraint(equalTo: centerYAnchor),
-            chevron.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 8),
-            chevron.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
-            chevron.centerYAnchor.constraint(equalTo: centerYAnchor),
-            chevron.widthAnchor.constraint(equalToConstant: 14),
-            chevron.heightAnchor.constraint(equalToConstant: 14)
+            heightAnchor.constraint(equalToConstant: 34),
+            icon.widthAnchor.constraint(equalToConstant: 15),
+            icon.heightAnchor.constraint(equalToConstant: 15),
+            chevron.widthAnchor.constraint(equalToConstant: 12),
+            chevron.heightAnchor.constraint(equalToConstant: 12),
+            label.widthAnchor.constraint(lessThanOrEqualToConstant: 120),
+            row.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+            row.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+            row.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    /// Passing nil restores the placeholder styling.
+    /// Passing nil restores the "Select a machine" placeholder.
     func setTitle(_ title: String?) {
         let value = title?.trimmingCharacters(in: .whitespaces) ?? ""
-        label.text = value.isEmpty ? placeholder : value
-        label.textColor = value.isEmpty ? AppColors.textSecondary : AppColors.textPrimary
+        label.text = value.isEmpty ? "Select a machine" : value
     }
 }
