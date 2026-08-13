@@ -13,6 +13,7 @@ enum Router {
         case "finances": return FinancesViewController()
         case "wallet": return WalletViewController()
         case "card_machine": return CardMachineViewController()
+        case "warehouse_staff": return WarehouseStaffViewController()
         case "reports": return ReportsViewController()
         case "deliveries": return DeliveriesViewController()
         case "returns": return ReturnsViewController()

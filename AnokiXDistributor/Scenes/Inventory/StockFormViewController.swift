@@ -91,6 +91,39 @@ final class StockFormViewController: UIViewController {
         return field
     }
 
+    /// Password field with the eye button that flips between dots and plain text.
+    @discardableResult
+    func addSecureField(placeholder: String) -> UITextField {
+        let field = addTextField(placeholder: placeholder)
+        field.isSecureTextEntry = true
+        field.autocapitalizationType = .none
+        field.autocorrectionType = .no
+
+        let toggle = UIButton(type: .system)
+        toggle.setImage(UIImage(systemName: "eye"), for: .normal)
+        toggle.tintColor = AppColors.textSecondary
+        toggle.frame = CGRect(x: 0, y: 0, width: 38, height: 38)
+        toggle.addAction(UIAction { [weak field] _ in
+            guard let field = field else { return }
+            field.isSecureTextEntry.toggle()
+            toggle.setImage(UIImage(systemName: field.isSecureTextEntry ? "eye" : "eye.slash"),
+                            for: .normal)
+        }, for: .touchUpInside)
+        field.rightView = toggle
+        field.rightViewMode = .always
+        return field
+    }
+
+    /// Caption under the previous field (e.g. "They sign in with this.").
+    func addCaption(_ text: String) {
+        let label = UILabel.make(text, font: AppFonts.regular(AppMetrics.textMicro),
+                                 color: AppColors.textSecondary, lines: 0)
+        fieldStack.addArrangedSubview(label)
+        if fieldStack.arrangedSubviews.count >= 2 {
+            fieldStack.setCustomSpacing(4, after: fieldStack.arrangedSubviews[fieldStack.arrangedSubviews.count - 2])
+        }
+    }
+
     @discardableResult
     func addPicker(title: String, options: [String], selectedIndex: Int?) -> StockFormPicker {
         let picker = StockFormPicker(title: title, options: options, selectedIndex: selectedIndex)

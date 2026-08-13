@@ -339,6 +339,44 @@ struct StockHistoryData: Decodable {
     let total: Int?
 }
 
+// MARK: - Warehouse staff
+
+/// data block of GET /api/distributor/staff — the warehouse staff who sign in with their
+/// own credentials to pick, pack and handle stock.
+struct StaffData: Decodable {
+    let staff: [Staff]?
+    let total: Int?
+    /// What the role is allowed to do server-side, e.g. ["fulfil", "stock"].
+    let staffCapabilities: [String]?
+
+    struct Staff: Decodable {
+        let id: Int64
+        let userId: Int64?
+        let name: String?
+        let firstName: String?
+        let lastName: String?
+        let email: String?
+        let phone: String?
+        let jobTitle: String?
+        /// "active" / "disabled".
+        let status: String?
+        let roleLabel: String?
+        let createdAt: String?
+        let canSignIn: Bool?
+
+        var isActive: Bool { status?.lowercased() == "active" }
+        var signInAllowed: Bool { canSignIn ?? isActive }
+
+        /// Falls back to the two name parts when the joined name is missing.
+        var displayName: String {
+            let joined = name?.trimmingCharacters(in: .whitespaces) ?? ""
+            if !joined.isEmpty { return joined }
+            return [firstName, lastName].compactMap { $0 }.joined(separator: " ")
+                .trimmingCharacters(in: .whitespaces)
+        }
+    }
+}
+
 // MARK: - Card machine (PayCloud POS)
 
 /// data block of GET /api/common/pos/terminals — the card machines linked to this

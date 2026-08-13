@@ -248,6 +248,38 @@ final class ApiClient {
         getAuthed("api/distributor/inventory/summary", query: nil, type: InventorySummaryData.self, completion: completion)
     }
 
+    // MARK: Warehouse staff
+
+    /// Warehouse staff who can sign in to pick, pack and handle stock.
+    func getStaff(completion: @escaping (Result<StaffData, ApiError>) -> Void) {
+        getAuthed("api/distributor/staff", query: nil, type: StaffData.self, completion: completion)
+    }
+
+    /// Creates a staff login (api/distributor/staff).
+    func addStaff(firstName: String, lastName: String, email: String, password: String,
+                  phone: String, jobTitle: String,
+                  completion: @escaping (Result<String, ApiError>) -> Void) {
+        var form = ["first_name": firstName, "last_name": lastName,
+                    "email": email, "password": password]
+        if !phone.isEmpty { form["phone_number"] = phone }
+        if !jobTitle.isEmpty { form["job_title"] = jobTitle }
+        postMessage("api/distributor/staff", form: form, completion: completion)
+    }
+
+    /// Sets a new sign-in password for a staff member (they are not emailed).
+    func setStaffPassword(staffId: Int64, password: String,
+                          completion: @escaping (Result<String, ApiError>) -> Void) {
+        postMessage("api/distributor/staff/password",
+                    form: ["staff_id": String(staffId), "password": password], completion: completion)
+    }
+
+    /// Turns a staff member's sign-in on ("active") or off ("disabled").
+    func updateStaffStatus(staffId: Int64, status: String,
+                           completion: @escaping (Result<String, ApiError>) -> Void) {
+        postMessage("api/distributor/staff/update",
+                    form: ["staff_id": String(staffId), "status": status], completion: completion)
+    }
+
     // MARK: Card machine (PayCloud POS)
 
     /// Card machines linked to this account (api/common/pos/terminals).
