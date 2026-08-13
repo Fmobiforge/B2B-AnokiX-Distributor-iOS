@@ -2,28 +2,23 @@ import UIKit
 
 /// "Generate a report" (New-Design/Report/3.Generate-Report.png, 4.Generate-Report-Options.png).
 ///
-/// A bottom sheet rather than a centre dialog: the three fields are all pickers, and a
-/// sheet keeps them within thumb reach. Category narrows the Report list — the API's
-/// `report_key` is all the generate call needs, so Category is an optional filter rather
-/// than a required step and defaults to "All Categories".
+/// A bottom sheet rather than a centre dialog: both fields are pickers, and a sheet keeps
+/// them within thumb reach. Report and Period are the whole form — a report already
+/// carries its category, so asking for one here would be a second way to say the same
+/// thing (the list screen keeps its Category filter, which is a different job).
 ///
-/// "Generate again" on a report card opens the same sheet with that report's category,
-/// report and original period already selected, so the user only confirms.
+/// "Generate again" on a report card opens the same sheet with that report and its
+/// original period already selected, so the user only confirms.
 final class GenerateReportViewController: UIViewController {
 
     /// Called after a successful generate, with the server's confirmation message.
     var onGenerated: ((String) -> Void)?
 
-    /// Category options from the requirements — the web dropdown, in its own order.
-    private static let categories = ["Sales", "Traders", "Inventory", "Deliveries", "Finance", "Products"]
-
     private let data: ReportsData
-    private var category = ""
     private var selected: ReportsData.Available?
     private var periodStart: Date
     private var periodEnd: Date
 
-    private let categoryField = FieldRow(placeholder: S.allCategories, icon: "chevron.down")
     private let reportField = FieldRow(placeholder: S.chooseAReport, icon: "chevron.down")
     private let aboutLabel = UILabel.make(font: AppFonts.regular(11),
                                           color: AppColors.textSecondary, lines: 0)
@@ -43,7 +38,6 @@ final class GenerateReportViewController: UIViewController {
         // Seed from the report being regenerated, so the sheet opens ready to confirm.
         if let report = repeating {
             selected = data.findAvailable(name: report.name, category: report.category)
-            category = selected?.category ?? ""
             if let from = Self.parseApiDate(report.periodFrom),
                let to = Self.parseApiDate(report.periodTo) {
                 periodStart = from
@@ -86,7 +80,6 @@ final class GenerateReportViewController: UIViewController {
         help.layer.cornerRadius = AppMetrics.radiusMD
         help.layer.masksToBounds = true
 
-        categoryField.onTap = { [weak self] in self?.pickCategory() }
         reportField.onTap = { [weak self] in self?.pickReport() }
         periodField.onTap = { [weak self] in self?.pickPeriod() }
 
@@ -110,7 +103,6 @@ final class GenerateReportViewController: UIViewController {
         let stack = UIStackView.vertical(spacing: 14, alignment: .fill)
         stack.addArrangedSubview(titleRow)
         stack.addArrangedSubview(help)
-        stack.addArrangedSubview(fieldGroup(S.reportCategoryLabel, categoryField))
         stack.addArrangedSubview(fieldGroup(S.reportLabel, reportField, extra: aboutLabel))
         stack.addArrangedSubview(periodGroup)
         stack.addArrangedSubview(buttons)
@@ -149,7 +141,6 @@ final class GenerateReportViewController: UIViewController {
     // MARK: Rendering
 
     private func render() {
-        categoryField.setValue(category.isEmpty ? nil : Self.capitalised(category))
         reportField.setValue(selected?.name)
 
         let about = (selected?.about ?? "").trimmingCharacters(in: .whitespaces)
@@ -161,27 +152,14 @@ final class GenerateReportViewController: UIViewController {
 
     // MARK: Pickers
 
-    private func pickCategory() {
-        let options = [S.allCategories] + Self.categories
-        presentPicker(options: options, title: S.reportCategoryLabel, anchor: categoryField) { [weak self] value in
-            guard let self = self else { return }
-            self.category = (value == S.allCategories) ? "" : value
-            // A report from another category would contradict the new filter.
-            if let current = self.selected, !self.matches(current) {
-                self.selected = nil
-            }
-            self.render()
-        }
-    }
-
     private func pickReport() {
-        let options = (data.available ?? []).filter { matches($0) }
+        let options = data.available ?? []
         guard !options.isEmpty else {
-            presentAlert(S.errNoReportsInCategory)
+            presentAlert(S.errChooseReport)
             return
         }
         presentPicker(options: options.map { $0.name ?? "" }, title: S.reportLabel,
-                anchor: reportField) { [weak self] value in
+                      anchor: reportField) { [weak self] value in
             guard let self = self else { return }
             self.selected = options.first { $0.name == value }
             self.render()
@@ -199,7 +177,7 @@ final class GenerateReportViewController: UIViewController {
     }
 
     private func presentPicker(options: [String], title: String, anchor: UIView,
-                         onPick: @escaping (String) -> Void) {
+                               onPick: @escaping (String) -> Void) {
         let sheet = UIAlertController(title: title, message: nil, preferredStyle: .actionSheet)
         for option in options {
             sheet.addAction(UIAlertAction(title: option, style: .default) { _ in onPick(option) })
@@ -208,12 +186,6 @@ final class GenerateReportViewController: UIViewController {
         sheet.popoverPresentationController?.sourceView = anchor   // iPad anchor
         sheet.popoverPresentationController?.sourceRect = anchor.bounds
         present(sheet, animated: true)
-    }
-
-    private func matches(_ option: ReportsData.Available) -> Bool {
-        guard !category.isEmpty else { return true }
-        return option.category?.trimmingCharacters(in: .whitespaces)
-            .caseInsensitiveCompare(category) == .orderedSame
     }
 
     // MARK: Submit
@@ -267,16 +239,11 @@ final class GenerateReportViewController: UIViewController {
         return apiFormatter().date(from: raw)
     }
 
-    /// The API sends categories lower-cased; the picker shows them capitalised.
-    private static func capitalised(_ value: String) -> String {
-        guard let first = value.first else { return "" }
-        return String(first).uppercased() + value.dropFirst()
-    }
 }
 
 // MARK: - Tappable value field
 
-/// A read-only field that opens a picker — the sheet's Category / Report / Period rows.
+/// A read-only field that opens a picker — the sheet's Report and Period rows.
 private final class FieldRow: UIControl {
 
     var onTap: (() -> Void)?

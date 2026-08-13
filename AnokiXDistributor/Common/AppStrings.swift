@@ -353,7 +353,6 @@ enum S {
     static let periodTo = "To"
     static let apply = "Apply"
     static let errChooseReport = "Choose a report to generate."
-    static let errNoReportsInCategory = "No reports are available in that category."
     static let generatingReport = "Generating…"
 
     // Download result
