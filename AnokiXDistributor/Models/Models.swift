@@ -14,19 +14,6 @@ struct StoreItem {
     var tags: [String] = []
 }
 
-struct TraderItem {
-    let id: String
-    let name: String
-    let traderCode: String
-    let location: String
-    let phone: String
-    let segment: String
-    let area: String
-    let initials: String
-    let avatarColor: UIColor
-    let isNew: Bool
-}
-
 struct ProductItem {
     let id: String
     let name: String

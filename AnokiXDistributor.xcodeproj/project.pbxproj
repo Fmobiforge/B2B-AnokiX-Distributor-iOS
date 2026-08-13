@@ -105,7 +105,6 @@
 		F16F99058F42D54544F57C4A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F3D5E9791EB24D8F1F3A6DD /* AppDelegate.swift */; };
 		F2F349D9992A0ED51BC1A461 /* Http.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9266F144883BBDE2294D859E /* Http.swift */; };
 		F6D4341189AC838D8A560A4D /* SettingsBusinessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B70F4E5944AD93B56DE8063 /* SettingsBusinessViewController.swift */; };
-		F7EF4D1442EDFA29007FB62D /* TraderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D424DDDDABCD6F5024D7AB5B /* TraderCell.xib */; };
 		F9214A3E3BDC745FC0BBA2AC /* ProductCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3BE86A57B8DB5241F851A0C /* ProductCell.swift */; };
 		FB6637ECB29529805DBA2002 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 74460E2F854EC018CE0D6C6A /* GoogleService-Info.plist */; };
 		FE7329084F2939E9A8BA3D23 /* MockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75167504B2C136F9EDA3DA28 /* MockData.swift */; };
@@ -136,7 +135,6 @@
 		36B8718F0850D5E694CF3D59 /* AppChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppChrome.swift; sourceTree = "<group>"; };
 		397F0E5581835F147B64552C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		3C197FF80B487B73CECAF3D3 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
-		3D12847532A9C2E05FECFAC3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/TraderCell.xib; sourceTree = "<group>"; };
 		3D7B6D0F30ADED760A0C53A7 /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
 		3D907F8E3E66E95C6812004F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/OrderCell.xib; sourceTree = "<group>"; };
 		3E7F264443BDFF0A95C471D7 /* LogoCropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoCropView.swift; sourceTree = "<group>"; };
@@ -351,7 +349,6 @@
 				4411E86573F39CF5B1EE45B0 /* PageTitleSectionView.xib */,
 				EF8E1FE326DC071C1B6B8740 /* ProductCell.xib */,
 				3F7C8E5351F5BABFEA172D0C /* StoreCell.xib */,
-				D424DDDDABCD6F5024D7AB5B /* TraderCell.xib */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -679,7 +676,6 @@
 				2BF395BD852371A26C8120CA /* PrivacyInfo.xcprivacy in Resources */,
 				DE7D2CC4F37F8BF71534D947 /* ProductCell.xib in Resources */,
 				7AD6083EDB84ABC2EF792F70 /* StoreCell.xib in Resources */,
-				F7EF4D1442EDFA29007FB62D /* TraderCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -913,14 +909,6 @@
 				4EBD6B5C4FE8886CCC105963 /* Base */,
 			);
 			name = DashboardHeaderView.xib;
-			sourceTree = "<group>";
-		};
-		D424DDDDABCD6F5024D7AB5B /* TraderCell.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				3D12847532A9C2E05FECFAC3 /* Base */,
-			);
-			name = TraderCell.xib;
 			sourceTree = "<group>";
 		};
 		DFC9071EC94373BAF6F64961 /* LogoHeaderView.xib */ = {

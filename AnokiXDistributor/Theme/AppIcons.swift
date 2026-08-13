@@ -40,6 +40,7 @@ enum AppIcons {
         "ic_visibility_off": "eye.slash.fill",
         "ic_eye": "eye.fill",
         "ic_calendar": "calendar",
+        "ic_clock": "clock.fill",
         "ic_location_pin": "mappin.and.ellipse",
         "ic_copy": "doc.on.doc",
         "ic_check_circle": "checkmark.circle.fill",

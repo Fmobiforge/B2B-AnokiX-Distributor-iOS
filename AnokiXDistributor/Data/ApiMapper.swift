@@ -38,34 +38,15 @@ enum ApiMapper {
 
     // MARK: Traders
 
-    static func toTraderItems(_ data: TradersData?) -> [TraderItem] {
-        guard let traders = data?.traders else { return [] }
-        return traders.enumerated().map { index, t in
-            let name = !isEmpty(t.businessName) ? safe(t.businessName)
-                : (!isEmpty(t.tradingName) ? safe(t.tradingName) : safe(t.name))
-            let phone = formatTraderPhone(countryCode: t.countryCode, phoneNumber: t.phoneNumber)
-            return TraderItem(id: safe(t.id),
-                              name: name,
-                              traderCode: safe(t.traderCode),
-                              location: safe(t.address),
-                              phone: phone,
-                              segment: capitalize(t.storeType),
-                              area: safe(t.address),
-                              initials: initials(name),
-                              avatarColor: avatarColors[index % avatarColors.count],
-                              isNew: (t.status ?? "").caseInsensitiveCompare("New") == .orderedSame)
-        }
+    /// Traders render straight from `TradersData.Trader` — the list response is the same
+    /// record the Edit wizard prefills from, so flattening it into a view model would only
+    /// throw away the fields the wizard needs.
+    static func traderAvatarColor(_ index: Int) -> UIColor {
+        avatarColors[abs(index) % avatarColors.count]
     }
 
-    private static func formatTraderPhone(countryCode: String?, phoneNumber: String?) -> String {
-        if isEmpty(countryCode) {
-            let raw = safe(phoneNumber).trimmingCharacters(in: .whitespaces)
-            if raw.hasPrefix("+") { return raw }
-            if raw.allSatisfy(\.isNumber), raw.hasPrefix("27") { return "+\(raw)" }
-            return raw
-        }
-        return "+\(safe(countryCode)) \(safe(phoneNumber))".trimmingCharacters(in: .whitespaces)
-    }
+    /// Up to two uppercase initials for the avatar circle.
+    static func traderInitials(_ name: String) -> String { initials(name) }
 
     // MARK: Products
 

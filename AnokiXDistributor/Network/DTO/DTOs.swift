@@ -534,6 +534,10 @@ struct ProductsData: Decodable {
 
 // MARK: - Traders
 
+/// GET /api/distributor/traders.
+///
+/// The list response carries the full trader record, so the Edit wizard is prefilled
+/// straight from the row the user tapped — there is no per-trader detail endpoint.
 struct TradersData: Decodable {
     let traders: [Trader]?
     let total: Int?
@@ -541,46 +545,157 @@ struct TradersData: Decodable {
 
     struct Trader: Decodable {
         let id: String?
+        let userId: String?
+        let traderCode: String?
+
+        // Owner. Only returned by newer builds of the API; the wizard prefills whatever
+        // is present and leaves the rest for the user to fill in.
+        let firstName: String?
+        let lastName: String?
+        let ownerFullName: String?
+        let mobileNumber: String?
+        let email: String?
+        let countryCode: String?
+        let idNumber: String?
+        let passportNumber: String?
+
+        // Business
         let name: String?
         let businessName: String?
         let tradingName: String?
-        let ownerFullName: String?
-        let phoneNumber: String?
-        let countryCode: String?
-        let email: String?
+        let companyLogoUrl: String?
+        let businessRegistrationNumber: String?
+        let businessPhoneNumber: String?
+        let businessEmail: String?
+
+        // Classification
+        let traderType: String?
+        let primaryProductCategoryIds: String?
+
+        // Location
         let address: String?
-        let storeType: String?
-        let traderCode: String?
+        let latitude: Double?
+        let longitude: Double?
+
+        // Distributor / trading preferences
+        let preferredDistributorIds: String?
+        let recommendedDistributorId: String?
+        let preferredDeliveryDays: String?
+        let paymentMethod: String?
+
+        // State
         let status: String?
         let registrationStatus: String?
         let creditStatus: String?
+        let createdAt: String?
+
+        /// Uploaded KYC files keyed by document field name.
+        let documents: [String: [Document]]?
 
         init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
             id = JSONDecoding.flexString(c, key: .id)
+            userId = JSONDecoding.flexString(c, key: .userId)
+            traderCode = try c.decodeIfPresent(String.self, forKey: .traderCode)
+
+            firstName = try c.decodeIfPresent(String.self, forKey: .firstName)
+            lastName = try c.decodeIfPresent(String.self, forKey: .lastName)
+            ownerFullName = try c.decodeIfPresent(String.self, forKey: .ownerFullName)
+            mobileNumber = JSONDecoding.flexString(c, key: .mobileNumber)
+                ?? JSONDecoding.flexString(c, key: .phoneNumber)
+            email = try c.decodeIfPresent(String.self, forKey: .email)
+            countryCode = try c.decodeIfPresent(String.self, forKey: .countryCode)
+            idNumber = JSONDecoding.flexString(c, key: .idNumber)
+            passportNumber = JSONDecoding.flexString(c, key: .passportNumber)
+
             name = try c.decodeIfPresent(String.self, forKey: .name)
             businessName = try c.decodeIfPresent(String.self, forKey: .businessName)
             tradingName = try c.decodeIfPresent(String.self, forKey: .tradingName)
-            ownerFullName = try c.decodeIfPresent(String.self, forKey: .ownerFullName)
-            phoneNumber = JSONDecoding.flexString(c, key: .phoneNumber)
-                ?? JSONDecoding.flexString(c, key: .businessPhoneNumber)
-            countryCode = try c.decodeIfPresent(String.self, forKey: .countryCode)
-            email = try c.decodeIfPresent(String.self, forKey: .businessEmail)
+            companyLogoUrl = try c.decodeIfPresent(String.self, forKey: .companyLogoUrl)
+            businessRegistrationNumber = JSONDecoding.flexString(c, key: .businessRegistrationNumber)
+            businessPhoneNumber = JSONDecoding.flexString(c, key: .businessPhoneNumber)
+            businessEmail = try c.decodeIfPresent(String.self, forKey: .businessEmail)
+
+            traderType = JSONDecoding.flexString(c, key: .traderType)
+            primaryProductCategoryIds = JSONDecoding.flexString(c, key: .primaryProductCategoryIds)
+
             address = try c.decodeIfPresent(String.self, forKey: .address)
-            storeType = try c.decodeIfPresent(String.self, forKey: .traderType)
-            traderCode = try c.decodeIfPresent(String.self, forKey: .traderCode)
+            latitude = try c.decodeIfPresent(Double.self, forKey: .latitude)
+            longitude = try c.decodeIfPresent(Double.self, forKey: .longitude)
+
+            preferredDistributorIds = JSONDecoding.flexString(c, key: .preferredDistributorIds)
+            recommendedDistributorId = JSONDecoding.flexString(c, key: .recommendedDistributorId)
+            preferredDeliveryDays = try c.decodeIfPresent(String.self, forKey: .preferredDeliveryDays)
+            paymentMethod = try c.decodeIfPresent(String.self, forKey: .paymentMethod)
+
             status = try c.decodeIfPresent(String.self, forKey: .status)
             registrationStatus = try c.decodeIfPresent(String.self, forKey: .registrationStatus)
             creditStatus = try c.decodeIfPresent(String.self, forKey: .creditStatus)
+            createdAt = try c.decodeIfPresent(String.self, forKey: .createdAt)
+            documents = try c.decodeIfPresent([String: [Document]].self, forKey: .documents)
         }
 
         private enum CodingKeys: String, CodingKey {
-            case id, name, businessName, tradingName, ownerFullName
-            case phoneNumber, businessPhoneNumber, countryCode
-            case email, businessEmail, address
-            case storeType, traderType, traderCode, status
-            case registrationStatus, creditStatus
+            case id, userId, traderCode
+            case firstName, lastName, ownerFullName, mobileNumber, phoneNumber
+            case email, countryCode, idNumber, passportNumber
+            case name, businessName, tradingName, companyLogoUrl
+            case businessRegistrationNumber, businessPhoneNumber, businessEmail
+            case traderType, primaryProductCategoryIds
+            case address, latitude, longitude
+            case preferredDistributorIds, recommendedDistributorId
+            case preferredDeliveryDays, paymentMethod
+            case status, registrationStatus, creditStatus, createdAt, documents
         }
+
+        /// Business name first, then trading name, then whatever the API called it.
+        var displayName: String {
+            for candidate in [businessName, tradingName, name] {
+                if let value = candidate, !value.trimmingCharacters(in: .whitespaces).isEmpty {
+                    return value
+                }
+            }
+            return ""
+        }
+
+        /// Owner first name, falling back to the first word of the full name.
+        var ownerFirstName: String {
+            if let first = firstName, !first.isEmpty { return first }
+            return fullNameParts.first ?? ""
+        }
+
+        /// Owner last name, falling back to everything after the first word.
+        var ownerLastName: String {
+            if let last = lastName, !last.isEmpty { return last }
+            return fullNameParts.dropFirst().joined(separator: " ")
+        }
+
+        private var fullNameParts: [String] {
+            (ownerFullName ?? "").split(separator: " ").map(String.init)
+        }
+
+        var categoryIds: [Int64] { TradersData.parseIds(primaryProductCategoryIds) }
+        var distributorIds: [Int64] { TradersData.parseIds(preferredDistributorIds) }
+
+        /// First uploaded file name for a document field, or "" when nothing is on file.
+        func documentName(_ field: String) -> String {
+            documents?[field]?.first?.originalName ?? ""
+        }
+    }
+
+    struct Document: Decodable {
+        let id: String?
+        let fileUrl: String?
+        let originalName: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            fileUrl = try c.decodeIfPresent(String.self, forKey: .fileUrl)
+            originalName = try c.decodeIfPresent(String.self, forKey: .originalName)
+        }
+
+        private enum CodingKeys: String, CodingKey { case id, fileUrl, originalName }
     }
 
     struct Summary: Decodable {
@@ -590,10 +705,29 @@ struct TradersData: Decodable {
         let activeTradersPercentLabel: String?
         let newThisMonth: Int?
         let newThisMonthChangeLabel: String?
-        let highValueTraders: Int?
-        let highValueTradersPercentLabel: String?
         let pendingApprovalTraders: Int?
         let pendingApprovalTradersPercentLabel: String?
+        let highValueTraders: Int?
+        let highValueTradersPercentLabel: String?
+    }
+
+    private static func parseIds(_ csv: String?) -> [Int64] {
+        (csv ?? "").split(separator: ",").compactMap { Int64($0.trimmingCharacters(in: .whitespaces)) }
+    }
+
+    /// Delivery days travel as `"1:8.00-18.00/3:8.00-18.00"` where the leading number is
+    /// the day index (0 = Sunday). Parsed into day → opening hours so the wizard can
+    /// repaint the schedule table it was saved from.
+    static func parseDeliveryDays(_ raw: String?) -> [Int: String] {
+        guard let raw = raw, !raw.trimmingCharacters(in: .whitespaces).isEmpty else { return [:] }
+        var out: [Int: String] = [:]
+        // Older records separated entries with "/," instead of "/".
+        for entry in raw.split(whereSeparator: { $0 == "/" || $0 == "," }) {
+            let parts = entry.split(separator: ":", maxSplits: 1, omittingEmptySubsequences: false)
+            guard parts.count == 2, let day = Int(parts[0].trimmingCharacters(in: .whitespaces)) else { continue }
+            out[day] = parts[1].trimmingCharacters(in: .whitespaces)
+        }
+        return out
     }
 }
 

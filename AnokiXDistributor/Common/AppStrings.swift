@@ -287,14 +287,50 @@ enum S {
     static let supportSubject = "Support Request – anokiX Distributor"
     static let distributorRegisterComingSoon = "Distributor registration coming soon"
 
-    // Create Trader
+    // Trader Management (New-Design/Traders)
+    static let tradersSubtitle = "View, manage and support your network of traders."
+    static let searchTradersHint = "Search trader name, phone or code…"
+    static let allCreditStatus = "All Credit Status"
+    static let filterCreditStatusTitle = "Credit Status"
+    static let kpiTotalTraders = "Total Traders"
+    static let kpiActiveTraders = "Active Traders"
+    static let kpiNewThisMonth = "New This Month"
+    static let kpiPendingApproval = "Pending Approval"
+    static let tradersEmpty = "No traders yet. Tap Add New Trader to register your first one."
+    static let tradersEmptyFiltered = "No traders match your search or filters."
+    static let traderEdit = "Edit Trader"
+    static let traderDelete = "Delete"
+    static let traderDeleteTitle = "Delete Confirmation"
+    static func traderDeleteMessage(_ name: String) -> String {
+        "Are you sure you want to delete \"\(name)\"?"
+    }
+    static let traderDeletedMessage = "Trader deleted"
+    static let traderUpdatedMessage = "Trader updated successfully"
+
+    // Create / Edit Trader
     static let addNewTrader = "Add New Trader"
     static let addNewTraderButton = "+ Add New Trader"
     static let createTraderSubtitle = "Register a new trader in your network."
+    static let editTraderTitle = "Edit Trader"
+    static let editTraderSubtitle = "Update trader information."
     static let continueButton = "Continue"
     static let registerButton = "Register"
+    static let saveChangesButton = "Save Changes"
     static let traderCreatedMessage = "Trader registered successfully"
     static let registering = "Registering…"
+    static let saving = "Saving…"
+
+    static let accountSignIn = "Account sign-in"
+    static let accountSignInHelpCreate =
+        "The owner signs in with this mobile number and email. Set the password they will use."
+    static let accountSignInHelpEdit =
+        "Update the owner contact details below. Leave the password blank to keep the current password."
+    static let passwordLabel = "Password"
+    static let passwordHelpCreate = "Must be at least 8 characters."
+    static let passwordHelpEdit =
+        "Leave blank to keep current password. New password must be at least 8 characters."
+    static let registeredUnderYou = "This trader will be registered under your distributor account."
+    static let deliveryDaysHelp = "Select the days you deliver and set the opening hours."
 
     static let stepOwner = "Owner"
     static let stepBusiness = "Business"

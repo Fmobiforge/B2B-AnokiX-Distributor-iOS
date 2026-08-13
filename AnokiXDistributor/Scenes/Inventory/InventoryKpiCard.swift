@@ -55,4 +55,13 @@ final class InventoryKpiCard: UIView {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     func set(_ text: String) { valueLabel.text = text }
+
+    /// Cards whose caption changes with the data (Traders KPIs) pass it in here; a nil or
+    /// empty caption collapses the line rather than leaving a gap.
+    func set(_ text: String, caption: String?) {
+        valueLabel.text = text
+        let trimmed = (caption ?? "").trimmingCharacters(in: .whitespaces)
+        captionLabel.text = trimmed
+        captionLabel.isHidden = trimmed.isEmpty
+    }
 }

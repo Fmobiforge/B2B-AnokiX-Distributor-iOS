@@ -107,13 +107,13 @@ final class ApiClient {
     }
 
     func getTraders(search: String, completion: @escaping (Result<TradersData, ApiError>) -> Void) {
-        getTraders(search: search, status: "", registrationStatus: "", completion: completion)
+        getTraders(search: search, status: "", creditStatus: "", completion: completion)
     }
 
-    func getTraders(search: String, status: String, registrationStatus: String,
+    func getTraders(search: String, status: String, creditStatus: String,
                     completion: @escaping (Result<TradersData, ApiError>) -> Void) {
         let q = ["search": search, "status": status,
-                 "registration_status": registrationStatus, "credit_status": ""]
+                 "credit_status": creditStatus, "registration_status": ""]
         getAuthed("api/distributor/traders", query: q, type: TradersData.self, completion: completion)
     }
 
@@ -153,6 +153,21 @@ final class ApiClient {
                            form: form, files: files, token: session.token) { [weak self] r in
             self?.deliver(r, type: CreateTraderData.self, completion: completion)
         }
+    }
+
+    /// Update an existing trader. Same multipart shape as create plus an `id`; documents
+    /// and the logo are only re-sent when the user picked a new file.
+    func updateTrader(form: [String: String], files: [Http.FilePart],
+                      completion: @escaping (Result<CreateTraderData, ApiError>) -> Void) {
+        Http.postMultipart(baseUrl: Self.baseURL, path: "api/distributor/traders/update",
+                           form: form, files: files, token: session.token) { [weak self] r in
+            self?.deliver(r, type: CreateTraderData.self, completion: completion)
+        }
+    }
+
+    /// Delete a trader. The response carries no trader object, so only the message matters.
+    func deleteTrader(id: String, completion: @escaping (Result<String, ApiError>) -> Void) {
+        postMessage("api/distributor/traders/delete", form: ["id": id], completion: completion)
     }
 
     func getProducts(completion: @escaping (Result<ProductsData, ApiError>) -> Void) {
