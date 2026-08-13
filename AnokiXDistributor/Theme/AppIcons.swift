@@ -57,6 +57,9 @@ enum AppIcons {
         "ic_finance_report": "chart.line.uptrend.xyaxis",
         "ic_ctr": "cursorarrow.click",
         "ic_chat": "bubble.left.fill",
+        // SF Symbols ships no WhatsApp mark (it is a trademark), so the Support Centre
+        // card uses a generic chat glyph tinted WhatsApp green.
+        "ic_whatsapp": "message.fill",
         "ic_vas": "antenna.radiowaves.left.and.right",
         // anokiX wallet screen
         "ic_arrow_down_left": "arrow.down",

@@ -307,6 +307,88 @@ enum S {
     static let traderDeletedMessage = "Trader deleted"
     static let traderUpdatedMessage = "Trader updated successfully"
 
+    // Support Centre (New-Design/Support Centre)
+    static let supportCentre = "Support Centre"
+    static let supportSubtitle = "We're here to help."
+    static let supportSearchHint = "Search help articles, topics or keywords…"
+    static let supportPopularTopics = "Popular Topics"
+    static let supportMyTickets = "My Support Tickets"
+    static let supportNewTicket = "New ticket"
+    static let supportTicketsEmpty = "No tickets yet. Reach out above and we'll pick it up."
+
+    static func supportSearchResults(_ query: String) -> String { "Results for \"\(query)\"" }
+    static func supportSearchEmpty(_ query: String) -> String {
+        "No help articles matched \"\(query)\"."
+    }
+    static func supportHours(_ hours: String) -> String { "Support hours: \(hours)" }
+
+    static let channelWhatsapp = "WhatsApp Support"
+    static let channelWhatsappSub = "Chat with us on WhatsApp"
+    static let channelCallback = "Call Back Request"
+    static let channelCallbackSub = "Leave a number and we'll ring you"
+    static let channelTicket = "Create Ticket"
+    static let channelTicketSub = "Submit a support request"
+    static let channelEmail = "Email Support"
+    static let channelPhone = "Call Support"
+    static let channelLiveChat = "Live Chat"
+    static let channelLiveChatSub = "Talk to an agent now"
+    static let errNoWhatsapp = "WhatsApp is not installed on this device."
+    static let errNoDialer = "This device cannot place calls."
+    static let errNoEmailApp = "No email app is set up on this device."
+    static let errNoBrowser = "Nothing on this device can open that link."
+
+    // Request a call back
+    static let callbackTitle = "Request a call back"
+    static let callbackNumberLabel = "Number to call *"
+    static let callbackNumberHint = "0821234567"
+    static let callbackSubjectLabel = "What is it about? (optional)"
+    static let callbackSubjectHint = "Delivery not marked as received"
+    static let callbackMessageLabel = "Anything we should know first? (optional)"
+    static let callbackSubmit = "Request call"
+    static let callbackDefaultSubject = "Call-back request"
+    static let errCallbackNumber = "Enter the number we should call you on."
+    static let requestingCall = "Requesting…"
+
+    // Create ticket
+    static let createTicketTitle = "Tell us what's wrong"
+    static let ticketSubjectLabel = "What is this about? *"
+    static let ticketSubjectHint = "Order ORD000123 has not been paid"
+    static let ticketTopicLabel = "Topic (optional)"
+    static let ticketTopicHint = "Choose a topic"
+    static let ticketPriorityLabel = "How urgent is it?"
+    static let ticketMessageLabel = "What happened? *"
+    static let ticketMessageHint = "Include order numbers, amounts and dates."
+    static let ticketSubmit = "Send request"
+    static let errTicketSubject = "Tell us what this is about."
+    static let errTicketMessage = "Describe what happened so we can help."
+    static let sendingRequest = "Sending…"
+    static let ticketLogged = "Your request has been logged."
+    static func ticketLoggedNumbered(_ number: String) -> String {
+        "Logged as \(number) — we'll be in touch."
+    }
+
+    static let priorityLow = "Low — whenever you can"
+    static let priorityNormal = "Normal"
+    static let priorityHigh = "High — it is affecting deliveries"
+    static let priorityUrgent = "Urgent — we cannot dispatch"
+
+    // Ticket detail
+    static func ticketOpened(_ when: String) -> String { "Opened \(when)" }
+    static let ticketReplyHint = "Write a reply…"
+    static let ticketSendReply = "Send reply"
+    static let ticketClose = "Close ticket"
+    static let ticketClosedNotice = "This ticket is closed. Open a new one if you still need help."
+    static let ticketClosedMessage = "Ticket closed."
+    static let ticketCloseTitle = "Close this ticket?"
+    static func ticketCloseMessage(_ subject: String) -> String {
+        "You won't be able to reply to \"\(subject)\" after closing it."
+    }
+    static let ticketWaitingSupport = "Waiting for support"
+    static let ticketSupportReplied = "Support replied — your turn"
+    static let ticketResolved = "Resolved"
+    static let errReplyEmpty = "Write a reply before sending."
+    static let sendingReply = "Sending…"
+
     // Reports (New-Design/Report)
     static let reportsPageSubtitle = "Generate and download business insights"
     static let searchReportsHint = "Search report name or period…"

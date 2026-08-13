@@ -768,6 +768,239 @@ struct TraderDetailData: Decodable {
     }
 }
 
+// MARK: - Support Centre
+
+/// `GET api/common/support/overview` — the whole Support Centre in one call: which
+/// contact channels are switched on, the help-article catalogue, and the tickets this
+/// account has raised.
+struct SupportOverviewData: Decodable {
+    let channels: Channels?
+    let categories: [Category]?
+    let popular: [Article]?
+    let tickets: [Ticket]?
+    let inboxAwaiting: Int?
+
+    /// Which ways of reaching support are switched on for this portal.
+    struct Channels: Decodable {
+        let tickets: Channel?
+        let callback: Channel?
+        let whatsapp: Whatsapp?
+        let liveChat: Channel?
+        let atlas: Channel?
+        let email: Email?
+        let phone: Phone?
+        /// Free-text opening hours, or empty when not published.
+        let hours: String?
+    }
+
+    struct Channel: Decodable {
+        let enabled: Bool?
+    }
+
+    struct Whatsapp: Decodable {
+        let enabled: Bool?
+        /// Pre-composed wa.me link with the greeting already in it.
+        let link: String?
+        /// The number as it should be shown ("+1 5674987536").
+        let display: String?
+    }
+
+    struct Email: Decodable {
+        let enabled: Bool?
+        let address: String?
+    }
+
+    struct Phone: Decodable {
+        let enabled: Bool?
+        let number: String?
+    }
+
+    /// A ticket topic. Empty for now, so the Create Ticket sheet hides its Topic field.
+    struct Category: Decodable {
+        let id: String?
+        let name: String?
+        let slug: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            name = try c.decodeIfPresent(String.self, forKey: .name)
+            slug = try c.decodeIfPresent(String.self, forKey: .slug)
+        }
+
+        private enum CodingKeys: String, CodingKey { case id, name, slug }
+    }
+
+    struct Article: Decodable {
+        let id: String?
+        let title: String?
+        let excerpt: String?
+        let url: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            title = try c.decodeIfPresent(String.self, forKey: .title)
+            excerpt = try c.decodeIfPresent(String.self, forKey: .excerpt)
+            url = try c.decodeIfPresent(String.self, forKey: .url)
+        }
+
+        private enum CodingKeys: String, CodingKey { case id, title, excerpt, url }
+    }
+
+    /// One support ticket. `messages` is only populated by the detail call.
+    struct Ticket: Decodable {
+        let id: String?
+        let ticketNumber: String?
+        let subject: String?
+        let category: String?
+        let channel: String?
+        let status: String?
+        let priority: String?
+        let callbackPhone: String?
+        let createdAt: String?
+        let lastReplyAt: String?
+        let lastReplyBy: String?
+        let resolvedAt: String?
+        let isOpen: Bool?
+        let messages: [Message]?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            ticketNumber = try c.decodeIfPresent(String.self, forKey: .ticketNumber)
+            subject = try c.decodeIfPresent(String.self, forKey: .subject)
+            category = try c.decodeIfPresent(String.self, forKey: .category)
+            channel = try c.decodeIfPresent(String.self, forKey: .channel)
+            status = try c.decodeIfPresent(String.self, forKey: .status)
+            priority = try c.decodeIfPresent(String.self, forKey: .priority)
+            callbackPhone = JSONDecoding.flexString(c, key: .callbackPhone)
+            createdAt = try c.decodeIfPresent(String.self, forKey: .createdAt)
+            lastReplyAt = try c.decodeIfPresent(String.self, forKey: .lastReplyAt)
+            lastReplyBy = try c.decodeIfPresent(String.self, forKey: .lastReplyBy)
+            resolvedAt = try c.decodeIfPresent(String.self, forKey: .resolvedAt)
+            isOpen = try c.decodeIfPresent(Bool.self, forKey: .isOpen)
+            messages = try c.decodeIfPresent([Message].self, forKey: .messages)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, ticketNumber, subject, category, channel, status, priority
+            case callbackPhone, createdAt, lastReplyAt, lastReplyBy, resolvedAt, isOpen, messages
+        }
+
+        var open: Bool { isOpen ?? true }
+
+        var statusLabel: String {
+            let value = (status ?? "").trimmingCharacters(in: .whitespaces)
+            guard let first = value.first else { return open ? "Open" : "Closed" }
+            return String(first).uppercased() + value.dropFirst()
+        }
+
+        /// "13 Aug, 20:39" — when the ticket was raised.
+        var openedLabel: String {
+            guard let when = SupportOverviewData.parseCreated(createdAt) else { return createdAt ?? "" }
+            return SupportOverviewData.format(when, "d MMM, HH:mm")
+        }
+
+        /// "13 Aug, 20:19" — the timestamp the list row shows on the right.
+        var lastActivityLabel: String {
+            guard let when = SupportOverviewData.parseIso(lastReplyAt) else { return openedLabel }
+            return SupportOverviewData.format(when, "d MMM, HH:mm")
+        }
+
+        /// An open ticket whose last word came from us is waiting on support; if support
+        /// replied last, the ball is in our court.
+        var isWaitingForSupport: Bool {
+            let by = (lastReplyBy ?? "").trimmingCharacters(in: .whitespaces)
+            return open && (by.isEmpty || by.caseInsensitiveCompare("merchant") == .orderedSame)
+        }
+    }
+
+    /// One entry in a ticket's conversation.
+    struct Message: Decodable {
+        let id: String?
+        let authorType: String?
+        let authorName: String?
+        let body: String?
+        let isInternal: Bool?
+        let createdAt: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            authorType = try c.decodeIfPresent(String.self, forKey: .authorType)
+            authorName = try c.decodeIfPresent(String.self, forKey: .authorName)
+            body = try c.decodeIfPresent(String.self, forKey: .body)
+            isInternal = try c.decodeIfPresent(Bool.self, forKey: .isInternal)
+            createdAt = try c.decodeIfPresent(String.self, forKey: .createdAt)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, authorType, authorName, body, isInternal, createdAt
+        }
+
+        /// Our own messages sit on the right of the thread.
+        var isMine: Bool {
+            let type = (authorType ?? "").trimmingCharacters(in: .whitespaces)
+            return type.isEmpty || type.caseInsensitiveCompare("merchant") == .orderedSame
+        }
+
+        /// Status notes ("Closed by the merchant.") are centred, not attributed.
+        var isSystem: Bool {
+            (authorType ?? "").trimmingCharacters(in: .whitespaces)
+                .caseInsensitiveCompare("system") == .orderedSame
+        }
+
+        /// "20:39" — the time in the bubble's corner.
+        var timeLabel: String {
+            guard let when = SupportOverviewData.parseCreated(createdAt) else { return "" }
+            return SupportOverviewData.format(when, "HH:mm")
+        }
+    }
+
+    // MARK: Date parsing
+    //
+    // The API mixes two shapes: createdAt comes back as "13/08/2026 20:33:41" while
+    // lastReplyAt / resolvedAt use "2026-08-13 20:33:41". Each has its own parser and
+    // both fall back to the raw string rather than showing nothing.
+
+    fileprivate static func parseCreated(_ raw: String?) -> Date? {
+        parse(raw, "dd/MM/yyyy HH:mm:ss") ?? parseIso(raw)
+    }
+
+    fileprivate static func parseIso(_ raw: String?) -> Date? {
+        parse(raw, "yyyy-MM-dd HH:mm:ss") ?? parse(raw, "yyyy-MM-dd")
+    }
+
+    private static func parse(_ raw: String?, _ pattern: String) -> Date? {
+        guard let raw = raw?.trimmingCharacters(in: .whitespaces), !raw.isEmpty else { return nil }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = pattern
+        return formatter.date(from: raw)
+    }
+
+    fileprivate static func format(_ date: Date, _ pattern: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = pattern
+        return formatter.string(from: date)
+    }
+}
+
+/// Envelope shared by `support/tickets` (create), `support/tickets/{id}`,
+/// `support/tickets/reply` and `support/tickets/close` — every one of them answers with
+/// the ticket in its new state, messages included.
+struct SupportTicketData: Decodable {
+    let ticket: SupportOverviewData.Ticket?
+}
+
+/// `GET api/common/support/articles/search?q=` — help-article search results.
+struct SupportArticlesData: Decodable {
+    let query: String?
+    let articles: [SupportOverviewData.Article]?
+    let total: Int?
+}
+
 // MARK: - Reports
 
 /// `GET api/distributor/reports` — the Reports dashboard in one call.

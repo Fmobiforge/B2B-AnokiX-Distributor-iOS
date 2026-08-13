@@ -410,6 +410,52 @@ final class ApiClient {
         }
     }
 
+    // MARK: Support Centre
+
+    /// Support Centre in one call: enabled contact channels, the help-article catalogue
+    /// and every ticket this account has raised.
+    func getSupportOverview(completion: @escaping (Result<SupportOverviewData, ApiError>) -> Void) {
+        getAuthed("api/common/support/overview", query: nil, type: SupportOverviewData.self,
+                  completion: completion)
+    }
+
+    /// Help-article search.
+    func searchSupportArticles(query: String,
+                               completion: @escaping (Result<SupportArticlesData, ApiError>) -> Void) {
+        getAuthed("api/common/support/articles/search", query: ["q": query],
+                  type: SupportArticlesData.self, completion: completion)
+    }
+
+    /// Raise a ticket. `channel` is `"web"` for a written request or `"callback"` for a
+    /// call-back, which also carries `callback_phone`.
+    func createSupportTicket(form: [String: String],
+                             completion: @escaping (Result<SupportTicketData, ApiError>) -> Void) {
+        postAuthed("api/common/support/tickets", form: form, type: SupportTicketData.self,
+                   completion: completion)
+    }
+
+    /// One ticket with its full conversation.
+    func getSupportTicket(id: String,
+                          completion: @escaping (Result<SupportTicketData, ApiError>) -> Void) {
+        getAuthed("api/common/support/tickets/\(id)", query: nil, type: SupportTicketData.self,
+                  completion: completion)
+    }
+
+    /// Post a reply; the response carries the ticket with the new message appended.
+    func replySupportTicket(ticketId: String, message: String,
+                            completion: @escaping (Result<SupportTicketData, ApiError>) -> Void) {
+        postAuthed("api/common/support/tickets/reply",
+                   form: ["ticket_id": ticketId, "message": message],
+                   type: SupportTicketData.self, completion: completion)
+    }
+
+    /// Close a ticket; the response carries it with the closing note appended.
+    func closeSupportTicket(ticketId: String,
+                            completion: @escaping (Result<SupportTicketData, ApiError>) -> Void) {
+        postAuthed("api/common/support/tickets/close", form: ["ticket_id": ticketId],
+                   type: SupportTicketData.self, completion: completion)
+    }
+
     // MARK: Reports
 
     /// Reports dashboard: the catalogue of reports that can be generated, everything

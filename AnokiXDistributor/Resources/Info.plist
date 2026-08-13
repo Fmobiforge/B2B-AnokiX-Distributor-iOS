@@ -72,6 +72,14 @@
 	</array>
 	<key>UIDesignRequiresCompatibility</key>
 	<true/>
+	<!-- canOpenURL is gated behind this list; without it the Support Centre cannot
+	     detect WhatsApp and would always fall back to opening wa.me in Safari. -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+		<string>tel</string>
+		<string>mailto</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UISupportedInterfaceOrientations</key>

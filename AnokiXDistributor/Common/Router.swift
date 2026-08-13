@@ -19,6 +19,7 @@ enum Router {
         case "returns": return ReturnsViewController()
         case "notifications": return NotificationsViewController()
         case "settings": return SettingsViewController()
+        case "support": return SupportViewController()
         default: return nil
         }
     }
