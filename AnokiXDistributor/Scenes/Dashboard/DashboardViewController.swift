@@ -27,7 +27,7 @@ final class DashboardViewController: BaseMainViewController {
     override func configureStoryboardChrome() {
         welcomeLabel.font = AppFonts.bold(AppMetrics.textTitle)
         welcomeLabel.textColor = AppColors.textPrimary
-        dashboardSubtitleLabel.text = S.dashboardSubtitle
+        // Text comes from refreshWelcome() — it depends on whether we know the company yet.
         dashboardSubtitleLabel.font = AppFonts.light(AppMetrics.textBodySM)
         dashboardSubtitleLabel.textColor = AppColors.textSecondary
         avatarLabel.layer.cornerRadius = 18
@@ -49,6 +49,7 @@ final class DashboardViewController: BaseMainViewController {
         notificationsButton.tintColor = AppColors.textPrimary
         addNotificationBadge(to: notificationsButton)
         refreshWelcome()
+        loadDistributorName()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -57,10 +58,39 @@ final class DashboardViewController: BaseMainViewController {
         refreshNotificationBadge(on: notificationsButton)
     }
 
+    /// Header identity block, matching the web dashboard's "ApplePay / Tam Ho": the
+    /// distributor's registered legal name on top and the signed-in user under it.
+    ///
+    /// Login only returns `portal_info.company_name`; the legal name comes from
+    /// `base-info` and is cached in the session, so on later launches it paints before
+    /// that call lands. Until any company name is known the greeting takes the top line,
+    /// so the header is never blank.
     private func refreshWelcome() {
-        welcomeLabel.text = S.welcomeBack(SessionManager.shared.firstName)
-        avatarLabel.text = SessionManager.shared.initials
+        let session = SessionManager.shared
+        let greeting = S.welcomeBack(session.firstName)
+        let distributor = session.distributorName
+
+        welcomeLabel.text = distributor.isEmpty ? greeting : distributor
+        dashboardSubtitleLabel.text = distributor.isEmpty ? S.dashboardSubtitle : greeting
+        avatarLabel.text = session.initials
         bindAvatarLogo()
+    }
+
+    /// Fills in the distributor's registered legal name, which login does not return.
+    /// Cached in the session so the header paints from it immediately next time.
+    private func loadDistributorName() {
+        ApiClient.shared.getBaseInfo { [weak self] result in
+            guard let self = self, case .success(let data) = result,
+                  let portal = data.portalInfo else { return }
+            // Fall back to the trading name rather than leaving the header on the
+            // login-time display name, which may be neither.
+            let name = [portal.companyLegalName, portal.tradingName]
+                .compactMap { $0 }
+                .first { !$0.trimmingCharacters(in: .whitespaces).isEmpty } ?? ""
+            guard !name.isEmpty else { return }
+            SessionManager.shared.companyLegalName = name
+            self.refreshWelcome()
+        }
     }
 
     private func bindAvatarLogo() {

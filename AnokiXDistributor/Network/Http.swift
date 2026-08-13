@@ -40,6 +40,16 @@ enum Http {
         return URLSession(configuration: config)
     }()
 
+    /// Plain URLSession for file downloads (report CSVs). Alamofire's `responseString`
+    /// path would decode the body as text, which is wrong for binary formats, so this
+    /// keeps the response as `Data`.
+    private static let downloadSession: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 60
+        config.timeoutIntervalForResource = 300
+        return URLSession(configuration: config)
+    }()
+
     static func get(baseUrl: String, path: String, query: [String: String]?, token: String?,
                     completion: @escaping (Result) -> Void) {
         var components = URLComponents(string: baseUrl + path)
@@ -85,6 +95,69 @@ enum Http {
             .responseString { response in
                 completion(map(response))
             }
+    }
+
+    /// A downloaded file: raw bytes plus whatever the server said they are.
+    struct Download {
+        let code: Int
+        let data: Data?
+        let fileName: String?
+        let mimeType: String?
+        var ok: Bool { code >= 200 && code < 300 && (data?.isEmpty == false) }
+    }
+
+    /// JSON POST whose response is a file rather than an envelope — the report download
+    /// service. The filename is taken from Content-Disposition when the server offers one.
+    ///
+    /// An error still arrives as JSON, so the content-type is reported back and the caller
+    /// can surface the server's message instead of saving a broken file. The completion
+    /// may fire off the main thread; ApiClient re-dispatches to main.
+    static func postJsonForFile(url urlString: String, json: [String: Any], token: String?,
+                                completion: @escaping (Download) -> Void) {
+        guard let url = URL(string: urlString),
+              let body = try? JSONSerialization.data(withJSONObject: json) else {
+            completion(Download(code: -1, data: nil, fileName: nil, mimeType: nil))
+            return
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("*/*", forHTTPHeaderField: "Accept")
+        if let token = token, !token.isEmpty {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        request.httpBody = body
+
+        let task = downloadSession.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("\(tag): download failed: \(error.localizedDescription)")
+                completion(Download(code: -1, data: nil, fileName: nil, mimeType: nil))
+                return
+            }
+            let http = response as? HTTPURLResponse
+            completion(Download(code: http?.statusCode ?? -1,
+                                data: data,
+                                fileName: fileName(from: http?.value(forHTTPHeaderField: "Content-Disposition")),
+                                mimeType: http?.value(forHTTPHeaderField: "Content-Type")))
+        }
+        task.resume()
+    }
+
+    /// Pulls `filename="stock_levels-16.csv"` out of a Content-Disposition header.
+    private static func fileName(from contentDisposition: String?) -> String? {
+        guard let header = contentDisposition else { return nil }
+        let pattern = "filename\\*?=(?:UTF-8'')?\"?([^\";]+)\"?"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+              let match = regex.firstMatch(in: header, range: NSRange(header.startIndex..., in: header)),
+              let range = Range(match.range(at: 1), in: header) else {
+            return nil
+        }
+        // Never let the server's name escape the directory we chose to write into.
+        let name = String(header[range])
+            .trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: "\\", with: "/")
+            .components(separatedBy: "/").last ?? ""
+        return name.isEmpty ? nil : name
     }
 
     /// One file part for a multipart upload (content already read into memory).

@@ -52,6 +52,7 @@ enum AppIcons {
         "ic_warning_box": "exclamationmark.triangle.fill",
         "ic_package": "shippingbox.fill",
         "ic_document": "doc.fill",
+        "ic_download": "arrow.down.to.line",
         "ic_pdf": "doc.richtext.fill",
         "ic_finance_report": "chart.line.uptrend.xyaxis",
         "ic_ctr": "cursorarrow.click",

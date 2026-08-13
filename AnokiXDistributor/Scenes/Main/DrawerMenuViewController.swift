@@ -10,6 +10,7 @@ final class DrawerMenuViewController: UIViewController, UITableViewDataSource, U
     private let scrim = UIView()
     private let panel = UIView()
     private let tableView = UITableView(frame: .zero, style: .plain)
+    private let companyLabel = UILabel()
     private let items = MockData.drawerMenuItems()
     private var panelLeading: NSLayoutConstraint!
 
@@ -56,9 +57,22 @@ final class DrawerMenuViewController: UIViewController, UITableViewDataSource, U
         badge.layer.cornerRadius = 8
         badge.layer.masksToBounds = true
 
+        // The signed-in distributor's registered legal name. Login does not return it —
+        // it comes from base-info and is cached in the session — so the row stays hidden
+        // until we know it rather than leaving an empty line under the badge.
+        let name = SessionManager.shared.distributorName
+        companyLabel.text = name
+        companyLabel.isHidden = name.isEmpty
+        companyLabel.font = AppFonts.bold(15)
+        companyLabel.textColor = AppColors.drawerText
+        companyLabel.numberOfLines = 2
+        companyLabel.lineBreakMode = .byTruncatingTail
+
         let header = UIStackView.vertical(spacing: AppMetrics.spacingSM, alignment: .leading)
         header.addArrangedSubview(logo)
         header.addArrangedSubview(badge)
+        header.addArrangedSubview(companyLabel)
+        header.setCustomSpacing(AppMetrics.spacingMD, after: badge)
         header.forAutoLayout()
         panel.addSubview(header)
 
@@ -84,6 +98,10 @@ final class DrawerMenuViewController: UIViewController, UITableViewDataSource, U
             header.leadingAnchor.constraint(equalTo: panel.leadingAnchor, constant: AppMetrics.spacingLG),
             header.trailingAnchor.constraint(lessThanOrEqualTo: panel.trailingAnchor, constant: -AppMetrics.spacingLG),
             logo.heightAnchor.constraint(lessThanOrEqualToConstant: 40),
+            // The header stack is leading-aligned, so its children keep their intrinsic
+            // width — a long legal name needs its own cap to wrap inside the panel.
+            companyLabel.widthAnchor.constraint(
+                lessThanOrEqualToConstant: AppMetrics.drawerWidth - 2 * AppMetrics.spacingLG),
             tableView.topAnchor.constraint(equalTo: header.bottomAnchor, constant: AppMetrics.spacingXL),
             tableView.leadingAnchor.constraint(equalTo: panel.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: panel.trailingAnchor),

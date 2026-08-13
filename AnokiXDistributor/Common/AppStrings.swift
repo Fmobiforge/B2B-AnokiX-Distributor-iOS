@@ -307,6 +307,65 @@ enum S {
     static let traderDeletedMessage = "Trader deleted"
     static let traderUpdatedMessage = "Trader updated successfully"
 
+    // Reports (New-Design/Report)
+    static let reportsPageSubtitle = "Generate and download business insights"
+    static let searchReportsHint = "Search report name or period…"
+    static let allCategories = "All Categories"
+    static let reportsEmpty = "No reports yet. Generate one to get started."
+    static let reportsEmptyFiltered = "No reports match your search."
+
+    static func reportsShowingCount(_ shown: Int, _ total: Int) -> String {
+        "Showing \(shown) of \(total) reports"
+    }
+
+    static let kpiReportsGenerated = "Reports Generated"
+    static let kpiReportsGeneratedCaption = "All time"
+    static let kpiReportDownloads = "Downloads"
+    static let kpiReportDownloadsCaption = "Across all reports"
+    static let kpiReportsThisMonth = "This Month"
+    static let kpiReportsThisMonthCaption = "Generated since the 1st"
+    static let kpiReportsFailed = "Failed"
+    static let kpiReportsFailedNone = "None"
+    static let kpiReportsFailedSome = "Needs attention"
+
+    static func reportPeriodValue(_ period: String) -> String { "Period \(period)" }
+    static func reportGeneratedValue(_ when: String) -> String { "Generated \(when)" }
+
+    static let reportDownload = "Download"
+    static let reportGenerateAgain = "Generate again"
+    static let reportDelete = "Delete"
+    static let reportDeleteTitle = "Delete report?"
+    static func reportDeleteMessage(_ name: String) -> String {
+        "\"\(name)\" will be removed along with its file. This cannot be undone."
+    }
+    static let reportDeletedMessage = "Report deleted."
+
+    // Generate a report sheet
+    static let generate = "Generate"
+    static let generateReportTitle = "Generate a report"
+    static let generateReportHelp =
+        "Built from your own data and downloaded as a CSV, which opens in Excel, Numbers and Google Sheets."
+    static let reportCategoryLabel = "Category"
+    static let reportLabel = "Report"
+    static let chooseAReport = "Choose a report"
+    static let periodLabel = "Period"
+    static let periodFrom = "From"
+    static let periodTo = "To"
+    static let apply = "Apply"
+    static let errChooseReport = "Choose a report to generate."
+    static let errNoReportsInCategory = "No reports are available in that category."
+    static let generatingReport = "Generating…"
+
+    // Download result
+    static let reportDownloading = "Downloading…"
+    static let reportDownloadedTitle = "Report downloaded"
+    static func reportDownloadedMessage(_ fileName: String) -> String {
+        "\(fileName) was saved to your device."
+    }
+    static let reportView = "View"
+    static let reportShare = "Share"
+    static let reportSaveFailed = "Could not save the downloaded report."
+
     // Create / Edit Trader
     static let addNewTrader = "Add New Trader"
     static let addNewTraderButton = "+ Add New Trader"

@@ -11,8 +11,6 @@ protocol DistributorRepository {
     func getPromotions() -> [PromotionItem]
     func getFinanceSummaries() -> [FinanceSummary]
     func getFinanceTransactions(typeFilter: String) -> [FinanceTransaction]
-    func getReportTypes() -> [ReportTypeItem]
-    func getRecentReports() -> [ReportHistoryItem]
     func getDeliveries(statusFilter: String) -> [DeliveryItem]
     func getSettingsProfile() -> SettingsProfile
     func getSettingsMenuEntries() -> [SettingsMenuEntry]

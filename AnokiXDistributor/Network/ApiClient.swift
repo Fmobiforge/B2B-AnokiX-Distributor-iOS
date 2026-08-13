@@ -13,6 +13,11 @@ final class ApiClient {
 
     static let baseURL = "http://155.117.20.51/ax/"
 
+    /// Report files are served by their own service — a different port from the JSON API,
+    /// with no `/ax/` prefix — which authenticates from the request body instead of an
+    /// Authorization header. It is the only endpoint that does not sit under `baseURL`.
+    static let reportDownloadURL = "http://155.117.20.51:5721/api/report-download"
+
     private let session = SessionManager.shared
     private let decoder: JSONDecoder = {
         let d = JSONDecoder()
@@ -144,6 +149,13 @@ final class ApiClient {
                            form: form, files: files, token: nil) { [weak self] r in
             self?.deliver(r, type: RegisterDistributorData.self, completion: completion)
         }
+    }
+
+    /// Full trader record for the Edit wizard. Unlike the list row this also returns the
+    /// linked user account, which carries the owner's name, email and mobile number.
+    func getTraderById(id: String, completion: @escaping (Result<TraderDetailData, ApiError>) -> Void) {
+        getAuthed("api/distributor/traders/get-by-id", query: ["id": id],
+                  type: TraderDetailData.self, completion: completion)
     }
 
     /// Create a trader under the logged-in distributor (multipart, with KYC documents).
@@ -396,6 +408,65 @@ final class ApiClient {
             }
             DispatchQueue.main.async { completion(result) }
         }
+    }
+
+    // MARK: Reports
+
+    /// Reports dashboard: the catalogue of reports that can be generated, everything
+    /// already generated, and the KPI summary. Takes no parameters — the screen's search
+    /// and category filters run over the returned list.
+    func getReports(completion: @escaping (Result<ReportsData, ApiError>) -> Void) {
+        getAuthed("api/distributor/reports", query: nil, type: ReportsData.self, completion: completion)
+    }
+
+    /// Build a report for a period — `reportKey` comes from `available[]`.
+    ///
+    /// The response echoes the new report and a refreshed summary, but the screen reloads
+    /// the whole list straight afterwards, so only the envelope's message ("Stock Levels
+    /// ready — 10 rows.") is worth carrying back.
+    func generateReport(reportKey: String, from: String, to: String,
+                        completion: @escaping (Result<String, ApiError>) -> Void) {
+        postMessage("api/distributor/reports/generate",
+                    form: ["report_key": reportKey, "from": from, "to": to],
+                    completion: completion)
+    }
+
+    /// Delete a generated report. The response only carries the refreshed summary.
+    func deleteReport(id: String, completion: @escaping (Result<String, ApiError>) -> Void) {
+        postMessage("api/distributor/reports/delete", form: ["id": id], completion: completion)
+    }
+
+    /// Fetch a generated report's file.
+    ///
+    /// Downloads are served by a separate host and port from the JSON API, and that
+    /// service authenticates from the request body rather than a Bearer header — so this
+    /// is the one call that does not go through `baseURL`.
+    func downloadReport(id: String, completion: @escaping (Result<Http.Download, ApiError>) -> Void) {
+        let body: [String: Any] = ["id": Int(id) ?? 0, "token": session.token]
+        Http.postJsonForFile(url: Self.reportDownloadURL, json: body, token: nil) { download in
+            let result: Result<Http.Download, ApiError>
+            if download.ok && !Self.looksLikeJSON(download) {
+                result = .success(download)
+            } else {
+                result = .failure(ApiError(message: Self.downloadError(download)))
+            }
+            DispatchQueue.main.async { completion(result) }
+        }
+    }
+
+    /// A JSON body from the download service means an error, not a report.
+    private static func looksLikeJSON(_ download: Http.Download) -> Bool {
+        (download.mimeType ?? "").lowercased().contains("json")
+    }
+
+    /// Surface the download service's own message when it sent one.
+    private static func downloadError(_ download: Http.Download) -> String {
+        if looksLikeJSON(download), let data = download.data,
+           let text = String(data: data, encoding: .utf8) {
+            let message = JSON(parseJSON: text)["message"].string ?? ""
+            if !message.isEmpty { return message }
+        }
+        return "Could not download the report (HTTP \(download.code))"
     }
 
     // MARK: Orders

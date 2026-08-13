@@ -13,6 +13,8 @@ final class SessionManager {
         static let lastName = "last_name"
         static let email = "email"
         static let roleLabel = "role_label"
+        static let companyName = "company_name"
+        static let companyLegalName = "company_legal_name"
         static let companyLogoUrl = "company_logo_url"
     }
 
@@ -44,6 +46,26 @@ final class SessionManager {
         set { defaults.set(newValue, forKey: Key.companyLogoUrl) }
     }
 
+    /// Display name from the login `portal_info`.
+    var companyName: String {
+        get { defaults.string(forKey: Key.companyName) ?? "" }
+        set { defaults.set(newValue, forKey: Key.companyName) }
+    }
+
+    /// The registered entity name from `base-info`'s `portal_info`. Login only returns
+    /// `company_name`, so this is cached separately once base-info answers and the
+    /// dashboard can paint it immediately on the next launch.
+    var companyLegalName: String {
+        get { defaults.string(forKey: Key.companyLegalName) ?? "" }
+        set { defaults.set(newValue.trimmingCharacters(in: .whitespaces), forKey: Key.companyLegalName) }
+    }
+
+    /// What to call the distributor on screen: the registered legal name when we know it,
+    /// otherwise the display name login returned.
+    var distributorName: String {
+        companyLegalName.isEmpty ? companyName : companyLegalName
+    }
+
     var initials: String {
         let f = firstName.prefix(1)
         let l = lastName.prefix(1)
@@ -52,7 +74,8 @@ final class SessionManager {
     }
 
     func clear() {
-        [Key.token, Key.firstName, Key.lastName, Key.email, Key.roleLabel, Key.companyLogoUrl].forEach {
+        [Key.token, Key.firstName, Key.lastName, Key.email, Key.roleLabel,
+         Key.companyName, Key.companyLegalName, Key.companyLogoUrl].forEach {
             defaults.removeObject(forKey: $0)
         }
     }

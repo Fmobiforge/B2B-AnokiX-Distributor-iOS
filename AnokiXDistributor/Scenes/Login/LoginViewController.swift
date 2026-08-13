@@ -107,6 +107,7 @@ final class LoginViewController: UIViewController {
                                                   email: user.email, roleLabel: user.roleLabel)
                 }
                 SessionManager.shared.companyLogoUrl = data.portalInfo?.companyLogoUrl ?? ""
+                SessionManager.shared.companyName = data.portalInfo?.companyName ?? ""
                 // FCM: ask for push permission and register this device's token now that we're signed in.
                 PushManager.shared.requestAuthorization()
                 PushManager.shared.registerCurrentToken()

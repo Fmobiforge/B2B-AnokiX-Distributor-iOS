@@ -96,25 +96,6 @@ final class MockDistributorRepository: DistributorRepository {
         }
     }
 
-    func getReportTypes() -> [ReportTypeItem] {
-        [
-            ReportTypeItem(id: "sales", title: "Sales Report", description: "View sales performance", icon: "ic_reports"),
-            ReportTypeItem(id: "inventory", title: "Inventory Report", description: "Track stock levels", icon: "ic_package"),
-            ReportTypeItem(id: "traders", title: "Traders Report", description: "Analyze trader activity", icon: "ic_traders"),
-            ReportTypeItem(id: "finance", title: "Finance Report", description: "Financial summaries", icon: "ic_finance_report")
-        ]
-    }
-
-    func getRecentReports() -> [ReportHistoryItem] {
-        [
-            ReportHistoryItem(id: "r1", name: "Sales Report - May 2025", generatedDate: "24 May 2025", format: "PDF"),
-            ReportHistoryItem(id: "r2", name: "Inventory Report - May 2025", generatedDate: "24 May 2025", format: "PDF"),
-            ReportHistoryItem(id: "r3", name: "Traders Report - May 2025", generatedDate: "23 May 2025", format: "PDF"),
-            ReportHistoryItem(id: "r4", name: "Finance Report - May 2025", generatedDate: "23 May 2025", format: "PDF"),
-            ReportHistoryItem(id: "r5", name: "Sales Report - April 2025", generatedDate: "30 Apr 2025", format: "PDF")
-        ]
-    }
-
     func getDeliveries(statusFilter: String) -> [DeliveryItem] {
         let all = [
             DeliveryItem(id: "DL-10045", traderName: "Mega Traders", driverName: "Thabo M.", eta: "Today, 15:30 – 16:00", status: "in_transit"),

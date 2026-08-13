@@ -186,20 +186,6 @@ struct ReturnItem {
     let status: String
 }
 
-struct ReportHistoryItem {
-    let id: String
-    let name: String
-    let generatedDate: String
-    let format: String
-}
-
-struct ReportTypeItem {
-    let id: String
-    let title: String
-    let description: String
-    let icon: String
-}
-
 struct SettingsMenuEntry {
     let key: String
     let title: String

@@ -66,6 +66,9 @@ struct LoginData: Decodable {
     /// Branding for the logged-in distributor company. `companyLogoUrl` is an absolute URL
     /// to the uploaded logo (may be nil/empty when none was set).
     struct PortalInfo: Decodable {
+        /// Display name for the distributor. Login does not return the registered legal
+        /// name — that comes from `base-info`'s `portal_info.company_legal_name`.
+        let companyName: String?
         let companyLogoUrl: String?
     }
 }
@@ -728,6 +731,199 @@ struct TradersData: Decodable {
             out[day] = parts[1].trimmingCharacters(in: .whitespaces)
         }
         return out
+    }
+}
+
+/// GET /api/distributor/traders/get-by-id.
+///
+/// The trader block matches the list row, but this call also returns the linked `user`
+/// account — the owner's name, email and mobile number, which the list response leaves
+/// out. The Edit wizard needs both to fill in step 1.
+struct TraderDetailData: Decodable {
+    let trader: TradersData.Trader?
+    let user: Owner?
+
+    /// The owner's login account (role_id 4 = trader).
+    struct Owner: Decodable {
+        let id: String?
+        let firstName: String?
+        let lastName: String?
+        let email: String?
+        let phoneNumber: String?
+        let status: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            firstName = try c.decodeIfPresent(String.self, forKey: .firstName)
+            lastName = try c.decodeIfPresent(String.self, forKey: .lastName)
+            email = try c.decodeIfPresent(String.self, forKey: .email)
+            phoneNumber = JSONDecoding.flexString(c, key: .phoneNumber)
+            status = try c.decodeIfPresent(String.self, forKey: .status)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, firstName, lastName, email, phoneNumber, status
+        }
+    }
+}
+
+// MARK: - Reports
+
+/// `GET api/distributor/reports` — the Reports dashboard in one call.
+///
+/// `available` is the catalogue the Generate sheet offers, `reports` is everything
+/// already generated, and `summary` feeds the four KPI cards. The endpoint takes no
+/// query parameters, so the screen's search and category filters run over this list
+/// locally rather than round-tripping.
+struct ReportsData: Decodable {
+    let available: [Available]?
+    let reports: [Report]?
+    let summary: Summary?
+
+    /// A report the distributor may generate — the options in the Report picker.
+    struct Available: Decodable {
+        let key: String?
+        let name: String?
+        let category: String?
+        let about: String?
+    }
+
+    /// One generated report: the web table's row.
+    struct Report: Decodable {
+        let id: String?
+        let name: String?
+        let category: String?
+        let periodFrom: String?
+        let periodTo: String?
+        let format: String?
+        let sizeBytes: Int64?
+        let rowCount: Int?
+        let status: String?
+        let error: String?
+        let downloads: Int?
+        let createdAt: String?
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = JSONDecoding.flexString(c, key: .id)
+            name = try c.decodeIfPresent(String.self, forKey: .name)
+            category = try c.decodeIfPresent(String.self, forKey: .category)
+            periodFrom = try c.decodeIfPresent(String.self, forKey: .periodFrom)
+            periodTo = try c.decodeIfPresent(String.self, forKey: .periodTo)
+            format = try c.decodeIfPresent(String.self, forKey: .format)
+            sizeBytes = try c.decodeIfPresent(Int64.self, forKey: .sizeBytes)
+            rowCount = try c.decodeIfPresent(Int.self, forKey: .rowCount)
+            status = try c.decodeIfPresent(String.self, forKey: .status)
+            error = try c.decodeIfPresent(String.self, forKey: .error)
+            downloads = try c.decodeIfPresent(Int.self, forKey: .downloads)
+            createdAt = try c.decodeIfPresent(String.self, forKey: .createdAt)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case id, name, category, periodFrom, periodTo, format
+            case sizeBytes, rowCount, status, error, downloads, createdAt
+        }
+
+        /// "14 Jul – 13 Aug 2026" — the year is only repeated when the range crosses one.
+        var periodLabel: String {
+            guard let from = ReportsData.parseDate(periodFrom),
+                  let to = ReportsData.parseDate(periodTo) else {
+                return [periodFrom, periodTo].compactMap { $0 }.joined(separator: " – ")
+            }
+            return FilterUiHelper.formatDateRange(start: from, end: to)
+        }
+
+        /// "13 Aug 2026" — the day the file was produced.
+        var generatedDateLabel: String {
+            guard let when = ReportsData.parseDateTime(createdAt) else { return createdAt ?? "" }
+            return ReportsData.format(when, "d MMM yyyy")
+        }
+
+        /// "10:51" — shown beside the date, as the web table does.
+        var generatedTimeLabel: String {
+            guard let when = ReportsData.parseDateTime(createdAt) else { return "" }
+            return ReportsData.format(when, "HH:mm")
+        }
+
+        /// "933 B" / "12.4 KB" — file sizes here are small, so B/KB/MB is enough.
+        var sizeLabel: String {
+            let bytes = sizeBytes ?? 0
+            if bytes <= 0 { return "—" }
+            if bytes < 1024 { return "\(bytes) B" }
+            if bytes < 1024 * 1024 {
+                return String(format: "%.1f KB", Double(bytes) / 1024)
+            }
+            return String(format: "%.1f MB", Double(bytes) / (1024 * 1024))
+        }
+
+        var formatLabel: String {
+            let value = (format ?? "").trimmingCharacters(in: .whitespaces)
+            return value.isEmpty ? "CSV" : value.uppercased()
+        }
+
+        /// Only a "ready" report has a file behind it, so only then may we download.
+        var isReady: Bool {
+            let value = (status ?? "").trimmingCharacters(in: .whitespaces)
+            return value.isEmpty || value.caseInsensitiveCompare("ready") == .orderedSame
+        }
+
+        /// Name for the downloaded file when the server offers none. Stays unique per
+        /// report so two downloads never overwrite each other.
+        var suggestedFileName: String {
+            let raw = (name ?? "report").lowercased()
+            let slug = raw.map { $0.isLetter || $0.isNumber ? String($0) : "-" }
+                .joined()
+                .split(separator: "-", omittingEmptySubsequences: true)
+                .joined(separator: "-")
+            return "\(slug.isEmpty ? "report" : slug)-\(id ?? "0").\(formatLabel.lowercased())"
+        }
+    }
+
+    struct Summary: Decodable {
+        let generated: Int?
+        let downloads: Int?
+        let thisMonth: Int?
+        let failed: Int?
+    }
+
+    /// Resolves a generated report back to its catalogue entry so "Generate again" can
+    /// send a `report_key`. The row only carries the display name, so match on that first
+    /// and fall back to the category — two reports never share one category here.
+    func findAvailable(name: String?, category: String?) -> Available? {
+        guard let available = available else { return nil }
+        if let name = name, !name.isEmpty,
+           let match = available.first(where: { $0.name?.caseInsensitiveCompare(name) == .orderedSame }) {
+            return match
+        }
+        guard let category = category, !category.isEmpty else { return nil }
+        return available.first { $0.category?.caseInsensitiveCompare(category) == .orderedSame }
+    }
+
+    // MARK: Formatting helpers
+
+    fileprivate static func parseDate(_ raw: String?) -> Date? {
+        parse(raw, "yyyy-MM-dd")
+    }
+
+    fileprivate static func parseDateTime(_ raw: String?) -> Date? {
+        parse(raw, "yyyy-MM-dd HH:mm:ss") ?? parseDate(raw)
+    }
+
+    private static func parse(_ raw: String?, _ pattern: String) -> Date? {
+        guard let raw = raw?.trimmingCharacters(in: .whitespaces), !raw.isEmpty else { return nil }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.dateFormat = pattern
+        return formatter.date(from: raw)
+    }
+
+    fileprivate static func format(_ date: Date, _ pattern: String) -> String {
+        let formatter = DateFormatter()
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.dateFormat = pattern
+        return formatter.string(from: date)
     }
 }
 

@@ -26,6 +26,10 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
 
     /// The trader being edited, or nil when registering a new one.
     private let editing: TradersData.Trader?
+    /// The fuller copy from traders/get-by-id, once it lands.
+    private var detail: TradersData.Trader?
+    /// Whatever we currently know about the trader: detail if it has arrived, else the row.
+    private var record: TradersData.Trader? { detail ?? editing }
     private var isEditing: Bool { editing != nil }
 
     init(editing trader: TradersData.Trader? = nil) {
@@ -152,14 +156,17 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
     private var termCheckboxes: [UIButton] = []
 
     // Documents
-    private struct DocDef { let key, title, sub: String; let required: Bool }
+    /// `key` is the multipart field used when uploading; `responseKey` is the key the same
+    /// document comes back under. The API reads "business_registration_document" but
+    /// writes "registration_document", so the two names have to be tracked separately.
+    private struct DocDef { let key, responseKey, title, sub: String; let required: Bool }
     private let docDefs: [DocDef] = [
-        DocDef(key: "business_registration_document", title: "Business Registration Document", sub: "CIPC, Business Permit, etc.", required: true),
-        DocDef(key: "owner_id_document", title: "Owner ID Document", sub: "ID or Passport", required: true),
-        DocDef(key: "proof_of_address", title: "Proof of Address", sub: "Municipal bill, Lease, etc.", required: true),
-        DocDef(key: "store_front_photo", title: "Store Front Photo", sub: "Clear photo of your store", required: true),
-        DocDef(key: "store_interior_photo", title: "Store Interior Photo", sub: "Inside view of your store", required: true),
-        DocDef(key: "additional_documents", title: "Additional Documents", sub: "(If any)", required: false)
+        DocDef(key: "business_registration_document", responseKey: "registration_document", title: "Business Registration Document", sub: "CIPC, Business Permit, etc.", required: true),
+        DocDef(key: "owner_id_document", responseKey: "id_document", title: "Owner ID Document", sub: "ID or Passport", required: true),
+        DocDef(key: "proof_of_address", responseKey: "proof_of_address", title: "Proof of Address", sub: "Municipal bill, Lease, etc.", required: true),
+        DocDef(key: "store_front_photo", responseKey: "store_front_photo", title: "Store Front Photo", sub: "Clear photo of your store", required: true),
+        DocDef(key: "store_interior_photo", responseKey: "store_interior_photo", title: "Store Interior Photo", sub: "Inside view of your store", required: true),
+        DocDef(key: "additional_documents", responseKey: "additional_documents", title: "Additional Documents", sub: "(If any)", required: false)
     ]
     /// The total POST is capped at 40 MB by the server. With up to 6 documents
     /// that means each file must stay under 5 MB (6 × 5 MB ≈ 30 MB, leaving room
@@ -225,6 +232,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
     override func loadData() {
         loadReference()
         loadCurrentDistributor()
+        loadTraderDetail()
     }
 
     // MARK: - Prefill (edit mode)
@@ -263,18 +271,120 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
             setPickerTitle(paymentButton, paymentLabels[index])
         }
 
-        // Nothing is re-uploaded unless the user picks a new file, so show what is on file.
+        renderStoredDocuments(trader)
+        loadExistingLogo(trader.companyLogoUrl)
+
+        // An approved trader already accepted the terms; keep them ticked so an edit does
+        // not force the distributor to re-consent on the owner's behalf.
+        termCheckboxes.forEach { $0.isSelected = true }
+    }
+
+    /// Pulls the full record for the trader being edited. The list row has no owner
+    /// fields, so step 1 stays blank until this lands and fills in the linked user
+    /// account's name, email and mobile number.
+    private func loadTraderDetail() {
+        guard let id = editing?.id, !id.isEmpty else { return }
+        ApiClient.shared.getTraderById(id: id) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let data):
+                // Detail is the fuller copy, but it lands after the screen is already
+                // interactive — only fill what the list row could not, so a fast typist's
+                // input is never overwritten.
+                if let trader = data.trader {
+                    self.detail = trader
+                    self.fillGaps(from: trader)
+                }
+                self.prefillOwner(data.user)
+            case .failure(let error):
+                self.toast(error.message)
+            }
+        }
+    }
+
+    /// Re-applies the parts of the record the list row could not supply. Text fields are
+    /// only filled when still empty; the rest (selections, schedule, documents, logo) is
+    /// repainted because the row carried no version of it to overwrite.
+    private func fillGaps(from trader: TradersData.Trader) {
+        fillIfEmpty(idNumberField, trader.idNumber)
+        fillIfEmpty(passportField, trader.passportNumber)
+        fillIfEmpty(businessNameField, trader.businessName)
+        fillIfEmpty(tradingNameField, trader.tradingName)
+        fillIfEmpty(businessRegField, trader.businessRegistrationNumber)
+        fillIfEmpty(businessEmailField, trader.businessEmail)
+        fillIfEmpty(addressField, trader.address)
+        if text(businessPhoneField).isEmpty {
+            businessCountry = setPhone(trader.businessPhoneNumber, fallback: businessCountry,
+                                       button: businessCountryButton, field: businessPhoneField)
+        }
+
+        if pickedCoordinate == nil, let lat = trader.latitude, let lng = trader.longitude {
+            placePin(at: CLLocationCoordinate2D(latitude: lat, longitude: lng), zoom: true)
+        }
+
+        selectedTraderTypeSlug = trader.traderType
+        normaliseTraderTypeSelection()
+        applyTraderTypeSelection()
+
+        selectedCategoryIds = trader.categoryIds
+        renderCategoryChips()
+
+        applyDeliveryDays(TradersData.parseDeliveryDays(trader.preferredDeliveryDays))
+        if let index = paymentValues.firstIndex(where: {
+            $0.caseInsensitiveCompare(trader.paymentMethod ?? "") == .orderedSame
+        }) {
+            paymentMethodValue = paymentValues[index]
+            setPickerTitle(paymentButton, paymentLabels[index])
+        }
+        renderStoredDocuments(trader)
+        loadExistingLogo(trader.companyLogoUrl)
+    }
+
+    /// Owner Information (step 1) comes from the linked user account, not the trader row.
+    private func prefillOwner(_ user: TraderDetailData.Owner?) {
+        guard let user = user else { return }
+        fillIfEmpty(firstNameField, user.firstName)
+        fillIfEmpty(lastNameField, user.lastName)
+        fillIfEmpty(ownerEmailField, user.email)
+        if text(ownerMobileField).isEmpty {
+            ownerCountry = setPhone(user.phoneNumber, fallback: ownerCountry,
+                                    button: ownerCountryButton, field: ownerMobileField)
+        }
+    }
+
+    /// Used by the late-arriving detail response so it never overwrites typed input.
+    private func fillIfEmpty(_ field: UITextField, _ value: String?) {
+        guard text(field).isEmpty, let value = value, !value.isEmpty else { return }
+        field.text = value
+    }
+
+    /// Documents already uploaded are listed by name; only replacements are re-sent.
+    private func renderStoredDocuments(_ trader: TradersData.Trader) {
         for def in docDefs {
-            let name = trader.documentName(def.key)
+            // Skip anything the user has already replaced in this session.
+            guard docFiles[def.key] == nil else { continue }
+            let name = trader.documentName(def.responseKey)
             guard !name.isEmpty else { continue }
             docSubtitleLabels[def.key]?.text = "On file: \(name)"
             docSubtitleLabels[def.key]?.textColor = AppColors.success
             docButtons[def.key]?.setTitle("Replace", for: .normal)
         }
+    }
 
-        // An approved trader already accepted the terms; keep them ticked so an edit does
-        // not force the distributor to re-consent on the owner's behalf.
-        termCheckboxes.forEach { $0.isSelected = true }
+    /// Shows the logo already on file so an edit does not look like it has none.
+    private func loadExistingLogo(_ urlString: String?) {
+        // A freshly cropped logo always wins.
+        guard logoData == nil,
+              let urlString = urlString, let url = URL(string: urlString) else { return }
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
+            guard let data = data, let image = UIImage(data: data) else { return }
+            DispatchQueue.main.async {
+                guard let self = self, self.logoData == nil else { return }
+                self.logoPreview.image = image
+                self.logoPreview.isHidden = false
+                self.logoPlaceholder.isHidden = true
+            }
+        }.resume()
     }
 
     /// Splits a stored MSISDN ("27821234567") back into the country picker and the
@@ -322,7 +432,9 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
             guard let self = self, case .success(let data) = result,
                   let portal = data.portalInfo else { return }
             if let id = portal.id, !id.isEmpty { self.currentDistributorId = id }
-            let label = [portal.tradingName, portal.companyLegalName]
+            // Registering a trader is a legal relationship, so the chip names the
+            // distributor's registered entity rather than its trading name.
+            let label = [portal.companyLegalName, portal.tradingName]
                 .compactMap { $0 }.first { !$0.isEmpty } ?? ""
             self.distributorChip.text = label
             self.distributorChip.isHidden = label.isEmpty
@@ -333,7 +445,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
     /// base-info has not answered yet — better to leave the link untouched than clear it.
     private func resolveDistributorId() -> String {
         if !currentDistributorId.isEmpty { return currentDistributorId }
-        return (editing?.preferredDistributorIds ?? "").trimmingCharacters(in: .whitespaces)
+        return (record?.preferredDistributorIds ?? "").trimmingCharacters(in: .whitespaces)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -517,7 +629,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         case stepVerify:
             // When editing, a document already on file satisfies the requirement — only a
             // replacement is re-uploaded.
-            for d in docDefs where d.required && docFiles[d.key] == nil && !hasStoredDocument(d.key) {
+            for d in docDefs where d.required && docFiles[d.key] == nil && !hasStoredDocument(d) {
                 return fail("Please upload all required documents.")
             }
             return true
@@ -553,9 +665,9 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
     }
 
     /// True when the trader being edited already has a file stored for this document.
-    private func hasStoredDocument(_ key: String) -> Bool {
-        guard let trader = editing else { return false }
-        return !trader.documentName(key).isEmpty
+    private func hasStoredDocument(_ def: DocDef) -> Bool {
+        guard let trader = record else { return false }
+        return !trader.documentName(def.responseKey).isEmpty
     }
 
     private func fail(_ message: String) -> Bool {
