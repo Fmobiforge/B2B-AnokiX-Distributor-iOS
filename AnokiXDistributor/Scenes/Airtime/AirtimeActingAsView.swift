@@ -15,6 +15,7 @@ final class AirtimeActingAsView: VasSectionView {
     var onChange: ((VasSelectCustomerData.Customer?) -> Void)?
 
     private let pickerButton = UIButton(type: .system)
+    private let clearButton = UIButton(type: .system)
     private let noteLabel = UILabel.make("", font: AppFonts.regular(12), color: AppColors.textSecondary, lines: 0)
     private var chip: PaddingLabel!
     private var pickerStack: UIStackView!
@@ -64,13 +65,26 @@ final class AirtimeActingAsView: VasSectionView {
         setDropdownTitle(pickerButton, "Select a customer", chosen: false)
         pickerButton.addAction(UIAction { [weak self] _ in self?.showPicker() }, for: .touchUpInside)
 
+        // Clears the pick. It sits beside the dropdown rather than inside it so the tap target
+        // is unambiguous — the × releases the customer, the field itself reopens the picker.
+        var clearConfig = UIButton.Configuration.plain()
+        clearConfig.image = UIImage(systemName: "xmark.circle.fill")
+        clearConfig.baseForegroundColor = AppColors.textSecondary
+        clearConfig.contentInsets = NSDirectionalEdgeInsets(top: 4, leading: 4, bottom: 4, trailing: 4)
+        clearButton.configuration = clearConfig
+        clearButton.accessibilityLabel = "Stop acting as this customer"
+        clearButton.isHidden = true
+        clearButton.addAction(UIAction { [weak self] _ in self?.releaseCustomer() }, for: .touchUpInside)
+
         spinner.hidesWhenStopped = true
         spinner.color = AppColors.purplePrimary
-        // The dropdown takes the slack; the spinner keeps its intrinsic width beside it.
+        // The dropdown takes the slack; the × and spinner keep their intrinsic width beside it.
         spinner.setContentHuggingPriority(.required, for: .horizontal)
+        clearButton.setContentHuggingPriority(.required, for: .horizontal)
         pickerButton.setContentHuggingPriority(.defaultLow, for: .horizontal)
         let pickerRow = UIStackView.horizontal(spacing: 8, alignment: .center)
         pickerRow.addArrangedSubview(pickerButton)
+        pickerRow.addArrangedSubview(clearButton)
         pickerRow.addArrangedSubview(spinner)
 
         noteLabel.text = Self.note
@@ -205,6 +219,16 @@ final class AirtimeActingAsView: VasSectionView {
                                        limesAccountId: c.limesAccountId)
     }
 
+    /// The × beside the field: stop acting as this customer. Their token is what the three tabs
+    /// run on, so letting it go locks them again — that is the point of the control, and it is
+    /// how an operator moves from one customer's order to the next without a stale panel in
+    /// between.
+    private func releaseCustomer() {
+        guard !busy, approved != nil else { return }
+        clearSelection()
+        render()
+    }
+
     private func clearSelection() {
         let had = approved != nil
         approved = nil
@@ -221,11 +245,17 @@ final class AirtimeActingAsView: VasSectionView {
         emptyStack.isHidden = !none
         noteLabel.isHidden = approved != nil
         noteLabel.text = Self.note
+        // There is nothing to release until a customer has been approved.
+        clearButton.isHidden = approved == nil
     }
 
     private func setLoading(_ active: Bool, note: String? = nil) {
         active ? spinner.startAnimating() : spinner.stopAnimating()
         pickerButton.isEnabled = !active
+        clearButton.isEnabled = !active
+        if active {
+            clearButton.isHidden = true
+        }
         if active, let note {
             noteLabel.isHidden = false
             noteLabel.text = note

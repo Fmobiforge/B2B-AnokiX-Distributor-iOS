@@ -57,6 +57,7 @@ final class AirtimeViewController: BaseSecondaryViewController {
     private var stack: UIStackView!
     private let kpiContainer = UIStackView.vertical(spacing: 12, alignment: .fill)
     private var tabButtons: [UIButton] = []
+    private var tabScroll: UIScrollView!
 
     private let onboardView = AirtimeOnboardView()
     private let customersView = AirtimeCustomersView()
@@ -118,6 +119,7 @@ final class AirtimeViewController: BaseSecondaryViewController {
     /// across a phone, and each pill is a plain button so the selected state is a style swap.
     private func buildTabStrip() -> UIView {
         let scroll = UIScrollView()
+        tabScroll = scroll
         scroll.showsHorizontalScrollIndicator = false
         let row = UIStackView.horizontal(spacing: 8, alignment: .fill)
         row.forAutoLayout()
@@ -165,10 +167,26 @@ final class AirtimeViewController: BaseSecondaryViewController {
         }
         actingAsView.setVisible(gated)
         gateCard.isHidden = !(gated && !unlocked)
+        revealTab(index)
 
         // Sections fetch their own data the first time they are opened, so switching tabs
         // never costs a request the operator did not ask for.
         if unlocked { sections[index].onShown() }
+    }
+
+    /// Slides the strip so the chosen pill sits at the left edge. Six labels never fit across a
+    /// phone, so the tab that was just tapped would otherwise stay half off-screen — and the
+    /// tabs after it are the ones the operator is most likely to want next. The scroll is
+    /// deferred because the pill has no frame until the strip has been laid out.
+    private func revealTab(_ index: Int) {
+        guard tabButtons.indices.contains(index) else { return }
+        let button = tabButtons[index]
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let maxOffset = max(0, self.tabScroll.contentSize.width - self.tabScroll.bounds.width)
+            let offset = min(max(0, button.frame.minX), maxOffset)
+            self.tabScroll.setContentOffset(CGPoint(x: offset, y: 0), animated: true)
+        }
     }
 
     /// The three tabs Limes runs on the customer's own token, so they need "Acting as" first.
