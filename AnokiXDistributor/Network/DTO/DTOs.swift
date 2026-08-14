@@ -2821,6 +2821,69 @@ struct VasCustomersData: Decodable {
     }
 }
 
+/// `data` block of POST api/common/vas/select-customer. Limes issues its token per customer,
+/// so the Subscription, Catalog & orders and Dynamic services tabs first authenticate as the
+/// customer being served; `subject` is the Limes login that answered and is what the
+/// "Acting as" chip shows once approved.
+struct VasSelectCustomerData: Decodable {
+    let authenticated: Bool
+    let subject: String?
+    let customer: Customer?
+
+    enum CodingKeys: String, CodingKey { case authenticated, subject, customer }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        authenticated = (try? c.decode(Bool.self, forKey: .authenticated)) ?? false
+        subject = try? c.decodeIfPresent(String.self, forKey: .subject)
+        customer = try? c.decodeIfPresent(Customer.self, forKey: .customer)
+    }
+
+    struct Customer: Decodable, Identifiable {
+        let id: String
+        let firstname: String?
+        let lastname: String?
+        let email: String?
+        let phone: String?
+        let status: String?
+        let limesAccountId: String?
+
+        enum CodingKeys: String, CodingKey {
+            case id, firstname, lastname, email, phone, status, limesAccountId
+        }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            // The list endpoint sends the id as a string and this one as a number.
+            id = JSONDecoding.flexString(c, key: .id) ?? ""
+            firstname = try? c.decodeIfPresent(String.self, forKey: .firstname)
+            lastname = try? c.decodeIfPresent(String.self, forKey: .lastname)
+            email = try? c.decodeIfPresent(String.self, forKey: .email)
+            phone = JSONDecoding.flexString(c, key: .phone)
+            status = try? c.decodeIfPresent(String.self, forKey: .status)
+            limesAccountId = JSONDecoding.flexString(c, key: .limesAccountId)
+        }
+
+        /// Stands in when the response omits the customer block — the row the operator picked
+        /// is what we know about them.
+        init(id: String, firstname: String?, lastname: String?, email: String?,
+             phone: String?, status: String?, limesAccountId: String?) {
+            self.id = id
+            self.firstname = firstname
+            self.lastname = lastname
+            self.email = email
+            self.phone = phone
+            self.status = status
+            self.limesAccountId = limesAccountId
+        }
+    }
+
+    /// The chip label: the Limes subject when it came back, otherwise the customer's email.
+    var subjectLabel: String {
+        let s = subject?.trimmingCharacters(in: .whitespaces) ?? ""
+        if !s.isEmpty { return s }
+        return customer?.email?.trimmingCharacters(in: .whitespaces) ?? ""
+    }
+}
+
 /// `data` block of GET api/common/vas/subscription-products — the SIM subscription products
 /// the "Assign a SIM" form offers. `inHand` products take an ICCID and activate immediately.
 struct VasSubscriptionProductsData: Decodable {

@@ -12,6 +12,11 @@ import UIKit
 ///
 /// Only onboarding + subscription need each other; airtime and data top-ups go straight to
 /// any number that is already active on the network.
+///
+/// Limes issues its token per customer, so Subscription, Catalog & orders and Dynamic services
+/// run behind the shared "Acting as" bar: nothing on those three tabs is shown or called until
+/// one of the distributor's active customers has been authenticated, and every request they
+/// then make carries that `customer_id`.
 final class AirtimeViewController: BaseSecondaryViewController {
 
     override var screenTitle: String { "Airtime & VAS" }
@@ -31,6 +36,16 @@ final class AirtimeViewController: BaseSecondaryViewController {
         "Onboard customer", "Customers", "Subscription",
         "Catalog & orders", "Dynamic services", "Recent transactions"
     ]
+
+    /// Indices into `tabTitles` / `sections`, in the order the pills are drawn.
+    private enum Tab {
+        static let onboard = 0
+        static let customers = 1
+        static let subscription = 2
+        static let catalog = 3
+        static let dynamic = 4
+        static let transactions = 5
+    }
 
     // MARK: State
 
@@ -52,6 +67,10 @@ final class AirtimeViewController: BaseSecondaryViewController {
     private var sections: [VasSectionView] { [onboardView, customersView, subscriptionView,
                                               catalogView, dynamicView, transactionsView] }
 
+    /// Shared by the three customer-scoped tabs — one pick serves all of them.
+    private let actingAsView = AirtimeActingAsView()
+    private var gateCard: UIView!
+
     // MARK: Setup
 
     override func setupContent(in container: UIView) {
@@ -60,13 +79,35 @@ final class AirtimeViewController: BaseSecondaryViewController {
         stack.addArrangedSubview(VasSectionView.infoBanner(NSAttributedString.vasExplainer(Self.howItWorks)))
         stack.addArrangedSubview(buildTabStrip())
 
+        // "Acting as" + its gate belong to the three customer-scoped tabs (Subscription,
+        // Catalog & orders, Dynamic services) and are hidden elsewhere; the selection is
+        // shared, so switching between those tabs keeps the same customer.
+        actingAsView.host = self
+        actingAsView.onChange = { [weak self] _ in self?.actingCustomerChanged() }
+        stack.addArrangedSubview(actingAsView)
+
+        gateCard = buildGateCard()
+        stack.addArrangedSubview(gateCard)
+
         for section in sections {
             section.host = self
             stack.addArrangedSubview(section)
         }
 
         rebuildKpis()
-        selectTab(0)
+        selectTab(Tab.onboard)
+    }
+
+    private func buildGateCard() -> UIView {
+        let card = StyleKit.cardView()
+        let label = UILabel.make(
+            "Select a customer above to continue. Limes authenticates as the customer, so every "
+            + "call on this tab runs on their token.",
+            font: AppFonts.regular(13), color: AppColors.textSecondary, align: .center, lines: 0)
+        label.forAutoLayout()
+        card.addSubview(label)
+        label.pinEdges(to: card, insets: UIEdgeInsets(top: 34, left: 20, bottom: 34, right: 20))
+        return card
     }
 
     override func loadData() {
@@ -115,12 +156,32 @@ final class AirtimeViewController: BaseSecondaryViewController {
             ]))
             button.configuration = config
         }
+        let gated = Self.isCustomerScoped(index)
+        let unlocked = !gated || actingAsView.hasCustomer
         for (i, section) in sections.enumerated() {
-            section.isHidden = i != index
+            // A gated tab shows the gate card instead of its panel until Limes has approved the
+            // customer, so a selected-but-locked section stays hidden.
+            section.isHidden = !(i == index && unlocked)
         }
+        actingAsView.setVisible(gated)
+        gateCard.isHidden = !(gated && !unlocked)
+
         // Sections fetch their own data the first time they are opened, so switching tabs
         // never costs a request the operator did not ask for.
-        sections[index].onShown()
+        if unlocked { sections[index].onShown() }
+    }
+
+    /// The three tabs Limes runs on the customer's own token, so they need "Acting as" first.
+    private static func isCustomerScoped(_ tab: Int) -> Bool {
+        tab == Tab.subscription || tab == Tab.catalog || tab == Tab.dynamic
+    }
+
+    /// A different customer was approved (or the pick was cleared): everything those tabs hold
+    /// belongs to the previous customer, so it is dropped and re-read on their token.
+    private func actingCustomerChanged() {
+        subscriptionView.onCustomerChanged()
+        catalogView.onCustomerChanged()
+        selectTab(currentTab)
     }
 
     // MARK: KPI
@@ -193,5 +254,12 @@ extension AirtimeViewController: VasSectionHost {
 
     func vasCustomerOnboarded() {
         customersView.reload()
+        actingAsView.reloadCustomers()
+    }
+
+    var vasActingCustomerId: String { actingAsView.customerId }
+
+    func vasOpenOnboardTab() {
+        selectTab(Tab.onboard)
     }
 }

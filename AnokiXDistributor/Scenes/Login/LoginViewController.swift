@@ -105,6 +105,7 @@ final class LoginViewController: UIViewController {
                 if let user = data.user {
                     SessionManager.shared.setUser(firstName: user.firstName, lastName: user.lastName,
                                                   email: user.email, roleLabel: user.roleLabel)
+                    SessionManager.shared.phone = user.phoneNumber ?? ""
                 }
                 SessionManager.shared.companyLogoUrl = data.portalInfo?.companyLogoUrl ?? ""
                 SessionManager.shared.companyName = data.portalInfo?.companyName ?? ""

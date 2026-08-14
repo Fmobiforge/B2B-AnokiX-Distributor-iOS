@@ -52,6 +52,22 @@ final class AirtimeCatalogView: VasSectionView {
         loadCategories()
     }
 
+    /// The distributor is now acting as a different customer (or none): the catalog is read on
+    /// the customer's token, so what is on screen is dropped and re-read for the new one.
+    func onCustomerChanged() {
+        loaded = false
+        categories = []
+        products = []
+        selectedCategory = nil
+        selectedProduct = nil
+        poweredByLabel.attributedText = nil
+        customAmountField.text = ""
+        rebuildCategories()
+        rebuildProducts()
+        rebuildOrderSummary()
+        if !isHidden && !(host?.vasActingCustomerId ?? "").isEmpty { onShown() }
+    }
+
     // MARK: Cards
 
     private func buildCategoryCard() -> UIView {
@@ -341,7 +357,7 @@ final class AirtimeCatalogView: VasSectionView {
     private func loadCategories() {
         categoriesLoading = true
         rebuildCategories()
-        ApiClient.shared.getVasCategories { [weak self] result in
+        ApiClient.shared.getVasCategories(customerId: host?.vasActingCustomerId ?? "") { [weak self] result in
             guard let self else { return }
             self.categoriesLoading = false
             switch result {
@@ -365,7 +381,8 @@ final class AirtimeCatalogView: VasSectionView {
         productsLoading = true
         products = []
         rebuildProducts()
-        ApiClient.shared.getVasProducts(category: categoryId, page: 1, limit: Self.productLimit) { [weak self] result in
+        ApiClient.shared.getVasProducts(category: categoryId, page: 1, limit: Self.productLimit,
+                                        customerId: host?.vasActingCustomerId ?? "") { [weak self] result in
             guard let self else { return }
             self.productsLoading = false
             switch result {
@@ -382,6 +399,11 @@ final class AirtimeCatalogView: VasSectionView {
 
     private func buyTapped() {
         guard validate(), let category = selectedCategory, let product = selectedProduct else { return }
+        let customerId = host?.vasActingCustomerId ?? ""
+        guard !customerId.isEmpty else {
+            _ = fail("Choose the customer you are acting for first.")
+            return
+        }
         let msisdn = text(recipientField)
         let amount = currentAmount()
 
@@ -389,7 +411,8 @@ final class AirtimeCatalogView: VasSectionView {
         buyButton.setTitle("Processing…", for: .normal)
         ApiClient.shared.purchaseVas(productId: product.id, msisdn: msisdn, amount: amount,
                                      sku: product.sku ?? "", name: product.name ?? "",
-                                     category: category.name) { [weak self] result in
+                                     category: category.name,
+                                     customerId: customerId) { [weak self] result in
             guard let self else { return }
             self.buyButton.isEnabled = true
             self.buyButton.setTitle("Sell now", for: .normal)

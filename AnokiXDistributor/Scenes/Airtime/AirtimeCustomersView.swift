@@ -25,10 +25,29 @@ final class AirtimeCustomersView: VasSectionView {
         content.addArrangedSubview(searchBar)
 
         countLabel = UILabel.make("", font: AppFonts.regular(12), color: AppColors.textSecondary)
-        let refresh = UIButton(type: .system)
+        // Search runs the keyword; Refresh re-reads the list as it is — clearing the keyword is
+        // the operator's call, exactly as on the web portal.
+        let search = pillButton("Search", icon: "magnifyingglass")
+        let refresh = pillButton("Refresh", icon: "arrow.clockwise")
+
+        let header = UIStackView.horizontal(spacing: 8, alignment: .center)
+        header.addArrangedSubview(countLabel)
+        header.addArrangedSubview(UIView())
+        header.addArrangedSubview(search)
+        header.addArrangedSubview(refresh)
+        content.addArrangedSubview(header)
+        content.addArrangedSubview(listContainer)
+
+        stack.addArrangedSubview(cardView)
+        rebuildList()
+    }
+
+    /// Small outlined pill — the shape both list actions share.
+    private func pillButton(_ title: String, icon: String) -> UIButton {
+        let button = UIButton(type: .system)
         var config = UIButton.Configuration.plain()
-        config.title = "Refresh"
-        config.image = UIImage(systemName: "arrow.clockwise")
+        config.title = title
+        config.image = UIImage(systemName: icon)
         config.imagePadding = 6
         config.baseForegroundColor = AppColors.purplePrimary
         config.background.strokeColor = AppColors.border
@@ -38,19 +57,10 @@ final class AirtimeCustomersView: VasSectionView {
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer {
             var out = $0; out.font = AppFonts.bold(12); return out
         }
-        refresh.configuration = config
-        refresh.setContentHuggingPriority(.required, for: .horizontal)
-        refresh.addAction(UIAction { [weak self] _ in self?.load() }, for: .touchUpInside)
-
-        let header = UIStackView.horizontal(spacing: 8, alignment: .center)
-        header.addArrangedSubview(countLabel)
-        header.addArrangedSubview(UIView())
-        header.addArrangedSubview(refresh)
-        content.addArrangedSubview(header)
-        content.addArrangedSubview(listContainer)
-
-        stack.addArrangedSubview(cardView)
-        rebuildList()
+        button.configuration = config
+        button.setContentHuggingPriority(.required, for: .horizontal)
+        button.addAction(UIAction { [weak self] _ in self?.load() }, for: .touchUpInside)
+        return button
     }
 
     /// Loads once when the tab is first opened; later visits reuse what is on screen.
@@ -93,7 +103,12 @@ final class AirtimeCustomersView: VasSectionView {
             return
         }
         if customers.isEmpty {
-            listContainer.addArrangedSubview(centeredMessage("No customers onboarded yet."))
+            // "Nothing matched" and "nobody onboarded yet" are different problems and read as
+            // such — a keyword that finds nothing is not an empty account.
+            listContainer.addArrangedSubview(centeredMessage(
+                text(searchBar.textField).isEmpty
+                    ? "No customers onboarded yet. Add one on the Onboard customer tab."
+                    : "No customers match that search."))
             return
         }
         for (i, customer) in customers.enumerated() {

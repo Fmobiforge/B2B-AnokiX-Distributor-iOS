@@ -237,11 +237,17 @@ final class AirtimeDynamicServicesView: VasSectionView {
 
     private func provision() {
         guard validate() else { return }
+        let customerId = host?.vasActingCustomerId ?? ""
+        guard !customerId.isEmpty else {
+            _ = fail("Choose the customer you are acting for first.")
+            return
+        }
         provisionButton.isEnabled = false
         provisionButton.setTitle("Processing…", for: .normal)
 
         ApiClient.shared.provisionVasDynamicServices(msisdn: text(msisdnField),
-                                                     services: buildServices()) { [weak self] result in
+                                                     services: buildServices(),
+                                                     customerId: customerId) { [weak self] result in
             guard let self else { return }
             self.provisionButton.isEnabled = true
             self.provisionButton.setTitle("Provision services", for: .normal)

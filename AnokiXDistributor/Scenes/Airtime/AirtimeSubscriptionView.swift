@@ -75,10 +75,24 @@ final class AirtimeSubscriptionView: VasSectionView {
         loadSubscriptions()
     }
 
+    /// The distributor is now acting as a different customer (or none): the products and the
+    /// activated SIMs on screen belong to the previous one, so they are dropped and re-read on
+    /// the new customer's token the next time the tab is shown.
+    func onCustomerChanged() {
+        loaded = false
+        products = []
+        selectedProduct = nil
+        subscriptions = []
+        setDropdownTitle(productButton, "Select a product", chosen: false)
+        iccidField.text = ""
+        rebuildSims()
+        if !isHidden && !(host?.vasActingCustomerId ?? "").isEmpty { onShown() }
+    }
+
     // MARK: Products
 
     private func loadProducts() {
-        ApiClient.shared.getVasSubscriptionProducts { [weak self] result in
+        ApiClient.shared.getVasSubscriptionProducts(customerId: host?.vasActingCustomerId ?? "") { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let data):
@@ -112,7 +126,7 @@ final class AirtimeSubscriptionView: VasSectionView {
     // MARK: Activated SIMs
 
     private func loadSubscriptions() {
-        ApiClient.shared.getVasSubscriptions { [weak self] result in
+        ApiClient.shared.getVasSubscriptions(customerId: host?.vasActingCustomerId ?? "") { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let data): self.subscriptions = data.subscriptions
@@ -168,10 +182,17 @@ final class AirtimeSubscriptionView: VasSectionView {
                                message: "Enter the SIM's ICCID (19–20 digits), or switch on eSIM.")
             return
         }
+        let customerId = host?.vasActingCustomerId ?? ""
+        guard !customerId.isEmpty else {
+            host?.vasShowAlert(title: "Check your details",
+                               message: "Choose the customer you are acting for first.")
+            return
+        }
 
         createButton.isEnabled = false
         createButton.setTitle("Processing…", for: .normal)
-        ApiClient.shared.subscribeVas(productId: product.id, iccid: iccid, eSim: eSim) { [weak self] result in
+        ApiClient.shared.subscribeVas(productId: product.id, iccid: iccid, eSim: eSim,
+                                      customerId: customerId) { [weak self] result in
             guard let self else { return }
             self.createButton.isEnabled = true
             self.createButton.setTitle("Create subscription", for: .normal)

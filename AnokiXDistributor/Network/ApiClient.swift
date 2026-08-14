@@ -751,29 +751,47 @@ final class ApiClient {
         getAuthed("api/common/vas/transactions", query: q, type: VasTransactionsData.self, completion: completion)
     }
 
-    /// The Limes VAS category tree (api/common/vas/categories). Flatten via `leaves`.
-    func getVasCategories(completion: @escaping (Result<VasCategoriesData, ApiError>) -> Void) {
-        getAuthed("api/common/vas/categories", query: nil, type: VasCategoriesData.self, completion: completion)
+    /// The Limes VAS category tree (api/common/vas/categories). Flatten via `leaves`. Scoped to
+    /// the customer being acted for — see `selectVasCustomer`.
+    func getVasCategories(customerId: String,
+                          completion: @escaping (Result<VasCategoriesData, ApiError>) -> Void) {
+        getAuthed("api/common/vas/categories", query: Self.customerScope(customerId),
+                  type: VasCategoriesData.self, completion: completion)
     }
 
     /// Purchasable products for one leaf category (api/common/vas/products).
-    func getVasProducts(category: String, page: Int, limit: Int,
+    func getVasProducts(category: String, page: Int, limit: Int, customerId: String,
                         completion: @escaping (Result<VasProductsData, ApiError>) -> Void) {
-        let q = ["category": category, "page": String(page), "limit": String(limit)]
+        var q = Self.customerScope(customerId)
+        q["category"] = category
+        q["page"] = String(page)
+        q["limit"] = String(limit)
         getAuthed("api/common/vas/products", query: q, type: VasProductsData.self, completion: completion)
+    }
+
+    /// A fresh parameter map already carrying `customer_id`. Limes runs these calls on the
+    /// customer's own token, so the id travels with every request the three customer-scoped
+    /// tabs make; a blank id is simply omitted rather than sent as an empty string.
+    private static func customerScope(_ customerId: String) -> [String: String] {
+        let id = customerId.trimmingCharacters(in: .whitespaces)
+        return id.isEmpty ? [:] : ["customer_id": id]
     }
 
     /// Buy a VAS product (api/common/vas/purchase). Paid from the anokiX wallet; the server
     /// debits and forwards to Limes. Only status/message decide success — the failure path
     /// carries the network's reason (e.g. inactive subscriber), and `data` is null.
     func purchaseVas(productId: String, msisdn: String, amount: Double, sku: String, name: String,
-                     category: String, completion: @escaping (Result<Void, ApiError>) -> Void) {
-        let form = [
-            "product_id": productId, "msisdn": msisdn, "amount": String(amount),
-            "sku": sku, "name": name, "category": category,
-            // Postman collection sends earn_commission=1 so the distributor accrues their VAS commission.
-            "earn_commission": "1"
-        ]
+                     category: String, customerId: String,
+                     completion: @escaping (Result<Void, ApiError>) -> Void) {
+        var form = Self.customerScope(customerId)
+        form["product_id"] = productId
+        form["msisdn"] = msisdn
+        form["amount"] = String(amount)
+        form["sku"] = sku
+        form["name"] = name
+        form["category"] = category
+        // Postman collection sends earn_commission=1 so the distributor accrues their VAS commission.
+        form["earn_commission"] = "1"
         Http.postForm(baseUrl: Self.baseURL, path: "api/common/vas/purchase", form: form,
                       token: session.token) { [weak self] r in
             self?.deliverStatus(r, completion: completion)
@@ -817,32 +835,48 @@ final class ApiClient {
         }
     }
 
-    /// End-customers this distributor has onboarded (api/common/vas/customers).
-    func getVasCustomers(search: String, limit: Int,
+    /// End-customers this distributor has onboarded (api/common/vas/customers). Pass
+    /// `activeOnly` to ask for the ACT customers only — that is the list the "Acting as" picker
+    /// offers, because Limes will not authenticate as a customer who is not active yet.
+    func getVasCustomers(search: String, limit: Int, activeOnly: Bool = false,
                          completion: @escaping (Result<VasCustomersData, ApiError>) -> Void) {
-        let q = ["search": search, "limit": String(limit)]
+        var q = ["search": search, "limit": String(limit)]
+        if activeOnly { q["active"] = "1" }
         getAuthed("api/common/vas/customers", query: q, type: VasCustomersData.self, completion: completion)
+    }
+
+    /// Authenticate as an onboarded customer (api/common/vas/select-customer). Limes issues its
+    /// token per customer, so the Subscription, Catalog & orders and Dynamic services tabs only
+    /// work once this has been approved; every later call on those tabs carries the same
+    /// `customer_id`.
+    func selectVasCustomer(customerId: String,
+                           completion: @escaping (Result<VasSelectCustomerData, ApiError>) -> Void) {
+        postAuthed("api/common/vas/select-customer", form: Self.customerScope(customerId),
+                   type: VasSelectCustomerData.self, completion: completion)
     }
 
     /// SIM subscription products offered by the "Assign a SIM" form (never hardcode these).
     func getVasSubscriptionProducts(
+        customerId: String,
         completion: @escaping (Result<VasSubscriptionProductsData, ApiError>) -> Void) {
-        getAuthed("api/common/vas/subscription-products", query: nil,
+        getAuthed("api/common/vas/subscription-products", query: Self.customerScope(customerId),
                   type: VasSubscriptionProductsData.self, completion: completion)
     }
 
-    /// SIMs already activated by this distributor, with the MSISDN Limes assigned to each.
-    func getVasSubscriptions(completion: @escaping (Result<VasSubscriptionsData, ApiError>) -> Void) {
-        getAuthed("api/common/vas/subscriptions", query: nil,
+    /// SIMs already activated for the selected customer, with the MSISDN Limes assigned to each.
+    func getVasSubscriptions(customerId: String,
+                             completion: @escaping (Result<VasSubscriptionsData, ApiError>) -> Void) {
+        getAuthed("api/common/vas/subscriptions", query: Self.customerScope(customerId),
                   type: VasSubscriptionsData.self, completion: completion)
     }
 
     /// Activate a SIM / create a subscription (api/common/vas/subscribe). An eSIM carries no
     /// ICCID, so `e_sim=1` is sent instead of the serial; a physical "SIM in hand" sends its
     /// ICCID and activates immediately.
-    func subscribeVas(productId: String, iccid: String, eSim: Bool,
+    func subscribeVas(productId: String, iccid: String, eSim: Bool, customerId: String,
                       completion: @escaping (Result<Void, ApiError>) -> Void) {
-        var form = ["product_id": productId]
+        var form = Self.customerScope(customerId)
+        form["product_id"] = productId
         if eSim { form["e_sim"] = "1" } else { form["iccid"] = iccid }
         Http.postForm(baseUrl: Self.baseURL, path: "api/common/vas/subscribe", form: form,
                       token: session.token) { [weak self] r in
@@ -854,14 +888,15 @@ final class ApiClient {
     /// (api/common/vas/dynamic-services) — the path Limes recommends over order/create for
     /// amounts the fixed catalog cannot express. Expects a JSON body; the charge is the sum
     /// of `priceInCents`.
-    func provisionVasDynamicServices(msisdn: String, services: [[String: Any]],
+    func provisionVasDynamicServices(msisdn: String, services: [[String: Any]], customerId: String,
                                      completion: @escaping (Result<Void, ApiError>) -> Void) {
-        let json: [String: Any] = [
+        var json: [String: Any] = [
             "msisdn": msisdn,
             // Postman collection sends earn_commission=1 so the distributor accrues commission.
             "earn_commission": 1,
             "services": services
         ]
+        Self.customerScope(customerId).forEach { json[$0.key] = $0.value }
         Http.postJson(baseUrl: Self.baseURL, path: "api/common/vas/dynamic-services", json: json,
                       token: session.token) { [weak self] r in
             self?.deliverStatus(r, completion: completion)

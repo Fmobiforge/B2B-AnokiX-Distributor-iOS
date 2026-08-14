@@ -12,6 +12,7 @@ final class SessionManager {
         static let firstName = "first_name"
         static let lastName = "last_name"
         static let email = "email"
+        static let phone = "phone_number"
         static let roleLabel = "role_label"
         static let companyName = "company_name"
         static let companyLegalName = "company_legal_name"
@@ -39,6 +40,14 @@ final class SessionManager {
     var fullName: String { "\(firstName) \(lastName)".trimmingCharacters(in: .whitespaces) }
     var email: String { defaults.string(forKey: Key.email) ?? "" }
     var roleLabel: String { defaults.string(forKey: Key.roleLabel) ?? "" }
+
+    /// The account's mobile number. Kept apart from `setUser` because login and the profile
+    /// editor learn it at different moments, and screens that pre-fill a form from the
+    /// signed-in operator (Airtime & VAS › Onboard customer) need it on its own.
+    var phone: String {
+        get { defaults.string(forKey: Key.phone) ?? "" }
+        set { defaults.set(newValue.trimmingCharacters(in: .whitespaces), forKey: Key.phone) }
+    }
 
     /// Absolute URL of the distributor company logo (from login `portal_info`), or "" when none.
     var companyLogoUrl: String {
@@ -74,7 +83,7 @@ final class SessionManager {
     }
 
     func clear() {
-        [Key.token, Key.firstName, Key.lastName, Key.email, Key.roleLabel,
+        [Key.token, Key.firstName, Key.lastName, Key.email, Key.phone, Key.roleLabel,
          Key.companyName, Key.companyLegalName, Key.companyLogoUrl].forEach {
             defaults.removeObject(forKey: $0)
         }

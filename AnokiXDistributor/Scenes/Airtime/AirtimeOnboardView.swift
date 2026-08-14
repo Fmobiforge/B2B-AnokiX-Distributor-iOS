@@ -101,6 +101,38 @@ final class AirtimeOnboardView: VasSectionView {
         content.addArrangedSubview(previewButton)
 
         stack.addArrangedSubview(cardView)
+        prefillFromSignedInUser()
+    }
+
+    /// Opens the form on the signed-in operator's own details, which is what the web portal
+    /// does: most first onboards are the distributor registering themselves, and everything
+    /// here stays editable for the customers that follow.
+    ///
+    /// The mobile number is only known once login or the profile screen has cached it, so an
+    /// older session falls back to one `base-info` read rather than leaving the field blank.
+    private func prefillFromSignedInUser() {
+        let session = SessionManager.shared
+        setIfEmpty(firstNameField, session.firstName)
+        setIfEmpty(lastNameField, session.lastName)
+        setIfEmpty(emailField, session.email)
+        setIfEmpty(phoneField, session.phone)
+        guard text(phoneField).isEmpty else { return }
+
+        ApiClient.shared.getBaseInfo { [weak self] result in
+            guard let self, case .success(let data) = result, let user = data.user else { return }
+            SessionManager.shared.phone = user.phoneNumber ?? ""
+            self.setIfEmpty(self.firstNameField, user.firstName)
+            self.setIfEmpty(self.lastNameField, user.lastName)
+            self.setIfEmpty(self.emailField, user.email)
+            self.setIfEmpty(self.phoneField, user.phoneNumber)
+        }
+    }
+
+    /// Writes `value` only into a field the operator has not typed into.
+    private func setIfEmpty(_ field: UITextField, _ value: String?) {
+        let trimmed = (value ?? "").trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty, text(field).isEmpty else { return }
+        field.text = trimmed
     }
 
     /// A SA ID is 13 digits; a passport is alphanumeric — so the keyboard follows the ID type.

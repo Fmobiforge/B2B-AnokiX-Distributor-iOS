@@ -107,6 +107,7 @@ final class SettingsProfileViewController: BaseSettingsFormViewController {
             case .success:
                 SessionManager.shared.setUser(firstName: firstName, lastName: lastName,
                                               email: email, roleLabel: SessionManager.shared.roleLabel)
+                SessionManager.shared.phone = phone
                 self.settingsSavedToast()
                 self.navigationController?.popViewController(animated: true)
             case .failure(let error):

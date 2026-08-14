@@ -11,6 +11,11 @@ protocol VasSectionHost: AnyObject {
     func vasRefreshTransactions()
     /// A new customer was onboarded, so the Customers tab must not show a stale list.
     func vasCustomerOnboarded()
+    /// The customer the three scoped tabs are acting for, or "" while none is authenticated.
+    /// Sections read it at call time so they always send the current pick.
+    var vasActingCustomerId: String { get }
+    /// Jumps to the Onboard customer tab — the only way forward with no customers.
+    func vasOpenOnboardTab()
 }
 
 /// Base for the six Airtime & VAS sections: a vertical stack the subclass fills with cards,
