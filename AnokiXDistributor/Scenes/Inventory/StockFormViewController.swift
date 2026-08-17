@@ -46,20 +46,57 @@ final class StockFormViewController: UIViewController {
         }
         stack.addArrangedSubview(fieldStack)
 
+        // The action bar is docked to the bottom rather than sitting at the end of the
+        // scroll content: a longer form (Add staff runs to six fields) pushes the button
+        // past the medium detent, and an action you have to go looking for reads as missing.
+        // The error sits with it so a rejected submit is visible from wherever you tapped.
         errorLabel.isHidden = true
-        stack.addArrangedSubview(errorLabel)
 
         submitButton.setTitle(submitTitle, for: .normal)
         StyleKit.stylePrimaryButton(submitButton)
         submitButton.constrainHeight(48)
         submitButton.addTarget(self, action: #selector(submit), for: .touchUpInside)
-        stack.addArrangedSubview(submitButton)
+
+        let actionBar = UIView()
+        actionBar.backgroundColor = AppColors.surface
+        actionBar.forAutoLayout()
+        view.addSubview(actionBar)
+
+        let topLine = ListScreenLayout.hairline()
+        topLine.forAutoLayout()
+        actionBar.addSubview(topLine)
+
+        let barContent = UIStackView.vertical(spacing: 10, alignment: .fill)
+        barContent.forAutoLayout()
+        barContent.addArrangedSubview(errorLabel)
+        barContent.addArrangedSubview(submitButton)
+        actionBar.addSubview(barContent)
+
+        // Sit above the home indicator normally, and ride up with the keyboard when one
+        // opens — the safe-area constraint yields to the required keyboard one.
+        let restingBottom = actionBar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        restingBottom.priority = .defaultHigh
 
         NSLayoutConstraint.activate([
             scroll.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scroll.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor),
+            scroll.bottomAnchor.constraint(equalTo: actionBar.topAnchor),
+
+            actionBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            actionBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            actionBar.bottomAnchor.constraint(lessThanOrEqualTo: view.keyboardLayoutGuide.topAnchor),
+            restingBottom,
+
+            topLine.topAnchor.constraint(equalTo: actionBar.topAnchor),
+            topLine.leadingAnchor.constraint(equalTo: actionBar.leadingAnchor),
+            topLine.trailingAnchor.constraint(equalTo: actionBar.trailingAnchor),
+
+            barContent.topAnchor.constraint(equalTo: actionBar.topAnchor, constant: 12),
+            barContent.leadingAnchor.constraint(equalTo: actionBar.leadingAnchor, constant: 16),
+            barContent.trailingAnchor.constraint(equalTo: actionBar.trailingAnchor, constant: -16),
+            barContent.bottomAnchor.constraint(equalTo: actionBar.bottomAnchor, constant: -12),
+
             stack.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 16),
             stack.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 16),
             stack.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -16),

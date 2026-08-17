@@ -95,20 +95,38 @@ class VasSectionView: UIView {
 
     func styleDropdown(_ button: UIButton) {
         var config = UIButton.Configuration.plain()
-        config.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12)
+        // Leave room on the right for the trailing chevron accessory below.
+        config.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 34)
         config.background.backgroundColor = AppColors.surface
         config.background.cornerRadius = AppMetrics.radiusMD
         config.background.strokeColor = AppColors.border
         config.background.strokeWidth = 1
-        config.image = UIImage(systemName: "chevron.down")
-        config.imagePlacement = .trailing
-        config.imagePadding = 8
-        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 11, weight: .semibold)
         button.configuration = config
         button.contentHorizontalAlignment = .leading
         button.tintColor = AppColors.textSecondary
         button.heightAnchor.constraint(equalToConstant: 48).isActive = true
+        addTrailingChevron(to: button)
     }
+
+    /// A chevron pinned to the button's right edge. The configuration's own `image` sits
+    /// immediately after the title instead — so on a full-width dropdown it lands in the
+    /// middle of the field rather than at its trailing edge.
+    func addTrailingChevron(to button: UIButton, inset: CGFloat = 12) {
+        button.viewWithTag(Self.chevronTag)?.removeFromSuperview()
+        let chevron = UIImageView(image: UIImage(systemName: "chevron.down",
+            withConfiguration: UIImage.SymbolConfiguration(pointSize: 12, weight: .semibold)))
+        chevron.tag = Self.chevronTag
+        chevron.tintColor = AppColors.textSecondary
+        chevron.isUserInteractionEnabled = false
+        chevron.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(chevron)
+        NSLayoutConstraint.activate([
+            chevron.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: -inset),
+            chevron.centerYAnchor.constraint(equalTo: button.centerYAnchor)
+        ])
+    }
+
+    private static let chevronTag = 90210
 
     /// Writes the selected label into a dropdown, switching it from hint grey to body colour.
     func setDropdownTitle(_ button: UIButton, _ title: String, chosen: Bool) {

@@ -731,11 +731,8 @@ final class AddEditStoreViewController: BaseSecondaryViewController, GMSMapViewD
         config.background.backgroundColor = AppColors.surface
         config.cornerStyle = .medium
         config.title = placeholder
-        config.image = UIImage(systemName: "chevron.down")
-        config.imagePlacement = .trailing
-        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(
-            pointSize: AppMetrics.textBodySM, weight: .regular)
-        config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12)
+        // Leave room on the right for the trailing chevron accessory below.
+        config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 34)
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
             var outgoing = incoming
             outgoing.font = AppFonts.regular(AppMetrics.textBody)
@@ -744,6 +741,19 @@ final class AddEditStoreViewController: BaseSecondaryViewController, GMSMapViewD
         button.configuration = config
         button.contentHorizontalAlignment = .leading
         button.constrainHeight(48)
+
+        // A small chevron pinned to the right edge. (The configuration's own image sits
+        // right after the title, so on a full-width field it lands mid-row instead.)
+        let chevron = UIImageView(image: UIImage(systemName: "chevron.down",
+            withConfiguration: UIImage.SymbolConfiguration(pointSize: 12, weight: .semibold)))
+        chevron.tintColor = AppColors.textSecondary
+        chevron.isUserInteractionEnabled = false
+        chevron.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(chevron)
+        NSLayoutConstraint.activate([
+            chevron.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: -12),
+            chevron.centerYAnchor.constraint(equalTo: button.centerYAnchor)
+        ])
     }
 
     private func text(_ field: UITextField) -> String {

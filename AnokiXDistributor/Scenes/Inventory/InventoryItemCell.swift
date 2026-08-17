@@ -47,6 +47,7 @@ final class InventoryItemCell: UICollectionViewCell {
         swatch.layer.cornerRadius = AppMetrics.radiusMD
         swatch.backgroundColor = AppColors.purplePrimary
         swatch.forAutoLayout()
+        cardView.addSubview(swatch)
         let swatchIcon = UIImageView(image: AppIcons.symbol("ic_package"))
         swatchIcon.tintColor = .white
         swatchIcon.alpha = 0.9
