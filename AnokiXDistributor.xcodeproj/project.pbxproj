@@ -10,19 +10,19 @@
 		00A84BA38C1DDCDD2CC084AF /* BaseSettingsFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B89C53AE0FA44F6AC60938 /* BaseSettingsFormViewController.swift */; };
 		05DD9A32506397943A80E42B /* ProductsTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D23903BB1B9D1D0ACD3F9756 /* ProductsTabViewController.swift */; };
 		09DB1879B4786FD05D411884 /* ReportsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0014905A214A71CA1E9395D0 /* ReportsViewController.swift */; };
-		09DB1879B4786FD05D411885 /* GenerateReportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0014905A214A71CA1E9395D1 /* GenerateReportViewController.swift */; };
-		09DB1879B4786FD05D411886 /* SupportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0014905A214A71CA1E9395D2 /* SupportViewController.swift */; };
-		09DB1879B4786FD05D411887 /* SupportRequestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0014905A214A71CA1E9395D3 /* SupportRequestViewController.swift */; };
-		09DB1879B4786FD05D411888 /* SupportTicketViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0014905A214A71CA1E9395D4 /* SupportTicketViewController.swift */; };
 		0B1BAA607E4E5C8C1C36D008 /* TopUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95BA3915F7692B138E1BA3D /* TopUpViewController.swift */; };
 		0BC88EE29223F0A212AD898B /* UILabel+Styles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508A36A771BDF8395C3C5F18 /* UILabel+Styles.swift */; };
+		0C331851137D899FC3E63A5C /* StockActionSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6C2CBA95D457B6C540370F /* StockActionSheets.swift */; };
 		124C8E3AF6130BEB959E5AC6 /* AdaptiveGridLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D71ED2B74AEB8C46DEDFC9 /* AdaptiveGridLayout.swift */; };
+		131EDE12266E39295A5CD9EF /* VasComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A78B791BE448BCB4E42BA602 /* VasComponents.swift */; };
 		16891561153BD3F856FD70E9 /* PushManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10333EBC45EE8D9A4CB94354 /* PushManager.swift */; };
 		16C385409B356182BB508228 /* PickerViewControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2110788581B0C9ABDD9EAFA3 /* PickerViewControllers.swift */; };
+		1CC9BE8D020D56B770C4F7DF /* AirtimeSubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E794692B37084EAADE010FB3 /* AirtimeSubscriptionView.swift */; };
 		1E150122E98593D4BF55341E /* AddProductOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CDA6C338D22242462AE5674 /* AddProductOptionsViewController.swift */; };
 		1E4B9C6F3625EA800E9CCB77 /* RegisterDistributorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94B9F0BA4FC9278F3F579E4 /* RegisterDistributorViewController.swift */; };
 		220DCC792279D57187041A88 /* DonutChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7E7EA5DF434C5C29176EC8 /* DonutChartView.swift */; };
 		247B8B5166BE8B77AE92CC1F /* StoresViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B7B66AF87E8F82C3611E71 /* StoresViewController.swift */; };
+		25D7ED6AFFFEA9D8D763DEBB /* InventoryItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D9E373ECA09DCA8EC872DB8 /* InventoryItemCell.swift */; };
 		2813F44AB952D81EF64F5F2E /* LogoHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = DFC9071EC94373BAF6F64961 /* LogoHeaderView.xib */; };
 		2A64C44EC7D1D9748C7DDD66 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C197FF80B487B73CECAF3D3 /* Router.swift */; };
 		2AADDEB874DBC35D3A80FB6A /* DTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A2475C9A0309A40D263AE7B /* DTOs.swift */; };
@@ -32,26 +32,34 @@
 		2CF59182AC7D9D2C7EEB4DF9 /* PromotionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B68AFE0E8A18707C0CF1D6A /* PromotionsViewController.swift */; };
 		2E17B43F87B7350628BFCED5 /* InventoryCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 87DA897D802A5C4BCA511725 /* InventoryCell.xib */; };
 		2E6F3096E2AB0BA66E549C1E /* ReturnDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97FE6BF4939BA871605563CE /* ReturnDetailViewController.swift */; };
+		2ECA41254CA424F6AA497037 /* AirtimeOnboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9406538983A635E6F17E56F6 /* AirtimeOnboardView.swift */; };
 		2F4BFA902F712054FEE8089B /* GoogleMapsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C0FFC6B013ABB479E008A5 /* GoogleMapsConfig.swift */; };
+		31308E2FD5320C2C55DE39BC /* InventoryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04336597EC5362495BF38528 /* InventoryDetailViewController.swift */; };
 		388A6CD524ECBD457FADA3BD /* FilterUiHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888481543406DF4DA9207745 /* FilterUiHelper.swift */; };
 		3A393765CD4F036813421FE1 /* AppMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7B83B72C9AD3E20FA0E7724 /* AppMetrics.swift */; };
 		3B9EE163AEB0A66AC15EF5BC /* LogoCropViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411ED792570DE8BEF472194A /* LogoCropViewController.swift */; };
-		3C1F25F6A4A5BFE19E0AB399 /* Pods_AnokiXDistributor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1F429B7675F684C420145E5 /* Pods_AnokiXDistributor.framework */; };
 		3C3423FE3537D0FC30856E2B /* UITableView+Nib.swift in Sources */ = {isa = PBXBuildFile; fileRef = A98D1CBA179BC538469F1D63 /* UITableView+Nib.swift */; };
 		3C887340B75868F4696F8320 /* PageTitleSectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4411E86573F39CF5B1EE45B0 /* PageTitleSectionView.xib */; };
 		3E5543EF447B9395A8FA36A2 /* InventoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A72DDF0CD936A09436CC31 /* InventoryViewController.swift */; };
 		3FCA5955E47202154B029A0E /* RegisterSubmittedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DB06F084301CE59B5BDE40A /* RegisterSubmittedViewController.swift */; };
 		40BB07BC9E17691AF9AF833E /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177CB4D8B6817F51A7779D9C /* SettingsViewController.swift */; };
 		4194AF26022FAB032346DC64 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432E7E4E99F004AE59774CF2 /* WelcomeViewController.swift */; };
+		4197E2559E9DB53B6044D00E /* AirtimeDynamicServicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCFEE218232D6185D7B287 /* AirtimeDynamicServicesView.swift */; };
+		44990DC79CD8FAE442600A74 /* AirtimeActingAsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2AB00CD4A5182F92B93B65 /* AirtimeActingAsView.swift */; };
 		45E49BEFA3433085988E1814 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C853752B0FC8035E9BEEFE2B /* Models.swift */; };
 		48355C27A7026A46F58F7727 /* LogoCropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E7F264443BDFF0A95C471D7 /* LogoCropView.swift */; };
 		4AEA6269EBBB27A5C73E506D /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDE657DFBAF6C3C26A0C627 /* SessionManager.swift */; };
+		4CA92015F7AF51CB6FE5C682 /* SupportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5F2388A5CEE77E02A9B339 /* SupportViewController.swift */; };
+		54FBA663729B95FEA37E5D16 /* CardMachineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32992CF3038775BD448D035F /* CardMachineViewController.swift */; };
 		55312CC5038BFA0FD3A58AF2 /* AppIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661F3D25ACC35319FE83E85D /* AppIcons.swift */; };
+		565311069B08B4A79AB819CB /* InventorySummaryHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283CD471467F8DE2F77B2CF8 /* InventorySummaryHeaderView.swift */; };
 		5799D2CD9381A703D1CC790D /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29A9889FE895D5A1EDCCB2A /* MainTabBarController.swift */; };
 		5AAF993C5D69FE9C98BD8A65 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 018D26E7D221BCBD2E4DD4CC /* AppColors.swift */; };
 		5C192575899646BA18925B13 /* PendingApprovalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5F047369F8D6A54EF29978 /* PendingApprovalViewController.swift */; };
 		5D46EF39724FE7F172DC1CB0 /* ForgotPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F22AE8737A47FA2D4534E553 /* ForgotPasswordViewController.swift */; };
+		6093AE3D65D7C466AC00B874 /* GenerateReportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C134E47B9A649F16D499FFB6 /* GenerateReportViewController.swift */; };
 		63292C978763AD1A78F35AA1 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3BBF4ADD424B365522D126 /* Components.swift */; };
+		65F732E19A8D9EF4B2807ED2 /* AirtimeTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95A19BEE7BD75E64172FFA6 /* AirtimeTransactionsView.swift */; };
 		6674B2D9D66D5AC4A314D283 /* RevenueChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C002563937465D15B26B5203 /* RevenueChartView.swift */; };
 		67DD698BE3F8F8265C0D1512 /* AppStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E265BE656E495FD5C0B6A1B4 /* AppStrings.swift */; };
 		69C06145291554FE07973D1D /* SplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D7B6D0F30ADED760A0C53A7 /* SplashViewController.swift */; };
@@ -60,7 +68,9 @@
 		7042253405DF1E4AFBB3ABAD /* BaseSecondaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F3580D78FE0F37F17CD7AB /* BaseSecondaryViewController.swift */; };
 		7153E1B4C665460A67FE8EC0 /* DeliveriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDFC0379EF541F4390B5024B /* DeliveriesViewController.swift */; };
 		73037A24F81876008636B6FF /* TradersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F39ECC454DAF6AFB2C046A7 /* TradersViewController.swift */; };
+		736196B960FCFA9FF8AF03FF /* SupportRequestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1735F5592C1674C8B9792F64 /* SupportRequestViewController.swift */; };
 		7756B2BA5D5B77AF3D7823BB /* DashboardHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A92A17A73C526C07998A88C5 /* DashboardHeaderView.xib */; };
+		79667ECEB6BEFEC4D2B398D4 /* InventoryKpiCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFA0DE85A9122F8129093455 /* InventoryKpiCard.swift */; };
 		7A29A1F8E02B39FDB90F0A6D /* PromoProductPickers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76C3740E2A3B78246BCEE67 /* PromoProductPickers.swift */; };
 		7AD6083EDB84ABC2EF792F70 /* StoreCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3F7C8E5351F5BABFEA172D0C /* StoreCell.xib */; };
 		7C1E8A68D7AD224D577B39FA /* DrawerMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F0115986430BC48659AD79F /* DrawerMenuViewController.swift */; };
@@ -69,6 +79,7 @@
 		7E6F4DDA1324A8C1DF3E7410 /* SettingsSecurityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DABF6F41B6F068451FA5EA0D /* SettingsSecurityViewController.swift */; };
 		818A9A7C2C263DE0ACA609D5 /* ProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1360C283782AA7BBE256EF /* ProductsViewController.swift */; };
 		83D172CE0179BE4E41CF72F1 /* AppHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669B94F58E5554DB9E3D9A95 /* AppHeaderView.swift */; };
+		871EEC13E81E40BC177A628F /* VasFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B252B6D2556FD7A63491ACDB /* VasFormat.swift */; };
 		87D0FD7E7175AF44915EEB94 /* CreatePromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D973D483E1D8393991E4A008 /* CreatePromotionViewController.swift */; };
 		89B43AE907E4DBC5C0D979BE /* MockDistributorRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D38B310DF3119E94E0BDCECC /* MockDistributorRepository.swift */; };
 		92A45A7B72518F219583DE5A /* DeliveryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86999EF3E545AC9105C5D4BC /* DeliveryDetailViewController.swift */; };
@@ -80,12 +91,15 @@
 		A6621507BEA31BB6D09DFE85 /* ApiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316B0CE12B5FD82B0AF1E08A /* ApiClient.swift */; };
 		A6A849CBBD34C1E6B1146F47 /* WalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D6179B6A72D8E4E477FC69 /* WalletViewController.swift */; };
 		A6EC622FC9255EB8A0780071 /* SettingsNotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9937EB61ED90750179AA5E8 /* SettingsNotificationsViewController.swift */; };
+		A78E353765ECF977CEF42C97 /* StockFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A956A55D6AB4279369E91B1 /* StockFormViewController.swift */; };
 		AA036E296DB6362E0E704AD3 /* BaseMainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 345D1FBA63F6437BFFFD080F /* BaseMainViewController.swift */; };
 		AA2193A41C373BE79E573740 /* OrderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 657C8072D494F88DE379C338 /* OrderCell.xib */; };
 		AD40532A2789E9D59DAB99BF /* SparklineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A459D177F24EFCDC162992A /* SparklineView.swift */; };
+		AE4384700EA9FE6231B9B273 /* Pods_AnokiXDistributor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A41B993764343D6ABA7E7C87 /* Pods_AnokiXDistributor.framework */; };
 		B17341282FF6714919BAA389 /* AirtimeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7EC019FD727A4A631DE410 /* AirtimeViewController.swift */; };
 		B284C2C9F4B08F1537A2E379 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF5860D0B3193CA92A18894 /* NotificationsViewController.swift */; };
 		B630E90E597604F6CBFC61AF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1BEBE3D4F429E572C598B9E /* SceneDelegate.swift */; };
+		B65603DA3DBD512AB595A2EB /* AirtimeCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E08C26843D97EB094EB512 /* AirtimeCatalogView.swift */; };
 		B6BFB66706C5F2CE292AE411 /* DistributorRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B81E3C641A84965906B404F /* DistributorRepository.swift */; };
 		B78D3ABA5A8CB9F96C9540BA /* FinancesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EBE2BF2B2360A8EF39D131A /* FinancesViewController.swift */; };
 		B926E2E7A2E7FED8FDE5C72C /* ViewPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D865E16297298AD8652521 /* ViewPromotionViewController.swift */; };
@@ -102,10 +116,14 @@
 		C76B3718097DFF63A20E2202 /* StyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EBF42877BF96F9CC486A9D /* StyleKit.swift */; };
 		CED1A393DC20CCB6447E04FE /* ListScreenHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476CDE9653A47E28B02AEFAF /* ListScreenHelpers.swift */; };
 		D10CE8CB86D76DA11698D25B /* AppChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B8718F0850D5E694CF3D59 /* AppChrome.swift */; };
+		D26ECAD7AAFBD9214377B194 /* AirtimeCustomersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70041778311B01095EECB592 /* AirtimeCustomersView.swift */; };
+		D916E43D49488F6A7CBF9F12 /* SupportTicketViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BDE1A35CAB7293C85DDBE56 /* SupportTicketViewController.swift */; };
 		DD7DFE2E26BE2D95C327839B /* ReturnsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0881138E23115F2F6C519B1B /* ReturnsViewController.swift */; };
 		DE7D2CC4F37F8BF71534D947 /* ProductCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = EF8E1FE326DC071C1B6B8740 /* ProductCell.xib */; };
 		EC78A24F5D699EC3B13B30E2 /* WalletDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144D399DFD2B58277C558A57 /* WalletDetailViewController.swift */; };
 		EE80103A8ED4261B8E3F2AD2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CE30754BC688C589CC10447 /* LaunchScreen.storyboard */; };
+		EFCBFA171367B77DFFD7EE02 /* ProductsListChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5099758D04259562C9F773B1 /* ProductsListChrome.swift */; };
+		F0F4D36F5BEF002ED8817E1F /* WarehouseStaffViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DC3D022827C437DC6E70F5 /* WarehouseStaffViewController.swift */; };
 		F16F99058F42D54544F57C4A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F3D5E9791EB24D8F1F3A6DD /* AppDelegate.swift */; };
 		F2F349D9992A0ED51BC1A461 /* Http.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9266F144883BBDE2294D859E /* Http.swift */; };
 		F6D4341189AC838D8A560A4D /* SettingsBusinessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B70F4E5944AD93B56DE8063 /* SettingsBusinessViewController.swift */; };
@@ -117,12 +135,8 @@
 
 /* Begin PBXFileReference section */
 		0014905A214A71CA1E9395D0 /* ReportsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsViewController.swift; sourceTree = "<group>"; };
-		0014905A214A71CA1E9395D1 /* GenerateReportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateReportViewController.swift; sourceTree = "<group>"; };
-		0014905A214A71CA1E9395D2 /* SupportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportViewController.swift; sourceTree = "<group>"; };
-		0014905A214A71CA1E9395D3 /* SupportRequestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportRequestViewController.swift; sourceTree = "<group>"; };
-		0014905A214A71CA1E9395D4 /* SupportTicketViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportTicketViewController.swift; sourceTree = "<group>"; };
 		018D26E7D221BCBD2E4DD4CC /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
-		048694CDE411E3EE115131E2 /* Pods-AnokiXDistributor.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXDistributor.debug.xcconfig"; path = "Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor.debug.xcconfig"; sourceTree = "<group>"; };
+		04336597EC5362495BF38528 /* InventoryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryDetailViewController.swift; sourceTree = "<group>"; };
 		05E2E3916F538EFDDE6A3F24 /* CreateProductViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateProductViewController.swift; sourceTree = "<group>"; };
 		0881138E23115F2F6C519B1B /* ReturnsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnsViewController.swift; sourceTree = "<group>"; };
 		0EBE2BF2B2360A8EF39D131A /* FinancesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancesViewController.swift; sourceTree = "<group>"; };
@@ -130,16 +144,21 @@
 		10333EBC45EE8D9A4CB94354 /* PushManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushManager.swift; sourceTree = "<group>"; };
 		125658EC8F013F3987867C03 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LogoHeaderView.xib; sourceTree = "<group>"; };
 		144D399DFD2B58277C558A57 /* WalletDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletDetailViewController.swift; sourceTree = "<group>"; };
+		1735F5592C1674C8B9792F64 /* SupportRequestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportRequestViewController.swift; sourceTree = "<group>"; };
 		177CB4D8B6817F51A7779D9C /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		1B262AFB48A1FF7D933DDA72 /* AnokiX Distributor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AnokiX Distributor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B81E3C641A84965906B404F /* DistributorRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributorRepository.swift; sourceTree = "<group>"; };
 		1CDA6C338D22242462AE5674 /* AddProductOptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProductOptionsViewController.swift; sourceTree = "<group>"; };
 		2110788581B0C9ABDD9EAFA3 /* PickerViewControllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerViewControllers.swift; sourceTree = "<group>"; };
 		26E0F0B3E188B92EEC495C80 /* DrawerMenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawerMenuCell.swift; sourceTree = "<group>"; };
+		283CD471467F8DE2F77B2CF8 /* InventorySummaryHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventorySummaryHeaderView.swift; sourceTree = "<group>"; };
+		2A956A55D6AB4279369E91B1 /* StockFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockFormViewController.swift; sourceTree = "<group>"; };
 		316B0CE12B5FD82B0AF1E08A /* ApiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiClient.swift; sourceTree = "<group>"; };
+		32992CF3038775BD448D035F /* CardMachineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardMachineViewController.swift; sourceTree = "<group>"; };
 		32C20CB35B15FBC56DFDE3CB /* OrdersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersViewController.swift; sourceTree = "<group>"; };
 		32D6179B6A72D8E4E477FC69 /* WalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewController.swift; sourceTree = "<group>"; };
 		345D1FBA63F6437BFFFD080F /* BaseMainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseMainViewController.swift; sourceTree = "<group>"; };
+		35CA3C2551148F5ABD95C61C /* Pods-AnokiXDistributor.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXDistributor.release.xcconfig"; path = "Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor.release.xcconfig"; sourceTree = "<group>"; };
 		36B8718F0850D5E694CF3D59 /* AppChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppChrome.swift; sourceTree = "<group>"; };
 		397F0E5581835F147B64552C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		3C197FF80B487B73CECAF3D3 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
@@ -154,19 +173,23 @@
 		4DDE657DFBAF6C3C26A0C627 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		4EBD6B5C4FE8886CCC105963 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/DashboardHeaderView.xib; sourceTree = "<group>"; };
 		508A36A771BDF8395C3C5F18 /* UILabel+Styles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Styles.swift"; sourceTree = "<group>"; };
+		5099758D04259562C9F773B1 /* ProductsListChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsListChrome.swift; sourceTree = "<group>"; };
 		52EBF42877BF96F9CC486A9D /* StyleKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleKit.swift; sourceTree = "<group>"; };
 		5714ACF14BF2BB387765D603 /* SettingsPreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPreferencesViewController.swift; sourceTree = "<group>"; };
 		57D865E16297298AD8652521 /* ViewPromotionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPromotionViewController.swift; sourceTree = "<group>"; };
 		5A459D177F24EFCDC162992A /* SparklineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparklineView.swift; sourceTree = "<group>"; };
 		5B0415D826FC7151CE88E27E /* DashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewController.swift; sourceTree = "<group>"; };
 		5B68AFE0E8A18707C0CF1D6A /* PromotionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionsViewController.swift; sourceTree = "<group>"; };
+		5D9E373ECA09DCA8EC872DB8 /* InventoryItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryItemCell.swift; sourceTree = "<group>"; };
 		5F0115986430BC48659AD79F /* DrawerMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawerMenuViewController.swift; sourceTree = "<group>"; };
+		63DC3D022827C437DC6E70F5 /* WarehouseStaffViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarehouseStaffViewController.swift; sourceTree = "<group>"; };
 		661F3D25ACC35319FE83E85D /* AppIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIcons.swift; sourceTree = "<group>"; };
 		669B94F58E5554DB9E3D9A95 /* AppHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppHeaderView.swift; sourceTree = "<group>"; };
 		6997EEC31E94F1C7DA884D86 /* TraderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderCell.swift; sourceTree = "<group>"; };
 		6BF5860D0B3193CA92A18894 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
 		6E732C71E5A143ABD631083A /* StoreCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreCell.swift; sourceTree = "<group>"; };
 		6F9A6678A643764978A70A54 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		70041778311B01095EECB592 /* AirtimeCustomersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeCustomersView.swift; sourceTree = "<group>"; };
 		74460E2F854EC018CE0D6C6A /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		75167504B2C136F9EDA3DA28 /* MockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockData.swift; sourceTree = "<group>"; };
 		78E345C15C8B2E18321B8428 /* SettingsProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsProfileViewController.swift; sourceTree = "<group>"; };
@@ -175,40 +198,49 @@
 		87D71ED2B74AEB8C46DEDFC9 /* AdaptiveGridLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveGridLayout.swift; sourceTree = "<group>"; };
 		87F95E8B3CD1A4B08AB345FD /* Countries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Countries.swift; sourceTree = "<group>"; };
 		888481543406DF4DA9207745 /* FilterUiHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterUiHelper.swift; sourceTree = "<group>"; };
+		8AFCFEE218232D6185D7B287 /* AirtimeDynamicServicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeDynamicServicesView.swift; sourceTree = "<group>"; };
 		90AE8F3FE62A04F499E04BDF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/StoreCell.xib; sourceTree = "<group>"; };
 		9266F144883BBDE2294D859E /* Http.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Http.swift; sourceTree = "<group>"; };
 		9314D37E331C802FA22E7085 /* ApiMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiMapper.swift; sourceTree = "<group>"; };
+		9406538983A635E6F17E56F6 /* AirtimeOnboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeOnboardView.swift; sourceTree = "<group>"; };
 		97B214FE6D74FABF6FF11B05 /* AddEditStoreViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditStoreViewController.swift; sourceTree = "<group>"; };
 		97FE6BF4939BA871605563CE /* ReturnDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnDetailViewController.swift; sourceTree = "<group>"; };
 		9966680E64D3C6AF84D5D7AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9A2475C9A0309A40D263AE7B /* DTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTOs.swift; sourceTree = "<group>"; };
+		9BDE1A35CAB7293C85DDBE56 /* SupportTicketViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportTicketViewController.swift; sourceTree = "<group>"; };
 		9F39ECC454DAF6AFB2C046A7 /* TradersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradersViewController.swift; sourceTree = "<group>"; };
 		9F69BCC256C8FEEC95CE4F04 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		9FD54E5AF63D9C1E1822030D /* AutoLayout+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoLayout+Helpers.swift"; sourceTree = "<group>"; };
+		A41B993764343D6ABA7E7C87 /* Pods_AnokiXDistributor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AnokiXDistributor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A735BBD6A3EB3B1791DB1CBD /* Pods-AnokiXDistributor.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXDistributor.debug.xcconfig"; path = "Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor.debug.xcconfig"; sourceTree = "<group>"; };
+		A78B791BE448BCB4E42BA602 /* VasComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasComponents.swift; sourceTree = "<group>"; };
 		A811074C5D36EEC08062A784 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PageTitleSectionView.xib; sourceTree = "<group>"; };
 		A8B7B66AF87E8F82C3611E71 /* StoresViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoresViewController.swift; sourceTree = "<group>"; };
 		A95A6407A5486FA57B4E7BA7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A98D1CBA179BC538469F1D63 /* UITableView+Nib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+Nib.swift"; sourceTree = "<group>"; };
 		A9937EB61ED90750179AA5E8 /* SettingsNotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsNotificationsViewController.swift; sourceTree = "<group>"; };
 		A9B89C53AE0FA44F6AC60938 /* BaseSettingsFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseSettingsFormViewController.swift; sourceTree = "<group>"; };
+		AE5F2388A5CEE77E02A9B339 /* SupportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportViewController.swift; sourceTree = "<group>"; };
 		B1BEBE3D4F429E572C598B9E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		B252B6D2556FD7A63491ACDB /* VasFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VasFormat.swift; sourceTree = "<group>"; };
 		B9FBAA74502FBE0DF0602DD1 /* InventoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryCell.swift; sourceTree = "<group>"; };
 		BC238935009AFC5CEFF57648 /* AnokiXDistributor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AnokiXDistributor.entitlements; sourceTree = "<group>"; };
 		BED3A022D51931AC0EF63C37 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/DrawerMenuCell.xib; sourceTree = "<group>"; };
 		BEEA0425DC457789EF9BD161 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ProductCell.xib; sourceTree = "<group>"; };
 		C002563937465D15B26B5203 /* RevenueChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueChartView.swift; sourceTree = "<group>"; };
 		C05CB68ED6C6896B36D24E8E /* CreateTraderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTraderViewController.swift; sourceTree = "<group>"; };
-		C1F429B7675F684C420145E5 /* Pods_AnokiXDistributor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AnokiXDistributor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C134E47B9A649F16D499FFB6 /* GenerateReportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateReportViewController.swift; sourceTree = "<group>"; };
 		C3BE86A57B8DB5241F851A0C /* ProductCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCell.swift; sourceTree = "<group>"; };
 		C3F5BB7BCAD7E13B34BEFCE3 /* OrderListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderListCell.swift; sourceTree = "<group>"; };
 		C444450A67242479B37269E6 /* AppFonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFonts.swift; sourceTree = "<group>"; };
-		C69F43246024C4970CDB6F3E /* Pods-AnokiXDistributor.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnokiXDistributor.release.xcconfig"; path = "Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor.release.xcconfig"; sourceTree = "<group>"; };
 		C76C3740E2A3B78246BCEE67 /* PromoProductPickers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromoProductPickers.swift; sourceTree = "<group>"; };
 		C853752B0FC8035E9BEEFE2B /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		CDFC0379EF541F4390B5024B /* DeliveriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveriesViewController.swift; sourceTree = "<group>"; };
+		CF2AB00CD4A5182F92B93B65 /* AirtimeActingAsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeActingAsView.swift; sourceTree = "<group>"; };
 		D23903BB1B9D1D0ACD3F9756 /* ProductsTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsTabViewController.swift; sourceTree = "<group>"; };
 		D29A9889FE895D5A1EDCCB2A /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		D38B310DF3119E94E0BDCECC /* MockDistributorRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDistributorRepository.swift; sourceTree = "<group>"; };
+		D4E08C26843D97EB094EB512 /* AirtimeCatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeCatalogView.swift; sourceTree = "<group>"; };
 		D89E5AA9B84CB5D0FC25C022 /* OrderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderCell.swift; sourceTree = "<group>"; };
 		D973D483E1D8393991E4A008 /* CreatePromotionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePromotionViewController.swift; sourceTree = "<group>"; };
 		DABF6F41B6F068451FA5EA0D /* SettingsSecurityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSecurityViewController.swift; sourceTree = "<group>"; };
@@ -216,6 +248,8 @@
 		DE7E7EA5DF434C5C29176EC8 /* DonutChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonutChartView.swift; sourceTree = "<group>"; };
 		E265BE656E495FD5C0B6A1B4 /* AppStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStrings.swift; sourceTree = "<group>"; };
 		E5C0FFC6B013ABB479E008A5 /* GoogleMapsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMapsConfig.swift; sourceTree = "<group>"; };
+		E794692B37084EAADE010FB3 /* AirtimeSubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeSubscriptionView.swift; sourceTree = "<group>"; };
+		E95A19BEE7BD75E64172FFA6 /* AirtimeTransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeTransactionsView.swift; sourceTree = "<group>"; };
 		E95BA3915F7692B138E1BA3D /* TopUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopUpViewController.swift; sourceTree = "<group>"; };
 		EA3BBF4ADD424B365522D126 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		EB9A65319ACAC5DBCF8F2C9B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -225,16 +259,18 @@
 		F4A72DDF0CD936A09436CC31 /* InventoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryViewController.swift; sourceTree = "<group>"; };
 		F7B83B72C9AD3E20FA0E7724 /* AppMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetrics.swift; sourceTree = "<group>"; };
 		F94B9F0BA4FC9278F3F579E4 /* RegisterDistributorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterDistributorViewController.swift; sourceTree = "<group>"; };
+		FC6C2CBA95D457B6C540370F /* StockActionSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockActionSheets.swift; sourceTree = "<group>"; };
 		FD045C96935508653C994CA0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/InventoryCell.xib; sourceTree = "<group>"; };
 		FD7EC019FD727A4A631DE410 /* AirtimeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirtimeViewController.swift; sourceTree = "<group>"; };
+		FFA0DE85A9122F8129093455 /* InventoryKpiCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryKpiCard.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		72F9D13E211903C4E24AFE4A /* Frameworks */ = {
+		73EF316FFD14AEE4A8445BAE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3C1F25F6A4A5BFE19E0AB399 /* Pods_AnokiXDistributor.framework in Frameworks */,
+				AE4384700EA9FE6231B9B273 /* Pods_AnokiXDistributor.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -244,20 +280,10 @@
 		06D461DBAD58A9508465AADA /* Reports */ = {
 			isa = PBXGroup;
 			children = (
+				C134E47B9A649F16D499FFB6 /* GenerateReportViewController.swift */,
 				0014905A214A71CA1E9395D0 /* ReportsViewController.swift */,
-				0014905A214A71CA1E9395D1 /* GenerateReportViewController.swift */,
 			);
 			path = Reports;
-			sourceTree = "<group>";
-		};
-		0A11B2C3D4E5F60718293A4B /* Support */ = {
-			isa = PBXGroup;
-			children = (
-				0014905A214A71CA1E9395D2 /* SupportViewController.swift */,
-				0014905A214A71CA1E9395D3 /* SupportRequestViewController.swift */,
-				0014905A214A71CA1E9395D4 /* SupportTicketViewController.swift */,
-			);
-			path = Support;
 			sourceTree = "<group>";
 		};
 		08910413F58E34FA9E5357FA /* Theme */ = {
@@ -285,6 +311,14 @@
 				3D7B6D0F30ADED760A0C53A7 /* SplashViewController.swift */,
 			);
 			path = Login;
+			sourceTree = "<group>";
+		};
+		0CBB5B0E8A82ACFD1EDE4045 /* CardMachine */ = {
+			isa = PBXGroup;
+			children = (
+				32992CF3038775BD448D035F /* CardMachineViewController.swift */,
+			);
+			path = CardMachine;
 			sourceTree = "<group>";
 		};
 		15C9D9AFDCD3924AB57A04B6 /* Network */ = {
@@ -342,14 +376,6 @@
 			path = Finances;
 			sourceTree = "<group>";
 		};
-		2BA677703E4548833A980255 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				C1F429B7675F684C420145E5 /* Pods_AnokiXDistributor.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		2C792CF58D5D0E7B4A802229 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -376,6 +402,7 @@
 			isa = PBXGroup;
 			children = (
 				BF0E2DB916FA988C0F43E10C /* Airtime */,
+				0CBB5B0E8A82ACFD1EDE4045 /* CardMachine */,
 				A644651BB28155137F5FB815 /* Dashboard */,
 				A7F5090ABF27FA7B74678C87 /* Deliveries */,
 				2A11EA6747C2956DA37E2EF4 /* Finances */,
@@ -388,15 +415,24 @@
 				46449E0863BD3DB5692C4C14 /* Promotions */,
 				27F6F12E9319AA0A6EE8CE24 /* Register */,
 				06D461DBAD58A9508465AADA /* Reports */,
-				0A11B2C3D4E5F60718293A4B /* Support */,
 				BB10D47DA6EBEE405E70045D /* Returns */,
 				3A60F821ED098BDED1BEE8CC /* Settings */,
+				6A05CFB84118CD0CB2A56C40 /* Staff */,
 				4D585B570DDB0ADAEB45F3D1 /* Stores */,
+				7882FB172F1B15E1CFBCC1D6 /* Support */,
 				6BE1F192DDF038BCCEF44D3B /* Traders */,
 				2072B63FA95A03B0CDEE242F /* Wallet */,
 				A15C53206F8B664ECC379D6B /* Welcome */,
 			);
 			path = Scenes;
+			sourceTree = "<group>";
+		};
+		35F64637B0F0554E63E8C827 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A41B993764343D6ABA7E7C87 /* Pods_AnokiXDistributor.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		371C769F3151F413FC647E38 /* Notifications */ = {
@@ -427,6 +463,7 @@
 				1CDA6C338D22242462AE5674 /* AddProductOptionsViewController.swift */,
 				05E2E3916F538EFDDE6A3F24 /* CreateProductViewController.swift */,
 				C3BE86A57B8DB5241F851A0C /* ProductCell.swift */,
+				5099758D04259562C9F773B1 /* ProductsListChrome.swift */,
 				D23903BB1B9D1D0ACD3F9756 /* ProductsTabViewController.swift */,
 				EE1360C283782AA7BBE256EF /* ProductsViewController.swift */,
 			);
@@ -454,13 +491,12 @@
 			path = Stores;
 			sourceTree = "<group>";
 		};
-		698676352AE55654762A0AFD /* Pods */ = {
+		6A05CFB84118CD0CB2A56C40 /* Staff */ = {
 			isa = PBXGroup;
 			children = (
-				048694CDE411E3EE115131E2 /* Pods-AnokiXDistributor.debug.xcconfig */,
-				C69F43246024C4970CDB6F3E /* Pods-AnokiXDistributor.release.xcconfig */,
+				63DC3D022827C437DC6E70F5 /* WarehouseStaffViewController.swift */,
 			);
-			path = Pods;
+			path = Staff;
 			sourceTree = "<group>";
 		};
 		6BE1F192DDF038BCCEF44D3B /* Traders */ = {
@@ -489,6 +525,25 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		755F636E11D226B57AF6AA71 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				A735BBD6A3EB3B1791DB1CBD /* Pods-AnokiXDistributor.debug.xcconfig */,
+				35CA3C2551148F5ABD95C61C /* Pods-AnokiXDistributor.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		7882FB172F1B15E1CFBCC1D6 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				1735F5592C1674C8B9792F64 /* SupportRequestViewController.swift */,
+				9BDE1A35CAB7293C85DDBE56 /* SupportTicketViewController.swift */,
+				AE5F2388A5CEE77E02A9B339 /* SupportViewController.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
 		829DC3EA83F0F88F0BEA25CE /* Common */ = {
 			isa = PBXGroup;
 			children = (
@@ -511,7 +566,13 @@
 			isa = PBXGroup;
 			children = (
 				B9FBAA74502FBE0DF0602DD1 /* InventoryCell.swift */,
+				04336597EC5362495BF38528 /* InventoryDetailViewController.swift */,
+				5D9E373ECA09DCA8EC872DB8 /* InventoryItemCell.swift */,
+				FFA0DE85A9122F8129093455 /* InventoryKpiCard.swift */,
+				283CD471467F8DE2F77B2CF8 /* InventorySummaryHeaderView.swift */,
 				F4A72DDF0CD936A09436CC31 /* InventoryViewController.swift */,
+				FC6C2CBA95D457B6C540370F /* StockActionSheets.swift */,
+				2A956A55D6AB4279369E91B1 /* StockFormViewController.swift */,
 			);
 			path = Inventory;
 			sourceTree = "<group>";
@@ -558,8 +619,8 @@
 			children = (
 				282F60CD45E1BC32073318C8 /* AnokiXDistributor */,
 				741E46C5CD830A5A114E8705 /* Products */,
-				698676352AE55654762A0AFD /* Pods */,
-				2BA677703E4548833A980255 /* Frameworks */,
+				755F636E11D226B57AF6AA71 /* Pods */,
+				35F64637B0F0554E63E8C827 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -575,7 +636,16 @@
 		BF0E2DB916FA988C0F43E10C /* Airtime */ = {
 			isa = PBXGroup;
 			children = (
+				CF2AB00CD4A5182F92B93B65 /* AirtimeActingAsView.swift */,
+				D4E08C26843D97EB094EB512 /* AirtimeCatalogView.swift */,
+				70041778311B01095EECB592 /* AirtimeCustomersView.swift */,
+				8AFCFEE218232D6185D7B287 /* AirtimeDynamicServicesView.swift */,
+				9406538983A635E6F17E56F6 /* AirtimeOnboardView.swift */,
+				E794692B37084EAADE010FB3 /* AirtimeSubscriptionView.swift */,
+				E95A19BEE7BD75E64172FFA6 /* AirtimeTransactionsView.swift */,
 				FD7EC019FD727A4A631DE410 /* AirtimeViewController.swift */,
+				A78B791BE448BCB4E42BA602 /* VasComponents.swift */,
+				B252B6D2556FD7A63491ACDB /* VasFormat.swift */,
 			);
 			path = Airtime;
 			sourceTree = "<group>";
@@ -629,12 +699,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B6F16DC378E461C90CA18DEB /* Build configuration list for PBXNativeTarget "AnokiXDistributor" */;
 			buildPhases = (
-				743674FD24E23282490C43EE /* [CP] Check Pods Manifest.lock */,
+				CF23BCB880CCAE4E31837505 /* [CP] Check Pods Manifest.lock */,
 				7BF8E06877BAEE004523779A /* Sources */,
 				550F96816C924744E3A9F4C3 /* Resources */,
-				72F9D13E211903C4E24AFE4A /* Frameworks */,
-				6098F9602AB8A1BB4B14AF32 /* [CP] Embed Pods Frameworks */,
-				DF949D2AA709545F1116243C /* [CP] Copy Pods Resources */,
+				73EF316FFD14AEE4A8445BAE /* Frameworks */,
+				60E76F35FD960626BCA5D565 /* [CP] Embed Pods Frameworks */,
+				96A088AECEC489F17A5877B7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -702,7 +772,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		6098F9602AB8A1BB4B14AF32 /* [CP] Embed Pods Frameworks */ = {
+		60E76F35FD960626BCA5D565 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -723,7 +793,28 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		743674FD24E23282490C43EE /* [CP] Check Pods Manifest.lock */ = {
+		96A088AECEC489F17A5877B7 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CF23BCB880CCAE4E31837505 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -745,27 +836,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		DF949D2AA709545F1116243C /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AnokiXDistributor/Pods-AnokiXDistributor-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -776,6 +846,13 @@
 				124C8E3AF6130BEB959E5AC6 /* AdaptiveGridLayout.swift in Sources */,
 				6CB2C13DA06E22CFDEBA0346 /* AddEditStoreViewController.swift in Sources */,
 				1E150122E98593D4BF55341E /* AddProductOptionsViewController.swift in Sources */,
+				44990DC79CD8FAE442600A74 /* AirtimeActingAsView.swift in Sources */,
+				B65603DA3DBD512AB595A2EB /* AirtimeCatalogView.swift in Sources */,
+				D26ECAD7AAFBD9214377B194 /* AirtimeCustomersView.swift in Sources */,
+				4197E2559E9DB53B6044D00E /* AirtimeDynamicServicesView.swift in Sources */,
+				2ECA41254CA424F6AA497037 /* AirtimeOnboardView.swift in Sources */,
+				1CC9BE8D020D56B770C4F7DF /* AirtimeSubscriptionView.swift in Sources */,
+				65F732E19A8D9EF4B2807ED2 /* AirtimeTransactionsView.swift in Sources */,
 				B17341282FF6714919BAA389 /* AirtimeViewController.swift in Sources */,
 				A6621507BEA31BB6D09DFE85 /* ApiClient.swift in Sources */,
 				FEE35CF80DA48D8B19C61A51 /* ApiMapper.swift in Sources */,
@@ -791,6 +868,7 @@
 				AA036E296DB6362E0E704AD3 /* BaseMainViewController.swift in Sources */,
 				7042253405DF1E4AFBB3ABAD /* BaseSecondaryViewController.swift in Sources */,
 				00A84BA38C1DDCDD2CC084AF /* BaseSettingsFormViewController.swift in Sources */,
+				54FBA663729B95FEA37E5D16 /* CardMachineViewController.swift in Sources */,
 				63292C978763AD1A78F35AA1 /* Components.swift in Sources */,
 				C5C9B519F2832EBBDCEB459D /* Countries.swift in Sources */,
 				C0EB7079699F9FA61F600415 /* CreateProductViewController.swift in Sources */,
@@ -807,9 +885,14 @@
 				388A6CD524ECBD457FADA3BD /* FilterUiHelper.swift in Sources */,
 				B78D3ABA5A8CB9F96C9540BA /* FinancesViewController.swift in Sources */,
 				5D46EF39724FE7F172DC1CB0 /* ForgotPasswordViewController.swift in Sources */,
+				6093AE3D65D7C466AC00B874 /* GenerateReportViewController.swift in Sources */,
 				2F4BFA902F712054FEE8089B /* GoogleMapsConfig.swift in Sources */,
 				F2F349D9992A0ED51BC1A461 /* Http.swift in Sources */,
 				A39CF3E3B202A5FCC576BAF0 /* InventoryCell.swift in Sources */,
+				31308E2FD5320C2C55DE39BC /* InventoryDetailViewController.swift in Sources */,
+				25D7ED6AFFFEA9D8D763DEBB /* InventoryItemCell.swift in Sources */,
+				79667ECEB6BEFEC4D2B398D4 /* InventoryKpiCard.swift in Sources */,
+				565311069B08B4A79AB819CB /* InventorySummaryHeaderView.swift in Sources */,
 				3E5543EF447B9395A8FA36A2 /* InventoryViewController.swift in Sources */,
 				CED1A393DC20CCB6447E04FE /* ListScreenHelpers.swift in Sources */,
 				BFED9B6D70345BF7710E0944 /* LoginViewController.swift in Sources */,
@@ -827,6 +910,7 @@
 				5C192575899646BA18925B13 /* PendingApprovalViewController.swift in Sources */,
 				16C385409B356182BB508228 /* PickerViewControllers.swift in Sources */,
 				F9214A3E3BDC745FC0BBA2AC /* ProductCell.swift in Sources */,
+				EFCBFA171367B77DFFD7EE02 /* ProductsListChrome.swift in Sources */,
 				05DD9A32506397943A80E42B /* ProductsTabViewController.swift in Sources */,
 				818A9A7C2C263DE0ACA609D5 /* ProductsViewController.swift in Sources */,
 				7A29A1F8E02B39FDB90F0A6D /* PromoProductPickers.swift in Sources */,
@@ -835,10 +919,6 @@
 				1E4B9C6F3625EA800E9CCB77 /* RegisterDistributorViewController.swift in Sources */,
 				3FCA5955E47202154B029A0E /* RegisterSubmittedViewController.swift in Sources */,
 				09DB1879B4786FD05D411884 /* ReportsViewController.swift in Sources */,
-				09DB1879B4786FD05D411885 /* GenerateReportViewController.swift in Sources */,
-				09DB1879B4786FD05D411886 /* SupportViewController.swift in Sources */,
-				09DB1879B4786FD05D411887 /* SupportRequestViewController.swift in Sources */,
-				09DB1879B4786FD05D411888 /* SupportTicketViewController.swift in Sources */,
 				2E6F3096E2AB0BA66E549C1E /* ReturnDetailViewController.swift in Sources */,
 				DD7DFE2E26BE2D95C327839B /* ReturnsViewController.swift in Sources */,
 				6674B2D9D66D5AC4A314D283 /* RevenueChartView.swift in Sources */,
@@ -853,17 +933,25 @@
 				40BB07BC9E17691AF9AF833E /* SettingsViewController.swift in Sources */,
 				AD40532A2789E9D59DAB99BF /* SparklineView.swift in Sources */,
 				69C06145291554FE07973D1D /* SplashViewController.swift in Sources */,
+				0C331851137D899FC3E63A5C /* StockActionSheets.swift in Sources */,
+				A78E353765ECF977CEF42C97 /* StockFormViewController.swift in Sources */,
 				7C876CA9CCBA8D731904BEF9 /* StoreCell.swift in Sources */,
 				247B8B5166BE8B77AE92CC1F /* StoresViewController.swift in Sources */,
 				C76B3718097DFF63A20E2202 /* StyleKit.swift in Sources */,
+				736196B960FCFA9FF8AF03FF /* SupportRequestViewController.swift in Sources */,
+				D916E43D49488F6A7CBF9F12 /* SupportTicketViewController.swift in Sources */,
+				4CA92015F7AF51CB6FE5C682 /* SupportViewController.swift in Sources */,
 				0B1BAA607E4E5C8C1C36D008 /* TopUpViewController.swift in Sources */,
 				95AE02C2C889EDFBF8AF2A3D /* TraderCell.swift in Sources */,
 				73037A24F81876008636B6FF /* TradersViewController.swift in Sources */,
 				0BC88EE29223F0A212AD898B /* UILabel+Styles.swift in Sources */,
 				3C3423FE3537D0FC30856E2B /* UITableView+Nib.swift in Sources */,
+				131EDE12266E39295A5CD9EF /* VasComponents.swift in Sources */,
+				871EEC13E81E40BC177A628F /* VasFormat.swift in Sources */,
 				B926E2E7A2E7FED8FDE5C72C /* ViewPromotionViewController.swift in Sources */,
 				EC78A24F5D699EC3B13B30E2 /* WalletDetailViewController.swift in Sources */,
 				A6A849CBBD34C1E6B1146F47 /* WalletViewController.swift in Sources */,
+				F0F4D36F5BEF002ED8817E1F /* WarehouseStaffViewController.swift in Sources */,
 				4194AF26022FAB032346DC64 /* WelcomeViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -956,19 +1044,20 @@
 /* Begin XCBuildConfiguration section */
 		AAF8B913B6B3647633F93427 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 048694CDE411E3EE115131E2 /* Pods-AnokiXDistributor.debug.xcconfig */;
+			baseConfigurationReference = A735BBD6A3EB3B1791DB1CBD /* Pods-AnokiXDistributor.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AnokiXDistributor/Resources/AnokiXDistributor.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = W792YDC6GY;
 				INFOPLIST_FILE = AnokiXDistributor/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.distributorapp;
 				PRODUCT_MODULE_NAME = AnokiXDistributor;
 				PRODUCT_NAME = "AnokiX Distributor";
@@ -1040,19 +1129,20 @@
 		};
 		F284550FEDD735754D0E3A8B /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C69F43246024C4970CDB6F3E /* Pods-AnokiXDistributor.release.xcconfig */;
+			baseConfigurationReference = 35CA3C2551148F5ABD95C61C /* Pods-AnokiXDistributor.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AnokiXDistributor/Resources/AnokiXDistributor.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = W792YDC6GY;
 				INFOPLIST_FILE = AnokiXDistributor/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.distributorapp;
 				PRODUCT_MODULE_NAME = AnokiXDistributor;
 				PRODUCT_NAME = "AnokiX Distributor";
