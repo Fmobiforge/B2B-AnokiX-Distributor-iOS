@@ -25,21 +25,21 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
     var onSaved: (() -> Void)?
 
     /// The trader being edited, or nil when registering a new one.
-    private let editing: TradersData.Trader?
+    private let editingTrader: TradersData.Trader?
     /// The fuller copy from traders/get-by-id, once it lands.
     private var detail: TradersData.Trader?
     /// Whatever we currently know about the trader: detail if it has arrived, else the row.
-    private var record: TradersData.Trader? { detail ?? editing }
-    private var isEditing: Bool { editing != nil }
+    private var record: TradersData.Trader? { detail ?? editingTrader }
+    private var isEditMode: Bool { editingTrader != nil }
 
     init(editing trader: TradersData.Trader? = nil) {
-        self.editing = trader
+        self.editingTrader = trader
         super.init(nibName: nil, bundle: nil)
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    override var screenTitle: String { isEditing ? S.editTraderTitle : S.addNewTrader }
-    override var screenSubtitle: String? { isEditing ? S.editTraderSubtitle : S.createTraderSubtitle }
+    override var screenTitle: String { isEditMode ? S.editTraderTitle : S.addNewTrader }
+    override var screenSubtitle: String? { isEditMode ? S.editTraderSubtitle : S.createTraderSubtitle }
 
     private let stepKeys = [S.stepOwner, S.stepBusiness, S.stepTrader, S.stepLocation,
                             S.stepVerify, S.stepDistributor, S.stepWallet, S.stepTerms]
@@ -225,7 +225,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
             step.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 24, right: 16)
             formStack.addArrangedSubview(step)
         }
-        if let trader = editing { prefill(from: trader) }
+        if let trader = editingTrader { prefill(from: trader) }
         showStep(0)
     }
 
@@ -283,7 +283,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
     /// fields, so step 1 stays blank until this lands and fills in the linked user
     /// account's name, email and mobile number.
     private func loadTraderDetail() {
-        guard let id = editing?.id, !id.isEmpty else { return }
+        guard let id = editingTrader?.id, !id.isEmpty else { return }
         ApiClient.shared.getTraderById(id: id) { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -654,7 +654,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
     private func validatePassword() -> Bool {
         let password = passwordField.text ?? ""
         let confirm = confirmPasswordField.text ?? ""
-        if isEditing && password.isEmpty && confirm.isEmpty { return true }
+        if isEditMode && password.isEmpty && confirm.isEmpty { return true }
         if password.count < Self.minPassword {
             return fail("Password must be at least 8 characters.")
         }
@@ -694,7 +694,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         infoBox.layer.cornerRadius = AppMetrics.radiusSM
         infoBox.addArrangedSubview(UILabel.make(S.accountSignIn, font: AppFonts.bold(13), color: AppColors.info))
         infoBox.addArrangedSubview(UILabel.make(
-            isEditing ? S.accountSignInHelpEdit : S.accountSignInHelpCreate,
+            isEditMode ? S.accountSignInHelpEdit : S.accountSignInHelpCreate,
             font: AppFonts.regular(12), color: AppColors.textSecondary, lines: 0))
         stack.addArrangedSubview(infoBox)
 
@@ -703,12 +703,12 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
 
         // Editing leaves the password blank to keep the current one (11.Trader-OwnerInfo.png).
         stack.addArrangedSubview(passwordGroup(S.passwordLabel, passwordField,
-                                               placeholder: isEditing ? "Enter new password (optional)"
+                                               placeholder: isEditMode ? "Enter new password (optional)"
                                                                       : "Enter password"))
         stack.addArrangedSubview(passwordGroup("Confirm Password", confirmPasswordField,
-                                               placeholder: isEditing ? "Confirm new password (optional)"
+                                               placeholder: isEditMode ? "Confirm new password (optional)"
                                                                       : "Confirm password"))
-        stack.addArrangedSubview(subtitle(isEditing ? S.passwordHelpEdit : S.passwordHelpCreate))
+        stack.addArrangedSubview(subtitle(isEditMode ? S.passwordHelpEdit : S.passwordHelpCreate))
         return stack
     }
 
@@ -779,7 +779,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         icon.contentMode = .scaleAspectFit
         icon.constrainSize(24)
         logoPlaceholder.addArrangedSubview(icon)
-        logoPlaceholder.addArrangedSubview(UILabel.make(isEditing ? "Change logo" : "Upload logo",
+        logoPlaceholder.addArrangedSubview(UILabel.make(isEditMode ? "Change logo" : "Upload logo",
                                                         font: AppFonts.bold(12),
                                                         color: AppColors.purplePrimary))
         logoPlaceholder.forAutoLayout()
@@ -1502,11 +1502,11 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
 
     // MARK: - Submit
 
-    private var submitLabel: String { isEditing ? S.saveChangesButton : S.registerButton }
+    private var submitLabel: String { isEditMode ? S.saveChangesButton : S.registerButton }
 
     private func submit() {
         var form: [String: String] = [:]
-        if let id = editing?.id { form["id"] = id }
+        if let id = editingTrader?.id { form["id"] = id }
 
         form["first_name"] = text(firstNameField)
         form["last_name"] = text(lastNameField)
@@ -1545,7 +1545,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         }
 
         continueButton.isEnabled = false
-        continueButton.setTitle(isEditing ? S.saving : S.registering, for: .normal)
+        continueButton.setTitle(isEditMode ? S.saving : S.registering, for: .normal)
 
         let completion: (Result<CreateTraderData, ApiError>) -> Void = { [weak self] result in
             guard let self = self else { return }
@@ -1562,7 +1562,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
             }
         }
 
-        if isEditing {
+        if isEditMode {
             ApiClient.shared.updateTrader(form: form, files: files, completion: completion)
         } else {
             ApiClient.shared.createTrader(form: form, files: files, completion: completion)
