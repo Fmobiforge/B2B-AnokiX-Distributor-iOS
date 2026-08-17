@@ -10,10 +10,13 @@ final class StockFormViewController: UIViewController {
     private let helpText: String?
     private let submitTitle: String
 
+    private let scroll = UIScrollView()
     private let fieldStack = UIStackView.vertical(spacing: 10, alignment: .fill)
     private let errorLabel = UILabel.make(font: AppFonts.regular(AppMetrics.textCaption),
                                           color: AppColors.danger, lines: 0)
     private let submitButton = UIButton(type: .system)
+    /// The detent is chosen once, on the first real layout pass.
+    private var didChooseDetent = false
 
     init(title: String, help: String?, submitTitle: String) {
         self.titleText = title
@@ -30,9 +33,10 @@ final class StockFormViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel,
                                                            target: self, action: #selector(cancel))
 
-        let scroll = UIScrollView()
         scroll.alwaysBounceVertical = true
-        scroll.keyboardDismissMode = .onDrag
+        // .onDrag drops the keyboard the moment a drag starts, which grows the scroll view
+        // and jumps the offset mid-gesture. .interactive lets the keyboard follow the finger.
+        scroll.keyboardDismissMode = .interactive
         scroll.forAutoLayout()
         view.addSubview(scroll)
 
@@ -104,14 +108,36 @@ final class StockFormViewController: UIViewController {
         ])
     }
 
-    /// Wraps the form in a navigation controller and presents it as a medium sheet.
+    /// Wraps the form in a navigation controller and presents it as a sheet. Short forms
+    /// open medium; `viewDidLayoutSubviews` promotes a taller one to large.
     func wrappedInNavigation() -> UIViewController {
         let nav = UINavigationController(rootViewController: self)
         if let sheet = nav.sheetPresentationController {
             sheet.detents = [.medium(), .large()]
             sheet.prefersGrabberVisible = true
+            // Leave the pan gesture with the form's scroll view. The default (true) hands a
+            // drag that starts at the content's top edge to the sheet instead, so the content
+            // springs back to the top when the sheet settles and the last fields stay out of
+            // reach. The grabber still resizes the sheet.
+            sheet.prefersScrollingExpandsWhenScrolledToEdge = false
         }
         return nav
+    }
+
+    /// A form that does not fit the medium detent (Receive stock, Add staff) opens large, so
+    /// every field is reachable. Measured rather than counted — the caller builds the field
+    /// list, and it varies per form.
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        guard !didChooseDetent, scroll.bounds.height > 0 else { return }
+        didChooseDetent = true
+        // contentSize is driven by the content layout guide, so settle the scroll view's own
+        // layout before reading it — on the first pass it is otherwise still zero.
+        scroll.layoutIfNeeded()
+        guard scroll.contentSize.height > scroll.bounds.height,
+              let sheet = navigationController?.sheetPresentationController,
+              sheet.selectedDetentIdentifier != .large else { return }
+        sheet.animateChanges { sheet.selectedDetentIdentifier = .large }
     }
 
     // MARK: Field builders
