@@ -623,7 +623,7 @@ enum S {
     // MARK: anokiX wallet (drawer › anokiX wallet)
 
     static let walletScreenTitle = "anokiX wallet"
-    static let walletScreenSubtitle = "Your IMB business account — balances, payments and settlements."
+    static let walletScreenSubtitle = "Manage your money and settlements — Powered by IMB"
     static let walletTotalBalance = "Total Wallet Balance"
     static let walletAvailableBalance = "Available Balance"
     static let walletPendingBalance = "Pending"
