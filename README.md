@@ -1,115 +1,319 @@
-# anokiX Distributor — iOS
+<div align="center">
 
-A native iOS (UIKit) port of the **AnokiXDistributorV2** Android app. Same bundle id
-(`com.anokix.distributorapp`), same backend (`http://155.117.20.51/ax/`), same screens,
-data models, and visual design system.
+<h1>anokiX Distributor — iOS</h1>
 
-## Requirements
+**The wholesale supply side of the anokiX B2B commerce platform, built natively for iOS.**
 
-- macOS with **Xcode 15** or newer
-- **iOS 16.0+** deployment target
-- [XcodeGen](https://github.com/yonsei/XcodeGen) to generate the `.xcodeproj`
-- [CocoaPods](https://cocoapods.org/) for third-party libraries
+List products, manage warehouse stock and stores, onboard traders, fulfil and deliver orders,
+run promotions and settle finances — from an iPhone or iPad.
 
-## Generating & running
+[![Platform](https://img.shields.io/badge/platform-iOS%2016%2B-000000?style=flat-square&logo=apple&logoColor=white)](#)
+[![Swift](https://img.shields.io/badge/Swift-UIKit-F05138?style=flat-square&logo=swift&logoColor=white)](#)
+[![Xcode](https://img.shields.io/badge/Xcode-15%2B-1575F9?style=flat-square&logo=xcode&logoColor=white)](#)
+[![CocoaPods](https://img.shields.io/badge/deps-CocoaPods-EE3322?style=flat-square&logo=cocoapods&logoColor=white)](#)
+[![Version](https://img.shields.io/badge/version-1.0.7-blue?style=flat-square)](#)
+[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
-```bash
-brew install xcodegen cocoapods   # one-time
-cd AnokiXDistributoriOS
-xcodegen generate                 # creates AnokiXDistributor.xcodeproj
-pod install                       # installs Alamofire, SwiftyJSON, GoogleMaps; creates .xcworkspace
-open AnokiXDistributor.xcworkspace
-```
+<br>
 
-Select a simulator (or your device — set a Development Team in *Signing & Capabilities*
-the first time) and **Run**. Regenerate the project after adding files:
+<img src="screenshots/03-dashboard.png" width="195">
+<img src="screenshots/06-orders-queue.png" width="195">
+<img src="screenshots/09-inventory.png" width="195">
+<img src="screenshots/11-products.png" width="195">
 
-```bash
-xcodegen generate && pod install
-```
+</div>
 
-Always open **`AnokiXDistributor.xcworkspace`** (not the `.xcodeproj`) after `pod install`.
+---
 
-### Build error: `Pods-AnokiXDistributor-frameworks.sh: Permission denied`
+## About
 
-This happens when the project was copied from Windows and CocoaPods shell scripts lose the executable bit.
+anokiX connects **distributors** (wholesale suppliers) with **traders** (retail shops). This is the distributor's app — a wholesaler's control room showing what's selling, what's in stock, which orders need picking and which traders are buying.
 
-**Quick fix (on Mac, in the project folder):**
+It is a native **UIKit** port of the Android Distributor app: same bundle id (`com.anokix.distributorapp`), same backend, same screens, data models and visual design system.
 
-```bash
-chmod +x scripts/fix-pods-permissions.sh
-./scripts/fix-pods-permissions.sh
-```
+> [!NOTE]
+> **The backend API is currently offline.** This repository is published as a reference for the app's **UI and user flows** — every screenshot below is a real capture from the running app, served by the bundled mock repository. To run against live data, point it at your own backend and supply your own keys (see [Configuration](#configuration)).
 
-Or manually:
+---
 
-```bash
-find "Pods/Target Support Files" -name "*.sh" -exec chmod +x {} \;
-```
+## Screens and flows
 
-Then run `pod install` again (the `Podfile` post-install hook also restores permissions and uses `/bin/bash` for embed scripts).
+### Sign in and get oriented
 
-## Dependencies (CocoaPods)
+A dark navy splash leads to a login sheet with email or phone tabs. The dashboard opens on revenue and order KPIs, then an overview grid — pending orders, out for delivery, low stock, new traders — a revenue chart, a top-selling-category donut and recent orders. A drawer mirrors the portal sidebar and reaches every secondary module.
 
-| Pod | Purpose |
-|-----|---------|
-| **Alamofire** ~> 5.9 | HTTP client (`Network/Http.swift`) |
-| **SwiftyJSON** ~> 5.0 | API envelope parsing (`Network/ApiClient.swift`) |
-| **GoogleMaps** ~> 9.0 | Store address pin picker (`AddEditStoreViewController`) |
+<table>
+<tr>
+<td><img src="screenshots/01-welcome.png" width="185"></td>
+<td><img src="screenshots/02-login.png" width="185"></td>
+<td><img src="screenshots/03-dashboard.png" width="185"></td>
+<td><img src="screenshots/04-dashboard-categories.png" width="185"></td>
+<td><img src="screenshots/05-drawer.png" width="185"></td>
+</tr>
+<tr>
+<td align="center"><sub>Splash</sub></td>
+<td align="center"><sub>Login</sub></td>
+<td align="center"><sub>Dashboard</sub></td>
+<td align="center"><sub>Categories &amp; orders</sub></td>
+<td align="center"><sub>Drawer</sub></td>
+</tr>
+</table>
 
-Domain models still decode with `Codable`; SwiftyJSON handles the `{ status, message, data }` wrapper.
+### Order fulfilment
 
-## Architecture (mirrors the Android project)
+Orders land in a queue tabbed by stage — **Order Queue → Accept → Picking → Packing → Ready for Delivery → Out for Delivery**. Each card carries its actions inline (*Accept* / *Reject*, later *Mark Ready*), so a warehouse clerk advances an order without opening it. The detail screen shows a live tracking timeline, the trader and the line items.
 
-**UI approach:** Interface Builder first — `Main.storyboard` defines Splash, Login, and the tab bar shell. Reusable headers live in XIB files (`DashboardHeaderView.xib`, `LogoHeaderView.xib`, `PageTitleSectionView.xib`). Swift code wires actions, API calls, and dynamic list content only.
+<table>
+<tr>
+<td><img src="screenshots/06-orders-queue.png" width="185"></td>
+<td><img src="screenshots/08-orders-packing.png" width="185"></td>
+<td><img src="screenshots/07-order-details.png" width="185"></td>
+<td><img src="screenshots/20-deliveries.png" width="185"></td>
+<td><img src="screenshots/21-returns.png" width="185"></td>
+</tr>
+<tr>
+<td align="center"><sub>Order queue</sub></td>
+<td align="center"><sub>Packing stage</sub></td>
+<td align="center"><sub>Tracking timeline</sub></td>
+<td align="center"><sub>Deliveries</sub></td>
+<td align="center"><sub>Returns &amp; credit notes</sub></td>
+</tr>
+</table>
 
-**List rows = XIB templates (Android `item_*.xml` parity).** Every dynamic list row has its layout defined in its own `.xib` — the iOS analogue of an Android per-row XML layout — so rows are edited visually and stay easy to maintain:
+### Catalogue, stock and stores
+
+Products carry SKU, category, price and a stock badge. Inventory shows per-SKU levels with colour-coded fill bars over an in-stock / low / out donut. Stores are created through a two-step form with fulfilment options (Click &amp; Collect, Click &amp; Deliver) and a Google Maps pin for the address.
+
+<table>
+<tr>
+<td><img src="screenshots/11-products.png" width="185"></td>
+<td><img src="screenshots/09-inventory.png" width="185"></td>
+<td><img src="screenshots/10-store-form.png" width="185"></td>
+<td><img src="screenshots/12-airtime-vas.png" width="185"></td>
+<td><img src="screenshots/13-airtime-sell.png" width="185"></td>
+</tr>
+<tr>
+<td align="center"><sub>Products</sub></td>
+<td align="center"><sub>Inventory</sub></td>
+<td align="center"><sub>Store form</sub></td>
+<td align="center"><sub>Airtime &amp; VAS</sub></td>
+<td align="center"><sub>Sell airtime</sub></td>
+</tr>
+</table>
+
+### Promotions, money and reporting
+
+Campaigns track budget, reach, clicks and CTR, and drill into a summary with targeting, added products and stock allocation logs. Finances splits income from expenses across a transaction ledger. Reports generates and downloads sales, inventory, trader and finance exports.
+
+<table>
+<tr>
+<td><img src="screenshots/14-promotions.png" width="185"></td>
+<td><img src="screenshots/15-campaign-details.png" width="185"></td>
+<td><img src="screenshots/16-campaign-products.png" width="185"></td>
+<td><img src="screenshots/17-finances.png" width="185"></td>
+<td><img src="screenshots/18-reports.png" width="185"></td>
+</tr>
+<tr>
+<td align="center"><sub>Campaigns</sub></td>
+<td align="center"><sub>Campaign detail</sub></td>
+<td align="center"><sub>Added products</sub></td>
+<td align="center"><sub>Finances</sub></td>
+<td align="center"><sub>Reports</sub></td>
+</tr>
+</table>
+
+<details>
+<summary><b>All 21 screens</b></summary>
+
+<br>
+
+<table>
+<tr>
+<td><img src="screenshots/01-welcome.png" width="150"></td>
+<td><img src="screenshots/02-login.png" width="150"></td>
+<td><img src="screenshots/03-dashboard.png" width="150"></td>
+<td><img src="screenshots/04-dashboard-categories.png" width="150"></td>
+<td><img src="screenshots/05-drawer.png" width="150"></td>
+<td><img src="screenshots/06-orders-queue.png" width="150"></td>
+</tr>
+<tr>
+<td align="center"><sub>Splash</sub></td><td align="center"><sub>Login</sub></td><td align="center"><sub>Dashboard</sub></td><td align="center"><sub>Categories</sub></td><td align="center"><sub>Drawer</sub></td><td align="center"><sub>Orders</sub></td>
+</tr>
+<tr>
+<td><img src="screenshots/07-order-details.png" width="150"></td>
+<td><img src="screenshots/08-orders-packing.png" width="150"></td>
+<td><img src="screenshots/09-inventory.png" width="150"></td>
+<td><img src="screenshots/10-store-form.png" width="150"></td>
+<td><img src="screenshots/11-products.png" width="150"></td>
+<td><img src="screenshots/12-airtime-vas.png" width="150"></td>
+</tr>
+<tr>
+<td align="center"><sub>Order detail</sub></td><td align="center"><sub>Packing</sub></td><td align="center"><sub>Inventory</sub></td><td align="center"><sub>Store form</sub></td><td align="center"><sub>Products</sub></td><td align="center"><sub>Airtime</sub></td>
+</tr>
+<tr>
+<td><img src="screenshots/13-airtime-sell.png" width="150"></td>
+<td><img src="screenshots/14-promotions.png" width="150"></td>
+<td><img src="screenshots/15-campaign-details.png" width="150"></td>
+<td><img src="screenshots/16-campaign-products.png" width="150"></td>
+<td><img src="screenshots/17-finances.png" width="150"></td>
+<td><img src="screenshots/18-reports.png" width="150"></td>
+</tr>
+<tr>
+<td align="center"><sub>Sell airtime</sub></td><td align="center"><sub>Promotions</sub></td><td align="center"><sub>Campaign</sub></td><td align="center"><sub>Campaign items</sub></td><td align="center"><sub>Finances</sub></td><td align="center"><sub>Reports</sub></td>
+</tr>
+<tr>
+<td><img src="screenshots/19-deliveries-list.png" width="150"></td>
+<td><img src="screenshots/20-deliveries.png" width="150"></td>
+<td><img src="screenshots/21-returns.png" width="150"></td>
+<td></td><td></td><td></td>
+</tr>
+<tr>
+<td align="center"><sub>Deliveries</sub></td><td align="center"><sub>Delivery stats</sub></td><td align="center"><sub>Returns</sub></td><td></td><td></td><td></td>
+</tr>
+</table>
+
+</details>
+
+---
+
+## Features
+
+| Area | Capability |
+| --- | --- |
+| **Dashboard** | Revenue and order KPIs, sparklines, category donut, recent orders, wallet detail |
+| **Catalogue** | Create and edit products, media upload, category and pricing management |
+| **Inventory** | Per-store stock levels, set-stock, transfers, goods receipt, stock-movement history |
+| **Stores** | Multi-warehouse management with a Google Maps pin picker |
+| **Traders** | Onboard retail customers, review applications, view trader detail |
+| **Orders** | Accept, reject, pick, pack and dispatch incoming orders |
+| **Deliveries** | Scheduling, per-delivery detail, mark-delivered |
+| **Returns** | Goods-return (GRN) approval flow with credit notes |
+| **Promotions** | Build campaigns over selected products, with media and stock allocation |
+| **Finances &amp; Wallet** | Transaction ledger, income vs expenses, balance, top-up |
+| **Card Machine** | POS terminal registry and payment reconciliation |
+| **Airtime / VAS** | Customer onboarding, catalogue, subscriptions, transaction history |
+| **Reports** | Generate and download server-rendered CSV reports |
+| **Staff** | Warehouse staff accounts with their own sign-in |
+| **Settings &amp; Support** | Profile, business, security and notification settings; ticketed support |
+| **Push** | Firebase Cloud Messaging, token registered on login and removed on logout |
+
+---
+
+## Tech stack
+
+- **Swift**, **UIKit**, iOS 16.0+, universal (iPhone + iPad)
+- Project generated by **XcodeGen** from `project.yml` — adding a source file needs no `.pbxproj` edit
+- Dependencies via **CocoaPods**:
+
+  | Pod | Purpose |
+  | --- | --- |
+  | **Alamofire** ~> 5.9 | HTTP transport (`Network/Http.swift`) |
+  | **SwiftyJSON** ~> 5.0 | `{ status, message, data }` envelope parsing |
+  | **GoogleMaps** ~> 9.0 | Store address pin picker |
+  | **Firebase/Messaging** ~> 11.0 | Push notifications |
+
+  Domain models still decode with `Codable`; SwiftyJSON only unwraps the envelope.
+
+### UI approach
+
+**Interface Builder first.** `Main.storyboard` defines Splash, Login and the tab-bar shell. Reusable headers live in XIBs (`DashboardHeaderView`, `LogoHeaderView`, `PageTitleSectionView`). Swift wires actions, API calls and dynamic list content only.
+
+**List rows are XIB templates** — the iOS analogue of Android's per-row `item_*.xml`, so rows are edited visually:
 
 | Android row layout | iOS XIB + cell class |
-|---|---|
+| --- | --- |
 | `item_trader.xml` | `TraderCell.xib` + `TraderCell.swift` |
 | `item_product.xml` | `ProductCell.xib` + `ProductCell.swift` |
 | `item_store.xml` | `StoreCell.xib` + `StoreCell.swift` |
 | `item_inventory.xml` | `InventoryCell.xib` + `InventoryCell.swift` |
 | `item_order.xml` | `OrderCell.xib` + `OrderCell.swift` |
-| `drawer_content.xml` row | `DrawerMenuCell.xib` + `DrawerMenuCell.swift` |
 
-Each XIB holds **structure + Auto Layout + outlets**; the cell's `awakeFromNib()` applies fonts/colors/radii from the theme (`AppColors`/`AppFonts`/`StyleKit`) so Swift stays the single source of truth for styling (same split as `DashboardHeaderView`). Adapters register and dequeue rows by class name via the `registerNib(_:)` / `dequeue(_:for:)` helpers in `Theme/UITableView+Nib.swift`, so a `cellForRowAt` reads like a RecyclerView adapter referencing a layout. **A new row XIB is picked up automatically on `xcodegen generate`** (the target globs the `AnokiXDistributor` folder) — no manual project edits.
+Each XIB holds structure, Auto Layout and outlets; `awakeFromNib()` applies fonts, colours and radii from the theme, so Swift stays the single source of truth for styling. A new row XIB is picked up automatically on `xcodegen generate`.
 
-**Tablet: adaptive card grids (RecyclerView `GridLayoutManager` parity).** The four card lists — **Products** (tab + standalone), **Stores**, **Traders**, **Inventory** — render in a `UICollectionView` driven by `Theme/AdaptiveGridLayout.swift`, a compositional layout whose column count comes from the available width: **1 column on iPhone (compact), 2 on iPad portrait, 3 on iPad landscape**. The same horizontal card XIB is reused at every column count — the cells are `UICollectionViewCell`s and the inter-card spacing (16pt edges, 8pt row gap, 16pt column gap) lives in the layout, not the cell, so cards never stretch full-width on iPad. It recomputes on rotation and iPad split-view resize. `OrderCell` (full-width action card) and the drawer stay single-column `UITableView`s.
+**Adaptive card grids on iPad.** Products, Stores, Traders and Inventory render in a `UICollectionView` driven by `Theme/AdaptiveGridLayout.swift`, a compositional layout whose column count comes from available width — **1 on iPhone, 2 on iPad portrait, 3 on iPad landscape**. The same card XIB is reused at every column count, and spacing lives in the layout rather than the cell, so cards never stretch full-width. It recomputes on rotation and iPad split-view resize.
 
-| Android (Java) | iOS (Swift) |
-|---|---|
-|---|---|
-| `res/values/colors.xml`, `dimens.xml`, `text_styles.xml` | `Theme/AppColors`, `AppMetrics`, `UILabel+Styles`, `StyleKit` |
-| `ui/views/Roboto*` custom views | `Theme/AppFonts` (system font; drop-in Inter supported) |
-| `network/Http`, `ApiClient` | `Network/Http` (Alamofire), `ApiClient` (SwiftyJSON envelope + Codable) |
-| `session/SessionManager` | `Network/SessionManager` |
-| `LoginActivity` | `SplashViewController` → `LoginViewController` (**Main.storyboard**) |
-| `MainActivity` (bottom nav + drawer) | `MainTabBarController` (**Main.storyboard**) + `DrawerMenuViewController` |
-| `include_logo_header` / dashboard header | `Common/AppChrome.swift` (`LogoHeaderView`, `DashboardHeaderView`) |
-| Bottom tabs: Home, Orders, Inventory, Products | Same four tabs in `MainTabBarController` |
-| Secondary Activities | Pushed on tab nav stack; tab bar hidden via `hidesBottomBarWhenPushed` |
-| Drawer screens | Stores, Traders, Products, Promotions, Finances, Reports, Deliveries, Returns, Notifications, Settings |
+---
 
-### UI parity with Android
+## Getting started
 
-- **Splash / Launch:** dark navy `#000920` gradient, anokiX logo, “Distributor App” subtitle
-- **Login:** gradient top + white bottom sheet, Email/Phone tabs, icon inputs, purple Login + outlined Join
-- **Home tab:** white header with hamburger, welcome message, notifications badge, profile initials
-- **Inventory / Products tabs:** logo header + page title (matches `include_logo_header`)
-- **Orders tab:** white page title header (no purple bar)
-- **Bottom navigation:** four labeled tabs with purple selected / grey unselected styling (`tabBarMinimizeBehavior = .never` on iOS 26 so the bar stays visible like Android)
-- **Drawer:** dark navy panel, logo, “Distributor Portal” badge, purple selected menu pill
+### Prerequisites
 
-### Notes
+- macOS with **Xcode 15** or newer
+- `brew install xcodegen cocoapods`
 
-- **Maps:** Google Maps pin picker in `AddEditStoreViewController` (same API key as Android `google_maps_api.xml`). Enable **Maps SDK for iOS** on that key in Google Cloud Console if tiles do not load.
-- **Icons:** SF Symbols via `Theme/AppIcons.swift`; swap in asset catalog icons for pixel parity.
-- **Fonts:** system font by default; add Inter `.ttf` files and set `useInter = true` in `AppFonts.swift`.
-- **Live vs mock:** Dashboard, Stores, Traders, Products, Inventory summary use the real API; Orders list and most drawer screens use mock data (same as Android).
+### Generate and run
+
+```bash
+xcodegen generate                 # creates AnokiXDistributor.xcodeproj from project.yml
+pod install                       # installs pods, creates the .xcworkspace
+open AnokiXDistributor.xcworkspace
+```
+
+Always open the **`.xcworkspace`**, never the `.xcodeproj`. Set a Development Team under *Signing &amp; Capabilities* the first time you run on a device. Re-run `xcodegen generate && pod install` after adding files or editing the `Podfile`.
+
+<details>
+<summary><b>Build error:</b> <code>Pods-AnokiXDistributor-frameworks.sh: Permission denied</code></summary>
+
+<br>
+
+CocoaPods shell scripts lose their executable bit when the repo is checked out on Windows. The `Podfile`'s `post_install` hook restores it and routes embed scripts through `/bin/bash`, so a plain `pod install` usually fixes it. To repair manually:
+
+```bash
+chmod +x scripts/fix-pods-permissions.sh && ./scripts/fix-pods-permissions.sh
+# or
+find "Pods/Target Support Files" -name "*.sh" -exec chmod +x {} \;
+```
+
+</details>
+
+### Configuration
+
+No credentials are committed. Supply your own before the app can reach live data:
+
+| What | Where |
+| --- | --- |
+| API base URL | `ApiClient.baseURL` in `Network/ApiClient.swift` |
+| Google Maps API key | `Common/GoogleMapsConfig.swift` |
+| Firebase / FCM | `Resources/GoogleService-Info.plist` |
+| APNs auth key (`.p8`) | Upload to the Firebase console — **never commit it** |
+
+Create your own Firebase project and Google Cloud API key, enable **Maps SDK for iOS**, and restrict the key to the `com.anokix.distributorapp` bundle ID.
+
+---
+
+## Project structure
+
+```
+AnokiXDistributor/
+├── App/           AppDelegate, SceneDelegate
+├── Common/        AppChrome, Components, Router, pickers, theme helpers
+├── Data/          DistributorRepository — API and mock implementations behind one interface
+├── Models/        Domain models
+├── Network/       ApiClient (typed endpoints) → Http (Alamofire) → DTO/, SessionManager, PushManager
+└── Scenes/        One folder per screen — Dashboard, Orders, Inventory, Products, Stores,
+                   Traders, Promotions, Deliveries, Returns, Finances, Reports, Wallet,
+                   Airtime, CardMachine, Staff, Settings, Support, Login, Register, Main
+```
+
+- **Auth** is a bearer token from `api/common/login`, persisted in `UserDefaults` and attached to every later request. Registration can land in a *pending approval* state, rendered as its own screen.
+- **Mock repositories** ship alongside the API ones, so every screen can be developed and demoed with no backend — which is how the captures above were produced.
+- Every Swift file lives under `AnokiXDistributor/` and is auto-included via the XcodeGen target glob.
+
+---
+
+## Related repositories
+
+| App | Platform |
+| --- | --- |
+| anokiX Distributor | iOS *(this repo)* · Android |
+| anokiX Trader | iOS · Android |
+
+---
 
 ## Status
 
-All Android screens are implemented. Build on a Mac with `pod install` before running.
-The splash → login → main tab flow and bottom navigation now match the Android app structure.
+All screens are implemented; the app is at version 1.0.7. The project is authored on Windows and generated with XcodeGen, so a first build on a Mac may surface minor adjustments. The backend API is offline, so the app currently runs against its bundled mock data.
+
+## License
+
+Released under the [MIT License](LICENSE).

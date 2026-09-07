@@ -1,16 +1,46 @@
-# Xcode / XcodeGen
-xcuserdata/
+# ─── Secrets — never commit ──────────────────────────────────────────────
+# Apple APNs auth keys, signing certs and provisioning profiles.
+# The .p8 is a private key: anyone holding it can send push as you.
+*.p8
+*.p12
+*.cer
+*.certSigningRequest
+*.mobileprovision
+AuthKey_*
+
+# Firebase config — generate your own from your Firebase project.
+GoogleService-Info.plist
+
+# API keys / endpoints.
+.env
+.env.*
+
+# ─── CocoaPods ───────────────────────────────────────────────────────────
+# Pods are restored by `pod install`; Podfile.lock stays tracked.
+Pods/
+!Podfile.lock
+
+# ─── XcodeGen ────────────────────────────────────────────────────────────
+# The project is generated from project.yml — run `xcodegen generate`.
+# Delete these two lines if you would rather track the generated project.
+*.xcodeproj/
+*.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
+
+# ─── Xcode build ─────────────────────────────────────────────────────────
 DerivedData/
 build/
 *.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip
 
-# CocoaPods
-Pods/
-Podfile.lock
-
-# macOS
+# ─── OS ──────────────────────────────────────────────────────────────────
 .DS_Store
-
-# Swift Package Manager
-.build/
-.swiftpm/
+Thumbs.db
+desktop.ini
