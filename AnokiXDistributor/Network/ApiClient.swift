@@ -11,12 +11,12 @@ final class ApiClient {
 
     static let shared = ApiClient()
 
-    static let baseURL = "http://109.176.30.129/ax/"
+    static let baseURL = "https://api.anokix.com/"  //"http://109.176.30.129/ax/"
 
     /// Report files are served by their own service — a different port from the JSON API,
     /// with no `/ax/` prefix — which authenticates from the request body instead of an
     /// Authorization header. It is the only endpoint that does not sit under `baseURL`.
-    static let reportDownloadURL = "http://109.176.30.129:5721/api/report-download"
+    static let reportDownloadURL = "https://api.anokix.com:5721/api/report-download"    //"http://109.176.30.129:5721/api/report-download"
 
     private let session = SessionManager.shared
     private let decoder: JSONDecoder = {
