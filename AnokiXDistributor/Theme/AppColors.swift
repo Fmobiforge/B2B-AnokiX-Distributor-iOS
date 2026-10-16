@@ -34,7 +34,7 @@ enum AppColors {
     static let drawerBg            = UIColor(hex: 0x000920)
     static let drawerItemSelected  = UIColor(hex: 0x6366F1)
     static let drawerText          = UIColor(hex: 0xFFFFFF)
-    static let drawerTextMuted     = UIColor(white: 1, alpha: 0.65)
+    static let drawerTextMuted     = UIColor(hex: 0xA6A7B1)   // white @ 65% over drawerBg, opaque
     static let drawerBadgeBg       = UIColor(hex: 0x6366F1, alpha: 0.22)
     static let drawerBadgeBorder   = UIColor(hex: 0x8B5CF6, alpha: 0.35)
     static let drawerBadgeText     = UIColor(hex: 0xC4B5FD)

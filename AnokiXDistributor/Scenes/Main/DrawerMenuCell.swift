@@ -54,8 +54,8 @@ final class DrawerMenuCell: UITableViewCell {
             text.append(NSAttributedString(
                 string: "\n" + subtitle,
                 attributes: [.font: AppFonts.regular(11),
-                             // drawerTextMuted already carries alpha 0.65 — keep the
-                             // second line a step quieter than the title.
+                             // Keep the second line a step quieter than the
+                             // (white @ 65%) title.
                              .foregroundColor: selected ? textColor.withAlphaComponent(0.85)
                                                         : UIColor(white: 1, alpha: 0.5)]))
             titleLabel.attributedText = text
