@@ -72,7 +72,7 @@
                                                     <constraint firstAttribute="width" constant="16" id="ch-w"/>
                                                     <constraint firstAttribute="height" constant="16" id="ch-h"/>
                                                 </constraints>
-                                                <color key="tintColor" red="0.58039215686274515" green="0.63921568627450975" blue="0.72156862745098038" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="tintColor" red="0.541" green="0.588" blue="0.639" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </imageView>
                                         </subviews>
                                     </stackView>

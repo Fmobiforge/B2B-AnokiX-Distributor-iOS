@@ -76,8 +76,8 @@ final class DonutChartView: UIView {
         let hasSub = (centerSub?.isEmpty == false)
 
         let mainAttrs: [NSAttributedString.Key: Any] = [
-            .font: AppFonts.bold(13),
-            .foregroundColor: AppColors.textPrimary
+            .font: AppFonts.semibold(13),
+            .foregroundColor: AppColors.topTitle
         ]
         let mainSize = (main as NSString).size(withAttributes: mainAttrs)
         let mainY = hasSub ? center.y - mainSize.height - 1 : center.y - mainSize.height / 2

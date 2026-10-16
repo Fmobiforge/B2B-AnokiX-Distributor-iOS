@@ -1,6 +1,6 @@
 import UIKit
 
-/// Port of BaseSecondaryActivity: a purple header with back navigation, access to the
+/// Port of BaseSecondaryActivity: a white portal header with back navigation, access to the
 /// shared repository, and a content container the subclass fills.
 class BaseSecondaryViewController: UIViewController {
 
@@ -76,8 +76,8 @@ class BaseSecondaryViewController: UIViewController {
         return listTop
     }
 
-    /// Purple header sits under the status bar — use white status bar content (Android windowLightStatusBar=false).
-    override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
+    /// White portal header sits under the status bar — use dark status bar content.
+    override var preferredStatusBarStyle: UIStatusBarStyle { .darkContent }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

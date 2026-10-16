@@ -19,6 +19,9 @@ class BaseMainViewController: UIViewController {
         if chromeStackView.arrangedSubviews.isEmpty {
             setupChromeHeader()
         }
+        // Storyboard chrome is authored in the system font — move it to Inter before the
+        // subclass applies its own styling.
+        StyleKit.applyInterFonts(in: chromeStackView)
         configureStoryboardChrome()
         setupContent(in: contentView)
         loadData()

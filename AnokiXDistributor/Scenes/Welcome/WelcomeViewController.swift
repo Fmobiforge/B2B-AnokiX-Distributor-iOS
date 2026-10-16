@@ -36,7 +36,7 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
 
         let title = UILabel.make(S.welcomeTitle, font: AppFonts.bold(28), color: .white, align: .center)
         let tagline = UILabel.make(S.welcomeTagline, font: AppFonts.regular(15),
-                                   color: UIColor(hex: 0x8A93B2), align: .center, lines: 0)
+                                   color: AppColors.textTertiary, align: .center, lines: 0)
 
         let loginButton = GradientButton(title: S.welcomeLogin)
         loginButton.constrainHeight(56)
@@ -72,8 +72,8 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
     }
 
     private func makeSignInRow() -> UIView {
-        let prompt = UILabel.make(S.welcomeHaveAccount, font: AppFonts.regular(14), color: UIColor(hex: 0x8A93B2))
-        let signIn = UILabel.make(S.welcomeSignIn, font: AppFonts.bold(14), color: UIColor(hex: 0x5B8DEF))
+        let prompt = UILabel.make(S.welcomeHaveAccount, font: AppFonts.regular(14), color: AppColors.textTertiary)
+        let signIn = UILabel.make(S.welcomeSignIn, font: AppFonts.bold(14), color: AppColors.authLink)
         let inner = UIStackView.horizontal(spacing: 2, alignment: .center)
         inner.addArrangedSubview(prompt)
         inner.addArrangedSubview(signIn)
@@ -84,11 +84,11 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
 
     private func makeSupportRow() -> UIView {
         let icon = UIImageView(image: UIImage(systemName: "headphones"))
-        icon.tintColor = UIColor(hex: 0x8A93B2)
+        icon.tintColor = AppColors.textTertiary
         icon.contentMode = .scaleAspectFit
         icon.constrainSize(18)
-        let prompt = UILabel.make(S.welcomeNeedHelp, font: AppFonts.regular(14), color: UIColor(hex: 0x8A93B2))
-        let support = UILabel.make(S.welcomeSupportCentre, font: AppFonts.bold(14), color: UIColor(hex: 0x5B8DEF))
+        let prompt = UILabel.make(S.welcomeNeedHelp, font: AppFonts.regular(14), color: AppColors.textTertiary)
+        let support = UILabel.make(S.welcomeSupportCentre, font: AppFonts.bold(14), color: AppColors.authLink)
         let inner = UIStackView.horizontal(spacing: 6, alignment: .center)
         inner.addArrangedSubview(icon)
         inner.addArrangedSubview(prompt)
@@ -152,18 +152,31 @@ final class WelcomeViewController: UIViewController, MFMailComposeViewController
     }
 }
 
-/// Pill button with the blue→purple welcome gradient (bg_welcome_login_gradient.xml).
+/// Pill button with the portal auth CTA gradient (#1E9DE6 → #4F8FF7 → #8B5CF6).
 final class GradientButton: UIButton {
-    private let gradient = CAGradientLayer()
 
-    init(title: String) {
+    /// `.auth` = the dark auth screens' 3-stop pill; `.primary` = the portal's solid brand-blue
+    /// button (radius 8) used for wizard CTAs on light screens.
+    enum Style { case auth, primary }
+
+    private let gradient = CAGradientLayer()
+    private let style: Style
+
+    init(title: String, style: Style = .auth) {
+        self.style = style
         super.init(frame: .zero)
         setTitle(title, for: .normal)
         setTitleColor(.white, for: .normal)
-        titleLabel?.font = AppFonts.bold(16)
-        gradient.colors = [UIColor(hex: 0x3B82F6).cgColor,
-                           UIColor(hex: 0x6366F1).cgColor,
-                           UIColor(hex: 0xA855F7).cgColor]
+        titleLabel?.font = AppFonts.semibold(16)
+        switch style {
+        case .auth:
+            gradient.colors = [AppColors.authGradientStart.cgColor,
+                               AppColors.authGradientCenter.cgColor,
+                               AppColors.authGradientEnd.cgColor]
+        case .primary:
+            gradient.colors = [AppColors.purplePrimary.cgColor,
+                               AppColors.purplePrimary.cgColor]
+        }
         gradient.startPoint = CGPoint(x: 0, y: 0.5)
         gradient.endPoint = CGPoint(x: 1, y: 0.5)
         layer.insertSublayer(gradient, at: 0)
@@ -172,9 +185,13 @@ final class GradientButton: UIButton {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        let radius = style == .auth ? bounds.height / 2 : AppMetrics.radiusSM
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
         gradient.frame = bounds
-        gradient.cornerRadius = bounds.height / 2
-        layer.cornerRadius = bounds.height / 2
+        gradient.cornerRadius = radius
+        CATransaction.commit()
+        layer.cornerRadius = radius
         clipsToBounds = true
     }
 }

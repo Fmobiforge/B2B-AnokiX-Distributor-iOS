@@ -28,6 +28,7 @@ final class ReturnDetailViewController: BaseSecondaryViewController {
     override func setupContent(in container: UIView) {
         contentStack = makeScrollStack(in: container, spacing: 16)
         spinner.hidesWhenStopped = true
+        spinner.color = AppColors.purplePrimary
         spinner.forAutoLayout()
         container.addSubview(spinner)
         NSLayoutConstraint.activate([
@@ -80,7 +81,7 @@ final class ReturnDetailViewController: BaseSecondaryViewController {
     }
 
     private func headerBlock(_ r: ReturnDetailDTO) -> UIView {
-        let number = UILabel.make(r.grnNumber ?? "", font: AppFonts.bold(20), color: AppColors.purplePrimary)
+        let number = UILabel.make(r.grnNumber ?? "", font: AppFonts.semibold(20), color: AppColors.topTitle)
 
         let badge = StyleKit.badgeLabel()
         let (fg, bg) = ReturnFormat.colors(r.status)

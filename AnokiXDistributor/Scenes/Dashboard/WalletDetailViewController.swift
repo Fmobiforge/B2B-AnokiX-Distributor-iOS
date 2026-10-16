@@ -33,11 +33,11 @@ final class WalletDetailViewController: UIViewController {
     private func buildLayout() {
         // Header: icon + title/subtitle + refresh.
         let tile = UIView()
-        tile.backgroundColor = AppColors.purplePrimary
-        tile.layer.cornerRadius = AppMetrics.radiusLG
+        tile.backgroundColor = AppColors.purpleLight
+        tile.layer.cornerRadius = AppMetrics.radiusMD
         tile.constrainSize(40)
         let icon = UIImageView(image: UIImage(systemName: "creditcard.fill"))
-        icon.tintColor = .white
+        icon.tintColor = AppColors.purplePrimary
         icon.contentMode = .scaleAspectFit
         icon.forAutoLayout()
         tile.addSubview(icon)
@@ -48,8 +48,8 @@ final class WalletDetailViewController: UIViewController {
             icon.heightAnchor.constraint(equalToConstant: 20)
         ])
 
-        let title = UILabel.make("anokiX wallet", font: AppFonts.bold(16), color: AppColors.textPrimary)
-        let subtitle = UILabel.make("Powered by IMB", font: AppFonts.light(11), color: AppColors.textSecondary)
+        let title = UILabel.make("anokiX wallet", font: AppFonts.semibold(16), color: AppColors.topTitle)
+        let subtitle = UILabel.make("Powered by IMB", font: AppFonts.regular(11), color: AppColors.textSecondary)
         let titleStack = UIStackView.vertical(spacing: 1, alignment: .leading)
         titleStack.addArrangedSubview(title)
         titleStack.addArrangedSubview(subtitle)
@@ -79,12 +79,12 @@ final class WalletDetailViewController: UIViewController {
         divider.constrainHeight(1)
 
         [availableLabel, currentLabel, pendingLabel].forEach {
-            $0.font = AppFonts.bold(16)
+            $0.font = AppFonts.semibold(16)
             $0.textColor = AppColors.textPrimary
         }
         availableLabel.textColor = AppColors.purplePrimary
-        currentLabel.font = AppFonts.bold(14)
-        pendingLabel.font = AppFonts.bold(14)
+        currentLabel.font = AppFonts.semibold(14)
+        pendingLabel.font = AppFonts.semibold(14)
 
         let rows = UIStackView.vertical(spacing: 0, alignment: .fill)
         rows.addArrangedSubview(detailRow("Available", availableLabel))
@@ -93,7 +93,7 @@ final class WalletDetailViewController: UIViewController {
         rows.addArrangedSubview(hairline())
         rows.addArrangedSubview(detailRow("Pending", pendingLabel))
 
-        asOfLabel.font = AppFonts.light(11)
+        asOfLabel.font = AppFonts.regular(11)
         asOfLabel.textColor = AppColors.textTertiary
 
         let content = UIStackView.vertical(spacing: 14, alignment: .fill)

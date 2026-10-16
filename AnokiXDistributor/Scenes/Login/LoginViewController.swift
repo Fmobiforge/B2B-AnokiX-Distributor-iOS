@@ -11,10 +11,13 @@ final class LoginViewController: UIViewController {
     @IBOutlet private weak var togglePasswordButton: UIButton!
 
     private var passwordVisible = false
+    /// Portal auth CTA: 3-stop gradient (#1E9DE6 → #4F8FF7 → #8B5CF6), fully rounded.
+    private let loginGradient = CAGradientLayer()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.setNavigationBarHidden(true, animated: false)
+        StyleKit.applyInterFonts(in: view)
         styleTextFields()
         selectEmailTab()
         let tap = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing(_:)))
@@ -28,17 +31,42 @@ final class LoginViewController: UIViewController {
         setNeedsStatusBarAppearanceUpdate()
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        loginGradient.frame = loginButton.bounds
+        loginGradient.cornerRadius = loginButton.bounds.height / 2
+        CATransaction.commit()
+        loginButton.layer.cornerRadius = loginButton.bounds.height / 2
+    }
+
     private func styleTextFields() {
         [emailField, passwordField].forEach { field in
-            field?.layer.cornerRadius = AppMetrics.radiusMD
+            field?.layer.cornerRadius = AppMetrics.radiusSM
             field?.layer.borderWidth = 1
             field?.layer.borderColor = AppColors.border.cgColor
+            field?.font = AppFonts.regular(14)
+            field?.textColor = AppColors.textPrimary
             field?.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 14, height: 1))
             field?.leftViewMode = .always
         }
-        tabEmailButton.layer.cornerRadius = AppMetrics.radiusMD - 2
-        tabPhoneButton.layer.cornerRadius = AppMetrics.radiusMD - 2
-        loginButton.layer.cornerRadius = AppMetrics.radiusMD
+        tabEmailButton.layer.cornerRadius = AppMetrics.radiusSM - 2
+        tabPhoneButton.layer.cornerRadius = AppMetrics.radiusSM - 2
+        tabEmailButton.titleLabel?.font = AppFonts.semibold(14)
+        tabPhoneButton.titleLabel?.font = AppFonts.semibold(14)
+        togglePasswordButton.tintColor = AppColors.textTertiary
+
+        loginGradient.colors = [AppColors.authGradientStart.cgColor,
+                                AppColors.authGradientCenter.cgColor,
+                                AppColors.authGradientEnd.cgColor]
+        loginGradient.startPoint = CGPoint(x: 0, y: 0.5)
+        loginGradient.endPoint = CGPoint(x: 1, y: 0.5)
+        loginButton.backgroundColor = .clear
+        loginButton.layer.insertSublayer(loginGradient, at: 0)
+        loginButton.clipsToBounds = true
+        loginButton.titleLabel?.font = AppFonts.semibold(15)
+        loginButton.layer.cornerRadius = 24
     }
 
     private func selectEmailTab() {

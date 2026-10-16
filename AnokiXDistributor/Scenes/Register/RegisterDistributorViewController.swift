@@ -116,7 +116,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
     // Additional contacts (dynamic rows)
     private final class ContactRow {
         let container = UIStackView.vertical(spacing: 10, alignment: .fill)
-        let header = UILabel.make("", font: AppFonts.bold(14), color: AppColors.purpleDark)
+        let header = UILabel.make("", font: AppFonts.semibold(14), color: AppColors.topTitle)
         let nameField = UITextField()
         let positionField = UITextField()
         let mobileField = UITextField()
@@ -387,7 +387,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
                 circle.textColor = .white
                 circle.text = "\(i + 1)"
                 title.textColor = AppColors.purplePrimary
-                title.font = AppFonts.bold(13)
+                title.font = AppFonts.semibold(13)
             } else {
                 circle.backgroundColor = AppColors.surface
                 circle.layer.borderWidth = 1.5
@@ -647,7 +647,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         stack.addArrangedSubview(sectionTitle("Contact Persons"))
         stack.addArrangedSubview(subtitle("Who should we reach out to?"))
 
-        stack.addArrangedSubview(UILabel.make("Primary Contact", font: AppFonts.bold(15), color: AppColors.purpleDark))
+        stack.addArrangedSubview(UILabel.make("Primary Contact", font: AppFonts.semibold(15), color: AppColors.topTitle))
         stack.addArrangedSubview(fieldGroup("Full Name *", primaryNameField, placeholder: "Enter full name"))
         stack.addArrangedSubview(fieldGroup("Position", primaryPositionField, placeholder: "e.g. Operations Manager"))
         stack.addArrangedSubview(phoneGroup("Mobile Number *", button: primaryCountryButton, country: primaryCountry, field: primaryMobileField, kind: .primary))
@@ -1043,7 +1043,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         iconRow.addArrangedSubview(UIView())
         stack.addArrangedSubview(iconRow)
 
-        stack.addArrangedSubview(UILabel.make("Benefits", font: AppFonts.bold(16), color: AppColors.purpleDark))
+        stack.addArrangedSubview(UILabel.make("Benefits", font: AppFonts.semibold(16), color: AppColors.topTitle))
         for benefit in ["Faster payments", "Access to credit", "Insurance solutions", "Rewards & cashback", "Business growth tools"] {
             let check = UIImageView(image: UIImage(systemName: "checkmark.circle.fill"))
             check.tintColor = AppColors.success
@@ -1099,7 +1099,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         walletInfoPanel.addArrangedSubview(notice)
 
         // Signing Owner Identity.
-        walletInfoPanel.addArrangedSubview(UILabel.make("Signing Owner Identity", font: AppFonts.bold(15), color: AppColors.purpleDark))
+        walletInfoPanel.addArrangedSubview(UILabel.make("Signing Owner Identity", font: AppFonts.semibold(15), color: AppColors.topTitle))
 
         configurePickerButton(walletIdTypeButton, placeholder: "Select ID type")
         setPickerTitle(walletIdTypeButton, "SA ID Number")
@@ -1166,7 +1166,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         walletInfoPanel.addArrangedSubview(labeledControl("Gender", walletGenderButton))
 
         // Residential Address.
-        walletInfoPanel.addArrangedSubview(UILabel.make("Residential Address", font: AppFonts.bold(15), color: AppColors.purpleDark))
+        walletInfoPanel.addArrangedSubview(UILabel.make("Residential Address", font: AppFonts.semibold(15), color: AppColors.topTitle))
         walletInfoPanel.addArrangedSubview(fieldGroup("Street Address", walletStreetField, placeholder: "17 New Haven Ave"))
         walletInfoPanel.addArrangedSubview(fieldGroup("Suburb", walletSuburbField, placeholder: "Bethesda"))
         walletInfoPanel.addArrangedSubview(fieldGroup("City", walletCityField, placeholder: "Cape Town"))
@@ -1185,7 +1185,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
         walletInfoPanel.addArrangedSubview(fieldGroup("Postal Code", walletPostCodeField, placeholder: "8001", keyboard: .numberPad))
 
         // Wallet Access.
-        walletInfoPanel.addArrangedSubview(UILabel.make("Wallet Access", font: AppFonts.bold(15), color: AppColors.purpleDark))
+        walletInfoPanel.addArrangedSubview(UILabel.make("Wallet Access", font: AppFonts.semibold(15), color: AppColors.topTitle))
         walletUssdTile = walletAccessTile(check: walletUssdCheck, title: "USSD access",
             sub: "Check balances and transact from any phone, no data needed.",
             action: #selector(toggleWalletUssd))
@@ -1249,7 +1249,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
 
     private func renderAccessTile(_ tile: UIView, _ check: UIImageView, _ on: Bool) {
         tile.backgroundColor = on ? AppColors.purpleLight : AppColors.surface
-        tile.layer.borderColor = (on ? UIColor(hex: 0xC9B6F6) : AppColors.border).cgColor
+        tile.layer.borderColor = (on ? AppColors.purpleTextLight : AppColors.border).cgColor
         check.image = UIImage(systemName: on ? "checkmark.square.fill" : "square")
         check.tintColor = on ? AppColors.purplePrimary : AppColors.textTertiary
     }
@@ -1976,7 +1976,7 @@ final class RegisterDistributorViewController: BaseSecondaryViewController, GMSM
     // MARK: - View builders
 
     private func sectionTitle(_ text: String) -> UILabel {
-        UILabel.make(text, font: AppFonts.bold(18), color: AppColors.purpleDark, lines: 0)
+        UILabel.make(text, font: AppFonts.semibold(18), color: AppColors.topTitle, lines: 0)
     }
 
     private func subtitle(_ text: String) -> UILabel {

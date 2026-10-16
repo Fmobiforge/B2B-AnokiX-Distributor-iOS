@@ -314,13 +314,14 @@ final class ProductKpiCard: UIView {
         super.init(frame: .zero)
         StyleKit.styleCard(self)
 
-        let titleLabel = UILabel.make(title, font: AppFonts.light(AppMetrics.textLabel),
+        let titleLabel = UILabel.make(title, font: AppFonts.medium(AppMetrics.textLabel),
                                       color: AppColors.textSecondary, lines: 1)
-        valueLabel.font = AppFonts.bold(AppMetrics.textStatValue)
-        valueLabel.textColor = valueColor
+        // Portal KPI: value stays navy; the status colour moves to the small caption.
+        valueLabel.font = AppFonts.semibold(AppMetrics.textStatValue)
+        valueLabel.textColor = AppColors.topTitle
         valueLabel.text = "0"
-        subtitleLabel.font = AppFonts.regular(AppMetrics.textMicro)
-        subtitleLabel.textColor = AppColors.textTertiary
+        subtitleLabel.font = AppFonts.medium(AppMetrics.textMicro)
+        subtitleLabel.textColor = valueColor
 
         let stack = UIStackView.vertical(spacing: 2, alignment: .leading)
         stack.addArrangedSubview(titleLabel)
@@ -340,7 +341,7 @@ final class ProductKpiCard: UIView {
 
     /// For pre-formatted values (currency, thousands separators).
     func set(text: String, subtitle: String) {
-        valueLabel.text = text
+        valueLabel.attributedText = NSAttributedString(string: text, attributes: [.kern: -0.5])
         subtitleLabel.text = subtitle
     }
 }
@@ -356,7 +357,7 @@ final class ProductTabView: UIView {
     init(title: String) {
         super.init(frame: .zero)
         label.text = title
-        label.font = AppFonts.bold(AppMetrics.textBodySM)
+        label.font = AppFonts.medium(AppMetrics.textBodySM)
         label.textColor = AppColors.textSecondary
 
         indicator.backgroundColor = AppColors.purplePrimary
@@ -381,6 +382,7 @@ final class ProductTabView: UIView {
     func set(title: String, selected: Bool) {
         label.text = title
         label.textColor = selected ? AppColors.purplePrimary : AppColors.textSecondary
+        label.font = selected ? AppFonts.semibold(AppMetrics.textBodySM) : AppFonts.medium(AppMetrics.textBodySM)
         indicator.isHidden = !selected
     }
 }

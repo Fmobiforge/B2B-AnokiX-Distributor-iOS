@@ -10,6 +10,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
         window = windowScene.windows.first
+        // Brand blue for system tints (alert actions, pickers, table accessories).
+        window?.tintColor = AppColors.purplePrimary
         connectionOptions.urlContexts.forEach { handle($0.url) }
     }
 

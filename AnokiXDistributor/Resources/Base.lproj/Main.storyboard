@@ -99,7 +99,7 @@
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="LOGIN" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="login-title">
                                         <rect key="frame" x="24" y="28" width="50" height="19"/>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
-                                        <color key="textColor" red="0.058823529411764705" green="0.090196078431372548" blue="0.16470588235294117" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="textColor" red="0.102" green="0.137" blue="0.494" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     </label>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="login-tab-bg">
                                         <rect key="frame" x="24" y="67" width="345" height="44"/>
@@ -108,7 +108,7 @@
                                                 <rect key="frame" x="4" y="4" width="168.66666666666666" height="36"/>
                                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
                                                 <state key="normal" title="Email">
-                                                    <color key="titleColor" red="0.48627450980392156" green="0.22745098039215686" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="titleColor" red="0.051" green="0.278" blue="0.631" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </state>
                                                 <connections>
                                                     <action selector="selectEmailTapped:" destination="login-vc" eventType="touchUpInside" id="tab-email-act"/>
@@ -118,14 +118,14 @@
                                                 <rect key="frame" x="172.66666666666663" y="4" width="168.33333333333337" height="36"/>
                                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
                                                 <state key="normal" title="Phone">
-                                                    <color key="titleColor" red="0.39215686274509803" green="0.45490196078431372" blue="0.54509803921568623" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="titleColor" red="0.361" green="0.420" blue="0.478" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </state>
                                                 <connections>
                                                     <action selector="selectPhoneTapped:" destination="login-vc" eventType="touchUpInside" id="tab-phone-act"/>
                                                 </connections>
                                             </button>
                                         </subviews>
-                                        <color key="backgroundColor" red="0.94509803921568625" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" red="0.961" green="0.969" blue="0.980" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="44" id="ltb-h"/>
                                             <constraint firstItem="tab-email" firstAttribute="leading" secondItem="login-tab-bg" secondAttribute="leading" constant="4" id="ltb1"/>
@@ -165,7 +165,7 @@
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="trailing" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="btn-forgot">
                                         <rect key="frame" x="24" y="295" width="345" height="34"/>
                                         <state key="normal" title="Forgot password?">
-                                            <color key="titleColor" red="0.48627450980392156" green="0.22745098039215686" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" red="0.051" green="0.278" blue="0.631" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </state>
                                         <connections>
                                             <action selector="forgotTapped:" destination="login-vc" eventType="touchUpInside" id="bf-act"/>
@@ -173,7 +173,7 @@
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="btn-login">
                                         <rect key="frame" x="24" y="349" width="345" height="48"/>
-                                        <color key="backgroundColor" red="0.48627450980392156" green="0.22745098039215686" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" red="0.051" green="0.278" blue="0.631" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="48" id="bl-h"/>
                                         </constraints>
@@ -195,19 +195,19 @@
                                         <constraints>
                                             <constraint firstAttribute="height" constant="48" id="bj-h"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="14"/>
                                         <state key="normal" title="Join Distributor App now">
-                                            <color key="titleColor" red="0.48627450980392156" green="0.22745098039215686" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" red="0.051" green="0.278" blue="0.631" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </state>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                                <real key="value" value="10"/>
+                                                <real key="value" value="24"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="number" keyPath="layer.borderWidth">
                                                 <real key="value" value="1"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="color" keyPath="layer.borderColor">
-                                                <color key="value" red="0.48627450980392156" green="0.22745098039215686" blue="0.92941176470588238" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="value" red="0.051" green="0.278" blue="0.631" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
@@ -359,7 +359,7 @@
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Here's what's happening today." lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dash-sub-lbl">
                                                 <rect key="frame" x="60" y="30.999999999999996" width="176" height="14.333333333333332"/>
                                                 <fontDescription key="fontDescription" type="system" weight="light" pointSize="12"/>
-                                                <color key="textColor" red="0.39200000000000002" green="0.45500000000000002" blue="0.54500000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="textColor" red="0.361" green="0.420" blue="0.478" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </label>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dash-bell-btn">
                                                 <rect key="frame" x="297" y="12" width="40" height="40"/>
@@ -370,13 +370,13 @@
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="center" text="A" textAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dash-avatar-lbl">
                                                 <rect key="frame" x="345" y="14" width="36" height="36"/>
-                                                <color key="backgroundColor" red="0.92900000000000005" green="0.91400000000000003" blue="0.996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" red="0.906" green="0.929" blue="0.965" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
-                                                <color key="textColor" red="0.48599999999999999" green="0.22700000000000001" blue="0.92900000000000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="textColor" red="0.051" green="0.278" blue="0.631" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </label>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dash-header-div">
                                                 <rect key="frame" x="0.0" y="66" width="393" height="1"/>
-                                                <color key="backgroundColor" red="0.88600000000000001" green="0.91000000000000003" blue="0.94099999999999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" red="0.863" green="0.882" blue="0.910" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="dhd-h"/>
                                                 </constraints>
@@ -425,7 +425,7 @@
                             </scrollView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="dash-safe"/>
-                        <color key="backgroundColor" red="0.94499999999999995" green="0.96099999999999997" blue="0.97599999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.961" green="0.969" blue="0.980" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="dash-chrome" firstAttribute="top" secondItem="dash-safe" secondAttribute="top" id="dv1"/>
                             <constraint firstItem="dash-chrome" firstAttribute="leading" secondItem="dash-view" secondAttribute="leading" id="dv2"/>
@@ -489,7 +489,7 @@
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Manage and process incoming orders" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="orders-sub-lbl">
                                                 <rect key="frame" x="16" y="33.333333333333314" width="210.33333333333334" height="571.66666666666674"/>
                                                 <fontDescription key="fontDescription" type="system" weight="light" pointSize="12"/>
-                                                <color key="textColor" red="0.39200000000000002" green="0.45500000000000002" blue="0.54500000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="textColor" red="0.361" green="0.420" blue="0.478" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </label>
                                         </subviews>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -505,11 +505,11 @@
                             </stackView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="orders-content">
                                 <rect key="frame" x="0.0" y="735" width="393" height="0.0"/>
-                                <color key="backgroundColor" red="0.94509803921568625" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="0.961" green="0.969" blue="0.980" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="orders-safe"/>
-                        <color key="backgroundColor" red="0.94509803921568625" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.961" green="0.969" blue="0.980" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="orders-chrome" firstAttribute="top" secondItem="orders-safe" secondAttribute="top" id="ov1"/>
                             <constraint firstItem="orders-chrome" firstAttribute="leading" secondItem="orders-view" secondAttribute="leading" id="ov2"/>
@@ -613,11 +613,11 @@
                             </stackView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="inv-content">
                                 <rect key="frame" x="0.0" y="735" width="393" height="0.0"/>
-                                <color key="backgroundColor" red="0.94509803921568625" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="0.961" green="0.969" blue="0.980" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="inv-safe"/>
-                        <color key="backgroundColor" red="0.94509803921568625" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.961" green="0.969" blue="0.980" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="inv-chrome" firstAttribute="top" secondItem="inv-safe" secondAttribute="top" id="iv1"/>
                             <constraint firstItem="inv-chrome" firstAttribute="leading" secondItem="inv-view" secondAttribute="leading" id="iv2"/>
@@ -688,7 +688,7 @@
                                             </button>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="prod-logo-div">
                                                 <rect key="frame" x="0.0" y="566" width="393" height="1"/>
-                                                <color key="backgroundColor" red="0.88600000000000001" green="0.91000000000000003" blue="0.94099999999999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" red="0.863" green="0.882" blue="0.910" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="pld-h"/>
                                                 </constraints>
@@ -729,11 +729,11 @@
                             </stackView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="prod-content">
                                 <rect key="frame" x="0.0" y="735" width="393" height="0.0"/>
-                                <color key="backgroundColor" red="0.94509803921568625" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="0.961" green="0.969" blue="0.980" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="prod-safe"/>
-                        <color key="backgroundColor" red="0.94499999999999995" green="0.96099999999999997" blue="0.97599999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.961" green="0.969" blue="0.980" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="prod-chrome" firstAttribute="top" secondItem="prod-safe" secondAttribute="top" id="pv1"/>
                             <constraint firstItem="prod-chrome" firstAttribute="leading" secondItem="prod-view" secondAttribute="leading" id="pv2"/>

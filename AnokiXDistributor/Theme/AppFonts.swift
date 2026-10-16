@@ -1,14 +1,14 @@
 import UIKit
 
-/// The Android app renders everything in the Inter typeface via the Roboto* custom views
+/// The Android app and the web portal render everything in the Inter typeface
 /// (RobotoTextView = regular, RobotoBoldTextView = bold, RobotoLightTextView = light).
 ///
-/// To match exactly, drop `Inter-Regular/Medium/SemiBold/Light.ttf` into Resources/Fonts,
-/// add them to `UIAppFonts` in Info.plist, and flip `useInter` to true. Until then we fall
-/// back to the system font at the equivalent weight, which is visually very close.
+/// `Inter-Regular/Medium/SemiBold/Light.ttf` ship in Resources/Fonts and are registered via
+/// `UIAppFonts` in Info.plist. If a face fails to load we fall back to the system font at the
+/// equivalent weight.
 enum AppFonts {
 
-    private static let useInter = false
+    private static let useInter = true
 
     static func regular(_ size: CGFloat) -> UIFont { font(size, weight: .regular, name: "Inter-Regular") }
     static func medium(_ size: CGFloat) -> UIFont  { font(size, weight: .medium,  name: "Inter-Medium") }

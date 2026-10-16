@@ -60,7 +60,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
     private var stepCircles: [UILabel] = []
     private var stepTitles: [UILabel] = []
     private let formScroll = UIScrollView()
-    private let continueButton = GradientButton(title: S.continueButton)
+    private let continueButton = GradientButton(title: S.continueButton, style: .primary)
     private var stepStacks: [UIStackView] = []
 
     // Reference data
@@ -1177,7 +1177,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         let stack = UIStackView.vertical(spacing: 12, alignment: .fill)
         stack.addArrangedSubview(sectionTitle("Select Preferred Distributor"))
         stack.addArrangedSubview(subtitle(S.registeredUnderYou))
-        stack.addArrangedSubview(UILabel.make("Preferred Distributors", font: AppFonts.bold(16), color: AppColors.purpleDark))
+        stack.addArrangedSubview(UILabel.make("Preferred Distributors", font: AppFonts.semibold(16), color: AppColors.topTitle))
 
         // This is the distributor portal, so the trader always belongs to the signed-in
         // distributor — the web multi-select is replaced by a read-only chip naming it
@@ -1373,7 +1373,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
         iconRow.addArrangedSubview(UIView())
         stack.addArrangedSubview(iconRow)
 
-        stack.addArrangedSubview(UILabel.make("Benefits", font: AppFonts.bold(16), color: AppColors.purpleDark))
+        stack.addArrangedSubview(UILabel.make("Benefits", font: AppFonts.semibold(16), color: AppColors.topTitle))
         for benefit in ["Faster payments", "Access to credit", "Insurance solutions", "Rewards & cashback", "Business growth tools"] {
             let check = UIImageView(image: UIImage(systemName: "checkmark.circle.fill"))
             check.tintColor = AppColors.success
@@ -1778,7 +1778,7 @@ final class CreateTraderViewController: BaseSecondaryViewController, GMSMapViewD
     // MARK: - View builders
 
     private func sectionTitle(_ text: String) -> UILabel {
-        UILabel.make(text, font: AppFonts.bold(18), color: AppColors.purpleDark, lines: 0)
+        UILabel.make(text, font: AppFonts.semibold(18), color: AppColors.topTitle, lines: 0)
     }
 
     private func subtitle(_ text: String) -> UILabel {

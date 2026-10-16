@@ -37,23 +37,24 @@ final class OrderCell: UITableViewCell {
 
         // Ribbon
         StyleKit.styleBadge(ribbonBadge)
-        ribbonBadge.font = AppFonts.bold(10)
+        ribbonBadge.font = AppFonts.semibold(10)
         ribbonBadge.textColor = AppColors.warning
         ribbonBadge.backgroundColor = AppColors.warningBg
 
-        timeLabel.font = AppFonts.light(11)
+        timeLabel.font = AppFonts.regular(11)
         timeLabel.textColor = AppColors.textSecondary
 
         // Avatar
-        avatarLabel.font = AppFonts.bold(14)
-        avatarLabel.textColor = AppColors.purplePrimary
+        // Portal initials avatar: 135° indigo → violet gradient, white semibold initials.
+        avatarLabel.font = AppFonts.semibold(14)
+        avatarLabel.textColor = .white
         avatarLabel.textAlignment = .center
-        avatarLabel.backgroundColor = AppColors.purpleLight
+        StyleKit.applyAvatarGradient(to: avatarLabel, size: CGSize(width: 44, height: 44))
         avatarLabel.layer.cornerRadius = AppMetrics.radiusMD
         avatarLabel.layer.masksToBounds = true
 
-        traderNameLabel.font = AppFonts.bold(14)
-        traderNameLabel.textColor = AppColors.textPrimary
+        traderNameLabel.font = AppFonts.semibold(14)
+        traderNameLabel.textColor = AppColors.topTitle
         orderIdLabel.font = AppFonts.regular(12)
         orderIdLabel.textColor = AppColors.textSecondary
         copyButton.tintColor = AppColors.textSecondary
@@ -62,23 +63,24 @@ final class OrderCell: UITableViewCell {
         summaryLabel.font = AppFonts.regular(12)
         summaryLabel.textColor = AppColors.textSecondary
         summaryLabel.numberOfLines = 2
-        amountLabel.font = AppFonts.bold(AppMetrics.textStatValue)
-        amountLabel.textColor = AppColors.textPrimary
+        amountLabel.font = AppFonts.semibold(AppMetrics.textStatValue)
+        amountLabel.textColor = AppColors.topTitle
 
         // Value badges
         StyleKit.styleBadge(paidBadge)
-        paidBadge.font = AppFonts.bold(10)
+        paidBadge.font = AppFonts.semibold(10)
         paidBadge.textColor = AppColors.success
         paidBadge.backgroundColor = AppColors.successBg
         StyleKit.styleBadge(paymentBadge)
-        paymentBadge.font = AppFonts.bold(10)
+        paymentBadge.font = AppFonts.semibold(10)
         paymentBadge.textColor = AppColors.purplePrimary
         paymentBadge.backgroundColor = AppColors.purpleLight
 
         // Actions
-        styleActionButton(viewButton, fg: AppColors.purplePrimary, bg: AppColors.purpleLight, stroke: nil, title: "View Order", icon: "eye")
-        styleActionButton(acceptButton, fg: .white, bg: AppColors.success, stroke: nil, title: "Accept Order", icon: "checkmark.circle.fill")
-        styleActionButton(rejectButton, fg: AppColors.danger, bg: AppColors.dangerBg, stroke: AppColors.danger, title: "Reject Order", icon: "xmark.circle.fill")
+        // Portal outlined actions: neutral View, success Accept, danger Reject (1pt, radius 8).
+        styleActionButton(viewButton, fg: AppColors.textPrimary, bg: AppColors.surface, stroke: AppColors.border, title: "View Order", icon: "eye")
+        styleActionButton(acceptButton, fg: AppColors.success, bg: AppColors.surface, stroke: AppColors.success, title: "Accept Order", icon: "checkmark.circle.fill")
+        styleActionButton(rejectButton, fg: AppColors.danger, bg: AppColors.surface, stroke: AppColors.danger, title: "Reject Order", icon: "xmark.circle.fill")
     }
 
     func configure(_ order: OrderItem, showActions: Bool) {
@@ -114,12 +116,13 @@ final class OrderCell: UITableViewCell {
         var config = UIButton.Configuration.filled()
         config.baseBackgroundColor = bg
         config.baseForegroundColor = fg
-        config.cornerStyle = .medium
+        config.cornerStyle = .fixed
+        config.background.cornerRadius = AppMetrics.radiusSM
         config.title = title
         config.image = UIImage(systemName: icon)
         config.imagePadding = 8
         config.titleTextAttributesTransformer = .init { incoming in
-            var out = incoming; out.font = AppFonts.bold(13); return out
+            var out = incoming; out.font = AppFonts.semibold(13); return out
         }
         if let stroke = stroke {
             config.background.strokeColor = stroke

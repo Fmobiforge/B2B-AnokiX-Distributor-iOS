@@ -35,6 +35,7 @@ final class OrderDetailViewController: BaseSecondaryViewController {
     override func setupContent(in container: UIView) {
         contentStack = makeScrollStack(in: container, spacing: 14)
         spinner.hidesWhenStopped = true
+        spinner.color = AppColors.purplePrimary
         spinner.forAutoLayout()
         container.addSubview(spinner)
         NSLayoutConstraint.activate([
@@ -83,20 +84,21 @@ final class OrderDetailViewController: BaseSecondaryViewController {
 
         let avatar = UILabel()
         avatar.text = name.isEmpty ? "?" : String(name.prefix(1)).uppercased()
-        avatar.font = AppFonts.bold(16)
+        avatar.font = AppFonts.semibold(16)
         avatar.textColor = .white
         avatar.textAlignment = .center
-        avatar.backgroundColor = OrderFormat.logoColor(order.traderId ?? 0)
         avatar.layer.cornerRadius = AppMetrics.radiusMD
         avatar.layer.masksToBounds = true
         avatar.constrainSize(44)
+        // Portal initials avatar: 135° indigo → violet gradient.
+        StyleKit.applyAvatarGradient(to: avatar, size: CGSize(width: 44, height: 44))
 
         let orderNumber = UILabel.make(order.orderNumber, font: AppFonts.bold(16), color: AppColors.textPrimary)
         let status = StyleKit.badgeLabel()
         let color = OrderFormat.statusColor(order.resolvedStatusKey)
         status.text = OrderFormat.humanize(order.resolvedStatusKey)
         status.textColor = color
-        status.backgroundColor = color.withAlphaComponent(0.11)
+        status.backgroundColor = color.withAlphaComponent(0.12)
         status.setContentHuggingPriority(.required, for: .horizontal)
 
         let titleRow = UIStackView.horizontal(spacing: 8, alignment: .center)
@@ -108,7 +110,7 @@ final class OrderDetailViewController: BaseSecondaryViewController {
         infoCol.addArrangedSubview(traderLabel)
 
         let amount = UILabel.make(OrderFormat.money(order.amount, currency: currency),
-                                  font: AppFonts.bold(18), color: AppColors.purplePrimary, align: .right)
+                                  font: AppFonts.semibold(18), color: AppColors.topTitle, align: .right)
         let itemsCount = UILabel.make(S.ordersItemsCount(order.itemCount ?? 0),
                                       font: AppFonts.regular(12), color: AppColors.textSecondary, align: .right)
         let rightCol = UIStackView.vertical(spacing: 2, alignment: .trailing)

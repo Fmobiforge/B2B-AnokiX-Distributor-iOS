@@ -53,10 +53,10 @@ final class OrdersViewController: BaseMainViewController, UITableViewDataSource,
 
     override func configureStoryboardChrome() {
         pageTitleLabel.text = S.ordersQueue
-        pageTitleLabel.font = AppFonts.bold(AppMetrics.textHeadline)
-        pageTitleLabel.textColor = AppColors.textPrimary
+        pageTitleLabel.font = AppFonts.semibold(AppMetrics.textHeadline)
+        pageTitleLabel.textColor = AppColors.topTitle
         pageSubtitleLabel.text = S.ordersSubtitle
-        pageSubtitleLabel.font = AppFonts.light(AppMetrics.textBodySM)
+        pageSubtitleLabel.font = AppFonts.regular(AppMetrics.textBodySM)
         pageSubtitleLabel.textColor = AppColors.textSecondary
     }
 
@@ -151,6 +151,7 @@ final class OrdersViewController: BaseMainViewController, UITableViewDataSource,
         emptyLabel.isHidden = true
         emptyLabel.forAutoLayout()
         spinner.hidesWhenStopped = true
+        spinner.color = AppColors.purplePrimary
         spinner.forAutoLayout()
 
         area.addSubviews(tableView, emptyLabel, spinner)
@@ -201,8 +202,8 @@ final class OrdersViewController: BaseMainViewController, UITableViewDataSource,
     private func styleNavButton(_ button: UIButton, system: String) {
         button.setImage(UIImage(systemName: system), for: .normal)
         button.tintColor = AppColors.textPrimary
-        button.backgroundColor = AppColors.surfaceVariant
-        button.layer.cornerRadius = AppMetrics.radiusMD
+        button.backgroundColor = AppColors.surface
+        button.layer.cornerRadius = AppMetrics.radiusSM
         button.layer.borderWidth = 1
         button.layer.borderColor = AppColors.border.cgColor
         button.widthAnchor.constraint(equalToConstant: 36).isActive = true
@@ -460,20 +461,20 @@ final class OrdersViewController: BaseMainViewController, UITableViewDataSource,
 
 enum OrderFormat {
 
-    private static let logoColors = [0xEC4899, 0x7C3AED, 0x2563EB, 0x0891B2, 0x16A34A, 0xEA580C, 0xD97706]
+    private static let logoColors = [0xEC4899, 0x8B5CF6, 0x1565C0, 0x0891B2, 0x2E7D32, 0xE65100, 0xF57F17]
 
     static func statusColor(_ key: String?) -> UIColor {
         switch key {
-        case "pending":            return UIColor(hex: 0xD97706)
-        case "accepted":           return UIColor(hex: 0x7C3AED)
-        case "picking":            return UIColor(hex: 0x2563EB)
+        case "pending":            return AppColors.statExpiring
+        case "accepted":           return AppColors.purplePrimary
+        case "picking":            return AppColors.info
         case "packing":            return UIColor(hex: 0x0891B2)
         case "ready_for_delivery": return UIColor(hex: 0x0D9488)
-        case "out_for_delivery":   return UIColor(hex: 0xEA580C)
-        case "delivered":          return UIColor(hex: 0x16A34A)
-        case "cancelled":          return UIColor(hex: 0xDC2626)
+        case "out_for_delivery":   return AppColors.warning
+        case "delivered":          return AppColors.success
+        case "cancelled":          return AppColors.danger
         case "failed":             return UIColor(hex: 0xB91C1C)
-        default:                   return UIColor(hex: 0x64748B)
+        default:                   return AppColors.textSecondary
         }
     }
 

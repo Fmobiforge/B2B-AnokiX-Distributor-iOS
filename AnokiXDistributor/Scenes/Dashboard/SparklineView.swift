@@ -3,7 +3,7 @@ import UIKit
 /// Lightweight line chart for the revenue overview — a slimmed port of LineChartView.
 final class SparklineView: UIView {
     var values: [Double] = [] { didSet { setNeedsDisplay() } }
-    var lineColor: UIColor = AppColors.purplePrimary
+    var lineColor: UIColor = AppColors.chartViolet
 
     override func draw(_ rect: CGRect) {
         guard values.count > 1,

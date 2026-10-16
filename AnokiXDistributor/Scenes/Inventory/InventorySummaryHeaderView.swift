@@ -44,7 +44,7 @@ final class InventorySummaryHeaderView: UICollectionReusableView {
 
         let title = UILabel.make(S.inventoryOverview, font: AppFonts.bold(AppMetrics.textHeadline),
                                  color: AppColors.textPrimary)
-        let subtitle = UILabel.make(S.inventorySubtitle, font: AppFonts.light(AppMetrics.textCaption),
+        let subtitle = UILabel.make(S.inventorySubtitle, font: AppFonts.regular(AppMetrics.textCaption),
                                     color: AppColors.textSecondary, lines: 0)
 
         let kpiRow = UIStackView.horizontal(spacing: 8, alignment: .fill)

@@ -20,13 +20,14 @@ final class SettingsProfileViewController: BaseSettingsFormViewController {
     private var isSaving = false
 
     override func setupForm(in card: UIView) {
-        avatarLabel.font = AppFonts.bold(22)
-        avatarLabel.textColor = AppColors.purplePrimary
+        // Portal profile avatar: 135° indigo → violet gradient, white semibold initials.
+        avatarLabel.font = AppFonts.semibold(22)
+        avatarLabel.textColor = .white
         avatarLabel.textAlignment = .center
-        avatarLabel.backgroundColor = AppColors.purpleLight
         avatarLabel.layer.cornerRadius = 28
         avatarLabel.layer.masksToBounds = true
         avatarLabel.constrainSize(56)
+        StyleKit.applyAvatarGradient(to: avatarLabel, size: CGSize(width: 56, height: 56))
 
         displayNameLabel.font = AppFonts.bold(14)
         displayNameLabel.textColor = AppColors.textPrimary

@@ -45,7 +45,7 @@ final class ProductCell: UICollectionViewCell {
         contentView.addSubview(cardView)
 
         imageContainer.backgroundColor = AppColors.purpleLight
-        imageContainer.layer.cornerRadius = AppMetrics.radiusSM
+        imageContainer.layer.cornerRadius = AppMetrics.radiusMD
         imageContainer.layer.masksToBounds = true
         imageContainer.forAutoLayout()
 
@@ -68,7 +68,7 @@ final class ProductCell: UICollectionViewCell {
         nameLabel.lineBreakMode = .byTruncatingTail
 
         StyleKit.styleBadge(statusBadge)
-        statusBadge.font = AppFonts.regular(AppMetrics.textMicro)
+        statusBadge.font = AppFonts.semibold(AppMetrics.textMicro)
         statusBadge.setContentHuggingPriority(.required, for: .horizontal)
         statusBadge.setContentCompressionResistancePriority(.required, for: .horizontal)
 
@@ -84,7 +84,7 @@ final class ProductCell: UICollectionViewCell {
         categoryChip.font = AppFonts.regular(AppMetrics.textMicro)
         categoryChip.textColor = AppColors.textSecondary
         categoryChip.backgroundColor = AppColors.borderLight
-        categoryChip.layer.cornerRadius = AppMetrics.radiusSM
+        categoryChip.isPill = true
         categoryChip.layer.borderWidth = 1
         categoryChip.layer.borderColor = AppColors.border.cgColor
         categoryChip.layer.masksToBounds = true
@@ -108,7 +108,7 @@ final class ProductCell: UICollectionViewCell {
         stockLabel.setContentHuggingPriority(.required, for: .horizontal)
 
         StyleKit.styleBadge(stockBadge)
-        stockBadge.font = AppFonts.regular(AppMetrics.textMicro)
+        stockBadge.font = AppFonts.semibold(AppMetrics.textMicro)
         stockBadge.setContentHuggingPriority(.required, for: .horizontal)
         stockBadge.setContentCompressionResistancePriority(.required, for: .horizontal)
 

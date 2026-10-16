@@ -221,7 +221,7 @@ final class FinancesViewController: BaseSecondaryViewController {
         iconRow.addArrangedSubview(tile)
         iconRow.addArrangedSubview(label)
 
-        let valueLabel = UILabel.make(value, font: AppFonts.bold(20), color: AppColors.textPrimary, lines: 1)
+        let valueLabel = UILabel.make(value, font: AppFonts.semibold(20), color: AppColors.topTitle, lines: 1)
         let subLabel = UILabel.make(sub, font: AppFonts.regular(10), color: subColor, lines: 1)
         let stack = UIStackView.vertical(spacing: 4, alignment: .fill)
         stack.forAutoLayout()
@@ -379,13 +379,13 @@ final class FinancesViewController: BaseSecondaryViewController {
         let avatar = UILabel()
         let name = t.resolvedTraderName
         avatar.text = OrderFormat.initials(name)
-        avatar.font = AppFonts.bold(14)
+        avatar.font = AppFonts.semibold(14)
         avatar.textColor = .white
         avatar.textAlignment = .center
-        avatar.backgroundColor = OrderFormat.logoColor(t.id)
         avatar.layer.cornerRadius = 19
         avatar.layer.masksToBounds = true
         avatar.constrainSize(38)
+        StyleKit.applyAvatarGradient(to: avatar, size: CGSize(width: 38, height: 38))
         let nameLabel = UILabel.make(name, font: AppFonts.bold(14), color: AppColors.textPrimary, lines: 1)
         let traderCol = UIStackView.vertical(spacing: 2, alignment: .leading)
         traderCol.addArrangedSubview(nameLabel)
@@ -417,7 +417,8 @@ final class FinancesViewController: BaseSecondaryViewController {
         walletIcon.constrainSize(13)
         walletIcon.setContentHuggingPriority(.required, for: .horizontal)
         let methodLabel = UILabel.make(methodDisplay(t), font: AppFonts.regular(11), color: AppColors.textSecondary, lines: 1)
-        let viewButton = OrderListCell.actionButton(title: S.viewBtn, icon: "eye", color: AppColors.purplePrimary)
+        let viewButton = OrderListCell.actionButton(title: S.viewBtn, icon: "eye", color: AppColors.textPrimary,
+                                                    stroke: AppColors.border)
         viewButton.setContentHuggingPriority(.required, for: .horizontal)
         viewButton.addAction(UIAction { [weak self] _ in self?.presentDetail(t) }, for: .touchUpInside)
         let menuButton = overflowButton()

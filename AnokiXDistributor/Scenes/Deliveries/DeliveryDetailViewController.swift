@@ -72,7 +72,7 @@ final class DeliveryDetailViewController: BaseSecondaryViewController {
     }
 
     private func headerBlock(_ d: DeliveryDetailDTO) -> UIView {
-        let number = UILabel.make(d.deliveryNumber ?? "", font: AppFonts.bold(20), color: AppColors.purplePrimary)
+        let number = UILabel.make(d.deliveryNumber ?? "", font: AppFonts.semibold(20), color: AppColors.topTitle)
         let orderNumber = UILabel.make(d.orderNumber ?? "", font: AppFonts.regular(13), color: AppColors.textSecondary)
         let leftCol = UIStackView.vertical(spacing: 2, alignment: .leading)
         leftCol.addArrangedSubview(number)
@@ -188,7 +188,7 @@ final class DeliveryDetailViewController: BaseSecondaryViewController {
     private func totalRow(_ d: DeliveryDetailDTO) -> UIView {
         let title = UILabel.make(S.orderTotalLabel, font: AppFonts.regular(14), color: AppColors.textSecondary)
         let amount = UILabel.make(OrderFormat.money(d.totalAmount ?? 0, currency: currency),
-                                  font: AppFonts.bold(18), color: AppColors.purplePrimary, align: .right)
+                                  font: AppFonts.semibold(18), color: AppColors.topTitle, align: .right)
         amount.setContentHuggingPriority(.required, for: .horizontal)
         let row = UIStackView.horizontal(spacing: 8, alignment: .center)
         row.addArrangedSubview(title)

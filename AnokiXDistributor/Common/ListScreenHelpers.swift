@@ -13,7 +13,7 @@ final class SearchFilterRowView: UIView {
         filterButton.setImage(UIImage(systemName: "line.3.horizontal.decrease"), for: .normal)
         filterButton.tintColor = AppColors.textSecondary
         filterButton.backgroundColor = AppColors.surface
-        filterButton.layer.cornerRadius = AppMetrics.radiusMD
+        filterButton.layer.cornerRadius = AppMetrics.radiusSM
         filterButton.layer.borderWidth = 1
         filterButton.layer.borderColor = AppColors.border.cgColor
         filterButton.forAutoLayout()
@@ -39,8 +39,8 @@ final class SearchFilterRowView: UIView {
 final class DateRangePillView: UIControl {
     init(text: String) {
         super.init(frame: .zero)
-        backgroundColor = AppColors.surfaceVariant
-        layer.cornerRadius = AppMetrics.filterPillHeight / 2
+        backgroundColor = AppColors.surface
+        layer.cornerRadius = AppMetrics.radiusSM
         layer.borderWidth = 1
         layer.borderColor = AppColors.border.cgColor
 
@@ -102,8 +102,8 @@ final class ScrollStatusTabBar: UIView {
         ])
         stack.spacing = 20
         for (index, title) in titles.enumerated() {
-            let label = UILabel.make(title, font: index == selectedIndex ? AppFonts.bold(13) : AppFonts.regular(13),
-                                     color: index == selectedIndex ? AppColors.warning : AppColors.textSecondary)
+            let label = UILabel.make(title, font: index == selectedIndex ? AppFonts.semibold(13) : AppFonts.medium(13),
+                                     color: index == selectedIndex ? AppColors.purplePrimary : AppColors.textSecondary)
             label.isUserInteractionEnabled = true
             label.tag = index
             label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tabTapped(_:))))
@@ -118,8 +118,8 @@ final class ScrollStatusTabBar: UIView {
         guard let index = gesture.view?.tag else { return }
         for (i, label) in labels.enumerated() {
             let selected = i == index
-            label.font = selected ? AppFonts.bold(13) : AppFonts.regular(13)
-            label.textColor = selected ? AppColors.warning : AppColors.textSecondary
+            label.font = selected ? AppFonts.semibold(13) : AppFonts.medium(13)
+            label.textColor = selected ? AppColors.purplePrimary : AppColors.textSecondary
         }
         onSelect?(index)
     }
@@ -156,7 +156,7 @@ final class ChipBarView: UIView {
         for (index, title) in titles.enumerated() {
             let chip = PaddingLabel(insets: UIEdgeInsets(top: 0, left: 14, bottom: 0, right: 14))
             chip.text = title
-            chip.font = index == selectedIndex ? AppFonts.bold(12) : AppFonts.regular(12)
+            chip.font = index == selectedIndex ? AppFonts.semibold(12) : AppFonts.medium(12)
             chip.layer.cornerRadius = 16
             chip.layer.masksToBounds = true
             chip.textAlignment = .center
@@ -173,13 +173,13 @@ final class ChipBarView: UIView {
 
     private func styleChip(_ chip: PaddingLabel, selected: Bool) {
         if selected {
-            chip.textColor = AppColors.warning
-            chip.backgroundColor = AppColors.warningBg
+            chip.textColor = .white
+            chip.backgroundColor = AppColors.purplePrimary
             chip.layer.borderWidth = 1
-            chip.layer.borderColor = AppColors.warning.withAlphaComponent(0.35).cgColor
+            chip.layer.borderColor = AppColors.purplePrimary.cgColor
         } else {
             chip.textColor = AppColors.textSecondary
-            chip.backgroundColor = AppColors.surfaceVariant
+            chip.backgroundColor = AppColors.surface
             chip.layer.borderWidth = 1
             chip.layer.borderColor = AppColors.border.cgColor
         }
@@ -188,7 +188,7 @@ final class ChipBarView: UIView {
     @objc private func chipTapped(_ gesture: UITapGestureRecognizer) {
         guard let index = gesture.view?.tag else { return }
         for (i, chip) in chips.enumerated() {
-            chip.font = i == index ? AppFonts.bold(12) : AppFonts.regular(12)
+            chip.font = i == index ? AppFonts.semibold(12) : AppFonts.medium(12)
             styleChip(chip, selected: i == index)
         }
         onSelect?(index)
@@ -214,7 +214,7 @@ final class UnderlineTabBar: UIView {
         for (index, title) in titles.enumerated() {
             let col = UIStackView.vertical(spacing: 0, alignment: .fill)
             let label = UILabel.make(title,
-                                     font: index == selectedIndex ? AppFonts.bold(AppMetrics.textBodySM) : AppFonts.regular(AppMetrics.textBodySM),
+                                     font: index == selectedIndex ? AppFonts.semibold(AppMetrics.textBodySM) : AppFonts.medium(AppMetrics.textBodySM),
                                      color: index == selectedIndex ? AppColors.purplePrimary : AppColors.textSecondary)
             label.textAlignment = .center
             label.isUserInteractionEnabled = true
@@ -222,8 +222,8 @@ final class UnderlineTabBar: UIView {
             label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tabTapped(_:))))
             let indicator = UIView()
             indicator.backgroundColor = AppColors.purplePrimary
-            indicator.layer.cornerRadius = 1.5
-            indicator.constrainHeight(3)
+            indicator.layer.cornerRadius = 1
+            indicator.constrainHeight(2)
             indicator.isHidden = index != selectedIndex
             col.addArrangedSubview(label)
             col.addArrangedSubview(indicator)
@@ -238,7 +238,7 @@ final class UnderlineTabBar: UIView {
         guard let index = gesture.view?.tag else { return }
         for (i, pair) in stacks.enumerated() {
             let selected = i == index
-            pair.label.font = selected ? AppFonts.bold(AppMetrics.textBodySM) : AppFonts.regular(AppMetrics.textBodySM)
+            pair.label.font = selected ? AppFonts.semibold(AppMetrics.textBodySM) : AppFonts.medium(AppMetrics.textBodySM)
             pair.label.textColor = selected ? AppColors.purplePrimary : AppColors.textSecondary
             pair.indicator.isHidden = !selected
         }
@@ -276,8 +276,8 @@ final class FilterPillButton: UIControl {
 
     init(title: String) {
         super.init(frame: .zero)
-        backgroundColor = AppColors.surfaceVariant
-        layer.cornerRadius = AppMetrics.filterPillHeight / 2
+        backgroundColor = AppColors.surface
+        layer.cornerRadius = AppMetrics.radiusSM
         layer.borderWidth = 1
         layer.borderColor = AppColors.border.cgColor
 
@@ -334,8 +334,8 @@ final class SegmentContainerView: UIView {
 
         for (index, title) in titles.enumerated() {
             let label = UILabel.make(title,
-                                     font: index == selectedIndex ? AppFonts.bold(AppMetrics.textBodySM) : AppFonts.regular(AppMetrics.textBodySM),
-                                     color: index == selectedIndex ? .white : AppColors.textPrimary,
+                                     font: index == selectedIndex ? AppFonts.semibold(AppMetrics.textBodySM) : AppFonts.medium(AppMetrics.textBodySM),
+                                     color: index == selectedIndex ? .white : AppColors.textSecondary,
                                      align: .center)
             label.layer.cornerRadius = AppMetrics.radiusMD - 2
             label.layer.masksToBounds = true
@@ -355,8 +355,8 @@ final class SegmentContainerView: UIView {
         guard let index = gesture.view?.tag else { return }
         for (i, label) in labels.enumerated() {
             let selected = i == index
-            label.font = selected ? AppFonts.bold(AppMetrics.textBodySM) : AppFonts.regular(AppMetrics.textBodySM)
-            label.textColor = selected ? .white : AppColors.textPrimary
+            label.font = selected ? AppFonts.semibold(AppMetrics.textBodySM) : AppFonts.medium(AppMetrics.textBodySM)
+            label.textColor = selected ? .white : AppColors.textSecondary
             label.backgroundColor = selected ? AppColors.purplePrimary : .clear
         }
         onSelect?(index)
@@ -369,7 +369,7 @@ enum FilterIconButton {
         button.setImage(UIImage(systemName: "line.3.horizontal.decrease"), for: .normal)
         button.tintColor = AppColors.textSecondary
         button.backgroundColor = AppColors.surface
-        button.layer.cornerRadius = AppMetrics.radiusMD
+        button.layer.cornerRadius = AppMetrics.radiusSM
         button.layer.borderWidth = 1
         button.layer.borderColor = AppColors.border.cgColor
         button.forAutoLayout()
@@ -424,7 +424,7 @@ final class ScrollSegmentBar: UIView {
         for (index, title) in titles.enumerated() {
             let label = PaddingLabel(insets: UIEdgeInsets(top: 0, left: 14, bottom: 0, right: 14))
             label.text = title
-            label.font = index == selectedIndex ? AppFonts.bold(12) : AppFonts.regular(12)
+            label.font = index == selectedIndex ? AppFonts.semibold(12) : AppFonts.medium(12)
             label.textAlignment = .center
             label.layer.cornerRadius = AppMetrics.radiusMD - 2
             label.layer.masksToBounds = true
@@ -445,7 +445,7 @@ final class ScrollSegmentBar: UIView {
             label.textColor = .white
             label.backgroundColor = AppColors.purplePrimary
         } else {
-            label.textColor = AppColors.textPrimary
+            label.textColor = AppColors.textSecondary
             label.backgroundColor = .clear
         }
     }
@@ -453,7 +453,7 @@ final class ScrollSegmentBar: UIView {
     @objc private func tabTapped(_ gesture: UITapGestureRecognizer) {
         guard let index = gesture.view?.tag else { return }
         for (i, label) in tabs.enumerated() {
-            label.font = i == index ? AppFonts.bold(12) : AppFonts.regular(12)
+            label.font = i == index ? AppFonts.semibold(12) : AppFonts.medium(12)
             styleTab(label, selected: i == index)
         }
         onSelect?(index)
@@ -477,7 +477,7 @@ final class ReturnStatusTabBar: UIView {
 
         for (index, title) in titles.enumerated() {
             let label = UILabel.make(title,
-                                     font: index == selectedIndex ? AppFonts.bold(14) : AppFonts.regular(14),
+                                     font: index == selectedIndex ? AppFonts.semibold(14) : AppFonts.medium(14),
                                      color: index == selectedIndex ? AppColors.purplePrimary : AppColors.textSecondary,
                                      align: .center)
             label.isUserInteractionEnabled = true
@@ -495,7 +495,7 @@ final class ReturnStatusTabBar: UIView {
         guard let index = gesture.view?.tag else { return }
         for (i, label) in labels.enumerated() {
             let selected = i == index
-            label.font = selected ? AppFonts.bold(14) : AppFonts.regular(14)
+            label.font = selected ? AppFonts.semibold(14) : AppFonts.medium(14)
             label.textColor = selected ? AppColors.purplePrimary : AppColors.textSecondary
         }
         onSelect?(index)

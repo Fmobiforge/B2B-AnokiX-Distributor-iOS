@@ -65,8 +65,8 @@ final class TopUpViewController: UIViewController {
         amountField.keyboardType = .decimalPad
         amountField.font = AppFonts.regular(14)
         amountField.textColor = AppColors.textPrimary
-        amountField.backgroundColor = AppColors.surfaceVariant
-        amountField.layer.cornerRadius = AppMetrics.radiusMD
+        amountField.backgroundColor = AppColors.surface
+        amountField.layer.cornerRadius = AppMetrics.radiusSM
         amountField.layer.borderWidth = 1
         amountField.layer.borderColor = AppColors.border.cgColor
         amountField.constrainHeight(50)
@@ -81,7 +81,8 @@ final class TopUpViewController: UIViewController {
         var config = UIButton.Configuration.filled()
         config.baseBackgroundColor = AppColors.purplePrimary
         config.baseForegroundColor = .white
-        config.cornerStyle = .medium
+        config.cornerStyle = .fixed
+        config.background.cornerRadius = AppMetrics.radiusSM
         config.image = UIImage(systemName: "creditcard.fill")
         config.imagePadding = 8
         config.contentInsets = NSDirectionalEdgeInsets(top: 15, leading: 16, bottom: 15, trailing: 16)
@@ -156,9 +157,10 @@ final class TopUpViewController: UIViewController {
     }
 
     private func styleChip(_ chip: UIButton, selected: Bool) {
-        chip.backgroundColor = selected ? AppColors.purpleLight : AppColors.surface
+        // Portal chip: selected = brand-blue fill + white text; unselected = white + hairline.
+        chip.backgroundColor = selected ? AppColors.purplePrimary : AppColors.surface
         chip.layer.borderColor = (selected ? AppColors.purplePrimary : AppColors.border).cgColor
-        chip.setTitleColor(selected ? AppColors.purplePrimary : AppColors.textPrimary, for: .normal)
+        chip.setTitleColor(selected ? .white : AppColors.textSecondary, for: .normal)
     }
 
     /// Keeps a pill lit only while the field still matches it.

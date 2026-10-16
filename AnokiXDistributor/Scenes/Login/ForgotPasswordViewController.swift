@@ -7,7 +7,8 @@ final class ForgotPasswordViewController: UIViewController {
 
     private let card = UIView()
     private let emailField = UITextField()
-    private let submitButton = UIButton(type: .system)
+    /// Auth CTA — the portal's 3-stop gradient pill.
+    private let submitButton = GradientButton(title: S.sendResetLink)
     private let formStack = UIStackView.vertical(spacing: 0, alignment: .fill)
     private let successStack = UIStackView.vertical(spacing: 0, alignment: .center)
     private let successMessageLabel = UILabel()
@@ -130,7 +131,7 @@ final class ForgotPasswordViewController: UIViewController {
         emailField.delegate = self
         emailField.font = AppFonts.regular(14)
         emailField.textColor = AppColors.textPrimary
-        emailField.layer.cornerRadius = AppMetrics.radiusMD
+        emailField.layer.cornerRadius = AppMetrics.radiusSM
         emailField.layer.borderWidth = 1
         emailField.layer.borderColor = AppColors.border.cgColor
         emailField.leftView = fieldIcon("envelope")
@@ -141,15 +142,13 @@ final class ForgotPasswordViewController: UIViewController {
         submitButton.setTitle(S.sendResetLink, for: .normal)
         submitButton.titleLabel?.font = AppFonts.bold(15)
         submitButton.setTitleColor(.white, for: .normal)
-        submitButton.backgroundColor = AppColors.purplePrimary
-        submitButton.layer.cornerRadius = AppMetrics.radiusMD
         submitButton.addTarget(self, action: #selector(submitTapped), for: .touchUpInside)
         submitButton.forAutoLayout()
         submitButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
 
         let backLink = UIButton(type: .system)
         backLink.setTitle(S.backToLogin, for: .normal)
-        backLink.titleLabel?.font = AppFonts.regular(13)
+        backLink.titleLabel?.font = AppFonts.semibold(13)
         backLink.setTitleColor(AppColors.purplePrimary, for: .normal)
         backLink.addTarget(self, action: #selector(dismissSelf), for: .touchUpInside)
 
@@ -194,12 +193,8 @@ final class ForgotPasswordViewController: UIViewController {
         successMessageLabel.numberOfLines = 0
         successMessageLabel.textAlignment = .center
 
-        let doneButton = UIButton(type: .system)
-        doneButton.setTitle(S.backToLogin, for: .normal)
+        let doneButton = GradientButton(title: S.backToLogin)
         doneButton.titleLabel?.font = AppFonts.bold(15)
-        doneButton.setTitleColor(.white, for: .normal)
-        doneButton.backgroundColor = AppColors.purplePrimary
-        doneButton.layer.cornerRadius = AppMetrics.radiusMD
         doneButton.addTarget(self, action: #selector(dismissSelf), for: .touchUpInside)
         doneButton.forAutoLayout()
         doneButton.heightAnchor.constraint(equalToConstant: 48).isActive = true

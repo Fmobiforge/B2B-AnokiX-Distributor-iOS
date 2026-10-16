@@ -25,16 +25,17 @@ final class DashboardViewController: BaseMainViewController {
     }()
 
     override func configureStoryboardChrome() {
-        welcomeLabel.font = AppFonts.bold(AppMetrics.textTitle)
-        welcomeLabel.textColor = AppColors.textPrimary
+        welcomeLabel.font = AppFonts.semibold(AppMetrics.textTitle)
+        welcomeLabel.textColor = AppColors.topTitle
         // Text comes from refreshWelcome() — it depends on whether we know the company yet.
-        dashboardSubtitleLabel.font = AppFonts.light(AppMetrics.textBodySM)
+        dashboardSubtitleLabel.font = AppFonts.regular(AppMetrics.textBodySM)
         dashboardSubtitleLabel.textColor = AppColors.textSecondary
         avatarLabel.layer.cornerRadius = 18
         avatarLabel.layer.masksToBounds = true
-        avatarLabel.backgroundColor = AppColors.purpleLight
-        avatarLabel.textColor = AppColors.purplePrimary
-        avatarLabel.font = AppFonts.bold(14)
+        // Portal avatar: 135° indigo → violet gradient with white semibold initials.
+        StyleKit.applyAvatarGradient(to: avatarLabel, size: CGSize(width: 36, height: 36))
+        avatarLabel.textColor = .white
+        avatarLabel.font = AppFonts.semibold(14)
         if avatarImageView.superview == nil {
             avatarLabel.isUserInteractionEnabled = true
             avatarLabel.addSubview(avatarImageView)
@@ -184,7 +185,7 @@ final class DashboardViewController: BaseMainViewController {
     }
 
     private func addSectionTitle(_ text: String) {
-        let label = UILabel.make(text, font: AppFonts.bold(15), color: AppColors.textPrimary)
+        let label = UILabel.make(text, font: AppFonts.semibold(15), color: AppColors.topTitle)
         stack.addArrangedSubview(label)
     }
 
@@ -198,11 +199,11 @@ final class DashboardViewController: BaseMainViewController {
         card.addTarget(self, action: #selector(walletCardTapped), for: .touchUpInside)
 
         let tile = UIView()
-        tile.backgroundColor = AppColors.purplePrimary
-        tile.layer.cornerRadius = AppMetrics.radiusLG
+        tile.backgroundColor = AppColors.purpleLight
+        tile.layer.cornerRadius = AppMetrics.radiusMD
         tile.constrainSize(42)
         let icon = UIImageView(image: UIImage(systemName: "creditcard.fill"))
-        icon.tintColor = .white
+        icon.tintColor = AppColors.purplePrimary
         icon.contentMode = .scaleAspectFit
         icon.forAutoLayout()
         tile.addSubview(icon)
@@ -214,7 +215,7 @@ final class DashboardViewController: BaseMainViewController {
         ])
 
         let caption = UILabel.make("Wallet Balance", font: AppFonts.regular(12), color: AppColors.textSecondary)
-        let balance = UILabel.make("—", font: AppFonts.bold(20), color: AppColors.textPrimary)
+        let balance = UILabel.make("—", font: AppFonts.semibold(20), color: AppColors.topTitle)
         let middle = UIStackView.vertical(spacing: 1, alignment: .leading)
         middle.addArrangedSubview(caption)
         middle.addArrangedSubview(balance)
@@ -329,9 +330,9 @@ final class DashboardViewController: BaseMainViewController {
         card.clipsToBounds = true
         let accent = accentColor(c.color)
 
-        let label = UILabel.make(c.label ?? "", font: AppFonts.regular(12), color: AppColors.textSecondary, lines: 1)
+        let label = UILabel.make(c.label ?? "", font: AppFonts.medium(12), color: AppColors.textSecondary, lines: 1)
         label.lineBreakMode = .byTruncatingTail
-        let tile = StyleKit.iconTile(color: accent.withAlphaComponent(0.13))
+        let tile = StyleKit.iconTile(color: accent.withAlphaComponent(0.12))
         tile.constrainSize(30)
         tile.setContentHuggingPriority(.required, for: .horizontal)
         let icon = UIImageView(image: AppIcons.symbol(iconKey(c.key)))
@@ -349,12 +350,13 @@ final class DashboardViewController: BaseMainViewController {
         topRow.addArrangedSubview(label)
         topRow.addArrangedSubview(tile)
 
-        let value = UILabel.make(c.formattedValue ?? "", font: AppFonts.bold(18), color: AppColors.textPrimary, lines: 1)
+        let value = UILabel.make(nil, font: AppFonts.semibold(18), color: AppColors.topTitle, lines: 1)
+        value.attributedText = NSAttributedString(string: c.formattedValue ?? "", attributes: [.kern: -0.5])
         value.adjustsFontSizeToFitWidth = true
         value.minimumScaleFactor = 0.7
 
         let up = (c.trend?.direction ?? "up").lowercased() != "down"
-        let trend = UILabel.make(c.trend?.label ?? "", font: AppFonts.bold(12),
+        let trend = UILabel.make(c.trend?.label ?? "", font: AppFonts.semibold(12),
                                  color: up ? AppColors.success : AppColors.danger, lines: 1)
 
         let compare = UILabel.make(c.compareLabel ?? "", font: AppFonts.light(10),
@@ -397,10 +399,11 @@ final class DashboardViewController: BaseMainViewController {
 
     private func accentColor(_ name: String?) -> UIColor {
         switch name {
-        case "blue": return AppColors.info
+        case "blue": return AppColors.chartBlue
         case "green": return AppColors.success
         case "orange": return AppColors.warning
-        default: return AppColors.purplePrimary
+        // Portal: revenue is the violet series / tile.
+        default: return AppColors.chartViolet
         }
     }
 
@@ -444,15 +447,16 @@ final class DashboardViewController: BaseMainViewController {
         header.addArrangedSubview(titleLabel)
         header.addArrangedSubview(UIView())
 
-        let totalLabel = UILabel.make(total, font: AppFonts.bold(AppMetrics.textKpiValue), color: AppColors.textPrimary)
+        let totalLabel = UILabel.make(nil, font: AppFonts.semibold(AppMetrics.textKpiValue), color: AppColors.topTitle)
+        totalLabel.attributedText = NSAttributedString(string: total, attributes: [.kern: -0.5])
         let up = !trendLabel.contains("↓")
         let trendBadge = PaddingLabel(insets: UIEdgeInsets(top: 3, left: 8, bottom: 3, right: 8))
         trendBadge.text = trendLabel
-        trendBadge.font = AppFonts.bold(11)
+        trendBadge.font = AppFonts.semibold(11)
         trendBadge.textColor = up ? AppColors.success : AppColors.danger
         trendBadge.backgroundColor = (up ? AppColors.success : AppColors.danger).withAlphaComponent(0.12)
-        trendBadge.layer.cornerRadius = AppMetrics.radiusSM
         trendBadge.layer.masksToBounds = true
+        trendBadge.isPill = true
 
         let amountRow = UIStackView.horizontal(spacing: 10, alignment: .center)
         amountRow.addArrangedSubview(totalLabel)
@@ -500,7 +504,7 @@ final class DashboardViewController: BaseMainViewController {
                 dot.heightAnchor.constraint(equalToConstant: 9)
             ])
             let name = UILabel.make(item.name, font: AppFonts.regular(12), color: AppColors.textSecondary)
-            let amount = UILabel.make(item.amount, font: AppFonts.bold(12), color: AppColors.textPrimary)
+            let amount = UILabel.make(item.amount, font: AppFonts.semibold(12), color: AppColors.textPrimary)
             amount.setContentHuggingPriority(.required, for: .horizontal)
             let row = UIStackView.horizontal(spacing: 8, alignment: .center)
             row.addArrangedSubview(dot)
@@ -522,21 +526,21 @@ final class DashboardViewController: BaseMainViewController {
             (self?.tabBarController as? MainTabBarController)?.selectTab(forKey: "orders")
         }
         for order in orders {
-            let title = UILabel.make(order.orderId, font: AppFonts.bold(13), color: AppColors.textPrimary)
+            let title = UILabel.make(order.orderId, font: AppFonts.semibold(13), color: AppColors.textPrimary)
             let sub = UILabel.make(order.trader, font: AppFonts.regular(12), color: AppColors.textSecondary)
-            let date = UILabel.make(order.date, font: AppFonts.light(10), color: AppColors.textTertiary)
+            let date = UILabel.make(order.date, font: AppFonts.regular(10), color: AppColors.textTertiary)
             let left = UIStackView.vertical(spacing: 2, alignment: .leading)
             [title, sub, date].forEach { left.addArrangedSubview($0) }
 
-            let amount = UILabel.make(order.amount, font: AppFonts.bold(13), color: AppColors.textPrimary)
+            let amount = UILabel.make(order.amount, font: AppFonts.semibold(13), color: AppColors.topTitle)
             amount.setContentHuggingPriority(.required, for: .horizontal)
             let status = PaddingLabel(insets: UIEdgeInsets(top: 3, left: 10, bottom: 3, right: 10))
             status.text = order.statusLabel
-            status.font = AppFonts.bold(10)
+            status.font = AppFonts.semibold(10)
             status.textColor = order.statusColor
             status.backgroundColor = order.statusColor.withAlphaComponent(0.12)
-            status.layer.cornerRadius = AppMetrics.radiusSM
             status.layer.masksToBounds = true
+            status.isPill = true
             let right = UIStackView.vertical(spacing: 6, alignment: .trailing)
             right.addArrangedSubview(amount)
             right.addArrangedSubview(status)

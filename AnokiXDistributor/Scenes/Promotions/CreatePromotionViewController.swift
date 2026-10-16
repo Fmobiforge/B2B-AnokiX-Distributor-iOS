@@ -98,7 +98,7 @@ final class CreatePromotionViewController: BaseSecondaryViewController, GMSMapVi
     private var stepCircles: [UILabel] = []
     private var stepTitles: [UILabel] = []
     private let formScroll = UIScrollView()
-    private let continueButton = GradientButton(title: S.continueButton)
+    private let continueButton = GradientButton(title: S.continueButton, style: .primary)
     private var stepStacks: [UIStackView] = []
 
     // Step 2 fields
@@ -1604,7 +1604,7 @@ final class CreatePromotionViewController: BaseSecondaryViewController, GMSMapVi
     // MARK: - Shared view builders
 
     private func sectionTitle(_ text: String) -> UILabel {
-        UILabel.make(text, font: AppFonts.bold(18), color: AppColors.purpleDark, lines: 0)
+        UILabel.make(text, font: AppFonts.semibold(18), color: AppColors.topTitle, lines: 0)
     }
     private func subtitle(_ text: String) -> UILabel {
         UILabel.make(text, font: AppFonts.regular(13), color: AppColors.textSecondary, lines: 0)

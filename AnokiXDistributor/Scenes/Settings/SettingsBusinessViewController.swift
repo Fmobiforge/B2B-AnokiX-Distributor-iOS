@@ -144,6 +144,7 @@ final class SettingsBusinessViewController: BaseSecondaryViewController,
             chip.setTitle("\(i + 1). \(name)", for: .normal)
             chip.titleLabel?.font = AppFonts.bold(13)
             chip.layer.cornerRadius = 16
+            chip.layer.borderWidth = 1
             chip.contentEdgeInsets = UIEdgeInsets(top: 6, left: 12, bottom: 6, right: 12)
             chip.tag = i
             chip.addTarget(self, action: #selector(stepChipTapped(_:)), for: .touchUpInside)
@@ -232,7 +233,9 @@ final class SettingsBusinessViewController: BaseSecondaryViewController,
         for (i, card) in stepCards.enumerated() { card.isHidden = i != index }
         for (i, chip) in stepChips.enumerated() {
             let active = i == index
-            chip.backgroundColor = active ? AppColors.purplePrimary : AppColors.surfaceVariant
+            // Portal chip: selected = brand-blue fill + white; unselected = white + hairline.
+            chip.backgroundColor = active ? AppColors.purplePrimary : AppColors.surface
+            chip.layer.borderColor = (active ? AppColors.purplePrimary : AppColors.border).cgColor
             chip.setTitleColor(active ? .white : AppColors.textSecondary, for: .normal)
         }
         contentScroll.setContentOffset(.zero, animated: false)
@@ -266,7 +269,7 @@ final class SettingsBusinessViewController: BaseSecondaryViewController,
 
     private func stepTitle(_ title: String, _ sub: String) -> UIStackView {
         let stack = UIStackView.vertical(spacing: 4, alignment: .fill)
-        stack.addArrangedSubview(UILabel.make(title, font: AppFonts.bold(20), color: AppColors.purplePrimary))
+        stack.addArrangedSubview(UILabel.make(title, font: AppFonts.semibold(20), color: AppColors.topTitle))
         stack.addArrangedSubview(UILabel.make(sub, font: AppFonts.regular(13), color: AppColors.textSecondary, lines: 0))
         return stack
     }

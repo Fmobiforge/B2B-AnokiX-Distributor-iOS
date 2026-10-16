@@ -45,12 +45,14 @@ final class TraderCell: UICollectionViewCell {
         contentView.addSubview(cardView)
         cardView.pinEdges(to: contentView, insets: UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0))
 
-        avatarLabel.font = AppFonts.bold(14)
+        avatarLabel.font = AppFonts.semibold(14)
         avatarLabel.textColor = .white
         avatarLabel.textAlignment = .center
         avatarLabel.layer.cornerRadius = 22
         avatarLabel.layer.masksToBounds = true
         avatarLabel.constrainSize(44)
+        // Portal initials avatar: 135° indigo → violet gradient (circular stays circular).
+        StyleKit.applyAvatarGradient(to: avatarLabel, size: CGSize(width: 44, height: 44))
 
         nameLabel.font = AppFonts.bold(14)
         nameLabel.textColor = AppColors.topTitle
@@ -130,7 +132,6 @@ final class TraderCell: UICollectionViewCell {
         let name = trader.displayName
         nameLabel.text = name
         avatarLabel.text = ApiMapper.traderInitials(name)
-        avatarLabel.backgroundColor = ApiMapper.traderAvatarColor(index)
 
         set(codeLabel, trader.traderCode)
         // Trading name only earns a second line when it differs from the headline.
@@ -170,7 +171,7 @@ final class TraderCell: UICollectionViewCell {
         badge.isHidden = value.isEmpty
         guard !value.isEmpty else { return }
         badge.text = value
-        badge.font = AppFonts.regular(AppMetrics.textMicro)
+        badge.font = AppFonts.semibold(AppMetrics.textMicro)
         badge.textColor = colors.fg
         badge.backgroundColor = colors.bg
     }

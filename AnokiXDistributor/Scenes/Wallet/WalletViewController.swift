@@ -81,6 +81,7 @@ final class WalletViewController: BaseSecondaryViewController {
         contentStack.addArrangedSubview(buildNeedFundsCard())
 
         spinner.hidesWhenStopped = true
+        spinner.color = AppColors.purplePrimary
         spinner.forAutoLayout()
         container.addSubview(spinner)
 
@@ -112,7 +113,8 @@ final class WalletViewController: BaseSecondaryViewController {
     // MARK: - Balance hero
 
     private func buildBalanceCard() -> UIView {
-        let card = GradientCardView(colors: [UIColor(hex: 0x7C3AED), UIColor(hex: 0x5B21B6)])
+        // Brand-blue hero (portal primary → pressed shade); violet is reserved for accents.
+        let card = GradientCardView(colors: [AppColors.purplePrimary, AppColors.purpleDark])
         card.layer.cornerRadius = AppMetrics.radiusXL
 
         let title = UILabel.make(S.walletTotalBalance, font: AppFonts.regular(12),
@@ -692,7 +694,7 @@ final class WalletViewController: BaseSecondaryViewController {
     }
 
     private func buildMicrofinanceCard() -> UIView {
-        let card = GradientCardView(colors: [UIColor(hex: 0xDBEAFE), UIColor(hex: 0xEFF6FF)])
+        let card = GradientCardView(colors: [AppColors.infoBg, AppColors.surfaceVariant])
         card.layer.cornerRadius = AppMetrics.radiusLG
 
         let title = UILabel.make(S.walletMicrofinanceTitle, font: AppFonts.bold(18), color: AppColors.textPrimary)
@@ -717,7 +719,7 @@ final class WalletViewController: BaseSecondaryViewController {
     }
 
     private func buildNeedFundsCard() -> UIView {
-        let card = GradientCardView(colors: [UIColor(hex: 0x7C3AED), UIColor(hex: 0x5B21B6)])
+        let card = GradientCardView(colors: [AppColors.purplePrimary, AppColors.purpleDark])
         card.layer.cornerRadius = AppMetrics.radiusLG
 
         let title = UILabel.make(S.walletNeedFunds, font: AppFonts.bold(18), color: .white)
@@ -964,7 +966,7 @@ final class WalletViewController: BaseSecondaryViewController {
         config.contentInsets = NSDirectionalEdgeInsets(top: 2, leading: 4, bottom: 2, trailing: 4)
         config.title = title
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-            var out = incoming; out.font = AppFonts.medium(12); return out
+            var out = incoming; out.font = AppFonts.semibold(12); return out
         }
         if let symbol = trailingSymbol {
             config.image = UIImage(systemName: symbol)
@@ -984,7 +986,7 @@ final class WalletViewController: BaseSecondaryViewController {
         config.baseForegroundColor = AppColors.purplePrimary
         config.background.strokeColor = AppColors.purplePrimary
         config.background.strokeWidth = 1
-        config.background.cornerRadius = AppMetrics.radiusMD
+        config.background.cornerRadius = AppMetrics.radiusSM
         config.background.backgroundColor = AppColors.surface
         config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 20)
         config.title = title

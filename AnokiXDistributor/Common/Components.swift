@@ -8,7 +8,7 @@ final class SearchBarView: UIView {
     init(placeholder: String, height: CGFloat = AppMetrics.searchBarHeight) {
         super.init(frame: .zero)
         backgroundColor = AppColors.surface
-        layer.cornerRadius = AppMetrics.radiusMD
+        layer.cornerRadius = AppMetrics.radiusSM
         layer.borderWidth = 1
         layer.borderColor = AppColors.border.cgColor
 
@@ -17,7 +17,8 @@ final class SearchBarView: UIView {
         glass.contentMode = .scaleAspectFit
         glass.forAutoLayout()
 
-        textField.placeholder = placeholder
+        textField.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [
+            .foregroundColor: AppColors.textTertiary, .font: AppFonts.regular(AppMetrics.textBody)])
         textField.font = AppFonts.regular(AppMetrics.textBody)
         textField.textColor = AppColors.textPrimary
         textField.clearButtonMode = .whileEditing
@@ -90,12 +91,15 @@ final class KpiCardView: UIView {
             iconView.heightAnchor.constraint(equalToConstant: 18)
         ])
 
-        let titleLabel = UILabel.make(title, font: AppFonts.regular(AppMetrics.textBodySM), color: AppColors.textSecondary)
+        let titleLabel = UILabel.make(title, font: AppFonts.medium(AppMetrics.textBodySM), color: AppColors.textSecondary)
         let topRow = UIStackView.horizontal(spacing: 8, alignment: .center)
         topRow.addArrangedSubview(tile)
         topRow.addArrangedSubview(titleLabel)
 
-        let valueLabel = UILabel.make(value, font: AppFonts.bold(AppMetrics.textKpiValue), color: valueColor)
+        // Portal KPI: the value is always navy; colour meaning lives in the icon tile.
+        _ = valueColor
+        let valueLabel = UILabel.make(nil, font: AppFonts.semibold(AppMetrics.textKpiValue), color: AppColors.topTitle)
+        valueLabel.attributedText = NSAttributedString(string: value, attributes: [.kern: -0.5])
 
         let stack = UIStackView.vertical(spacing: 8, alignment: .leading)
         stack.forAutoLayout()
@@ -125,7 +129,7 @@ final class SectionCard: UIView {
             let action = UIButton(type: .system)
             action.setTitle(actionTitle, for: .normal)
             action.setTitleColor(AppColors.purplePrimary, for: .normal)
-            action.titleLabel?.font = AppFonts.medium(AppMetrics.textBodySM)
+            action.titleLabel?.font = AppFonts.semibold(AppMetrics.textBodySM)
             action.setContentHuggingPriority(.required, for: .horizontal)
             self.actionHandler = onAction
             action.addTarget(self, action: #selector(actionTapped), for: .touchUpInside)

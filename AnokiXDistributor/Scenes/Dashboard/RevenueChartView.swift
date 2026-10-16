@@ -7,10 +7,11 @@ final class RevenueChartView: UIView {
     var values: [Double] = [] { didSet { setNeedsDisplay() } }
     var labels: [String] = [] { didSet { setNeedsDisplay() } }
     var currencySymbol = "R" { didSet { setNeedsDisplay() } }
-    var lineColor: UIColor = AppColors.purplePrimary
+    /// Portal: revenue series is violet with a fading fill.
+    var lineColor: UIColor = AppColors.chartViolet
 
     private let axisColor = AppColors.textTertiary
-    private let gridColor = AppColors.border
+    private let gridColor = AppColors.borderLight
 
     override func draw(_ rect: CGRect) {
         guard values.count > 1, let ctx = UIGraphicsGetCurrentContext() else { return }

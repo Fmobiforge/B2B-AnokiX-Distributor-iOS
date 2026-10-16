@@ -64,13 +64,14 @@ final class SettingsViewController: BaseSecondaryViewController {
     }
 
     private func buildProfileCard() -> UIView {
-        avatarLabel.font = AppFonts.bold(22)
-        avatarLabel.textColor = AppColors.purplePrimary
+        // Portal profile avatar: 135° indigo → violet gradient, white semibold initials.
+        avatarLabel.font = AppFonts.semibold(22)
+        avatarLabel.textColor = .white
         avatarLabel.textAlignment = .center
-        avatarLabel.backgroundColor = AppColors.purpleLight
         avatarLabel.layer.cornerRadius = 28
         avatarLabel.layer.masksToBounds = true
         avatarLabel.constrainSize(56)
+        StyleKit.applyAvatarGradient(to: avatarLabel, size: CGSize(width: 56, height: 56))
 
         nameLabel.font = AppFonts.bold(14)
         nameLabel.textColor = AppColors.textPrimary
@@ -135,7 +136,7 @@ final class SettingsViewController: BaseSecondaryViewController {
         iconView.contentMode = .scaleAspectFit
         iconView.constrainSize(20)
 
-        let titleLabel = UILabel.make(title, font: AppFonts.regular(12), color: AppColors.textPrimary)
+        let titleLabel = UILabel.make(title, font: AppFonts.medium(12), color: AppColors.textPrimary)
         let chevron = UIImageView(image: UIImage(systemName: "chevron.right"))
         chevron.tintColor = AppColors.textSecondary
         chevron.contentMode = .scaleAspectFit

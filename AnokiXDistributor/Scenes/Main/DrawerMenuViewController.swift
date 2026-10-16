@@ -1,7 +1,7 @@
 import UIKit
 
 /// Port of drawer_content.xml + DrawerMenuAdapter. Dark 280pt panel with logo, portal badge,
-/// menu items with purple selected pill, and logout.
+/// menu items with the indigo → violet gradient selected pill, and logout.
 final class DrawerMenuViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     var onSelect: ((String) -> Void)?
@@ -17,7 +17,12 @@ final class DrawerMenuViewController: UIViewController, UITableViewDataSource, U
     init(selectedKey: String = "home") {
         self.selectedKey = selectedKey
         super.init(nibName: nil, bundle: nil)
+        // Over-full-screen presentation: take over the status bar so its icons stay light
+        // on the dark #000920 panel.
+        modalPresentationCapturesStatusBarAppearance = true
     }
+
+    override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     override func viewDidLoad() {
@@ -51,11 +56,13 @@ final class DrawerMenuViewController: UIViewController, UITableViewDataSource, U
 
         let badge = PaddingLabel(insets: UIEdgeInsets(top: 4, left: 12, bottom: 4, right: 12))
         badge.text = S.distributorPortal
-        badge.font = AppFonts.regular(AppMetrics.textLabel)
+        badge.font = AppFonts.medium(AppMetrics.textLabel)
         badge.textColor = AppColors.drawerBadgeText
         badge.backgroundColor = AppColors.drawerBadgeBg
-        badge.layer.cornerRadius = 8
+        badge.layer.borderWidth = 1
+        badge.layer.borderColor = AppColors.drawerBadgeBorder.cgColor
         badge.layer.masksToBounds = true
+        badge.isPill = true
 
         // The signed-in distributor's registered legal name. Login does not return it —
         // it comes from base-info and is cached in the session — so the row stays hidden
@@ -86,7 +93,7 @@ final class DrawerMenuViewController: UIViewController, UITableViewDataSource, U
         panel.addSubview(tableView)
 
         let divider = UIView()
-        divider.backgroundColor = AppColors.drawerBadgeBg
+        divider.backgroundColor = AppColors.drawerDivider
         divider.forAutoLayout()
         panel.addSubview(divider)
 
@@ -128,7 +135,7 @@ final class DrawerMenuViewController: UIViewController, UITableViewDataSource, U
 
         let label = UILabel()
         label.text = S.logout
-        label.font = AppFonts.regular(14)
+        label.font = AppFonts.medium(14)
         label.textColor = AppColors.drawerTextMuted
 
         let row = UIStackView.horizontal(spacing: AppMetrics.spacingMD, alignment: .center)

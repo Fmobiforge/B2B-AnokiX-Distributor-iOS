@@ -72,10 +72,11 @@ final class StoreCell: UICollectionViewCell {
     private func tagChip(_ text: String) -> UIView {
         let chip = PaddingLabel(insets: UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10))
         chip.text = text
-        chip.font = AppFonts.regular(AppMetrics.textCaption)
+        chip.font = AppFonts.medium(AppMetrics.textCaption)
         chip.textColor = AppColors.purplePrimary
         chip.backgroundColor = AppColors.purpleLight
         chip.layer.cornerRadius = AppMetrics.radiusSM
+        chip.isPill = true
         chip.layer.masksToBounds = true
         chip.setContentHuggingPriority(.required, for: .horizontal)
         return chip

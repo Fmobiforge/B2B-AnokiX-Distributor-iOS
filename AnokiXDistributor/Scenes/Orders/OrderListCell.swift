@@ -16,17 +16,19 @@ final class OrderListCell: UITableViewCell {
 
     private let card = UIView()
     private let avatar = UILabel()
-    private let traderNameLabel = UILabel.make(font: AppFonts.bold(14), color: AppColors.purplePrimary, lines: 1)
+    private let traderNameLabel = UILabel.make(font: AppFonts.semibold(14), color: AppColors.topTitle, lines: 1)
     private let orderNumberLabel = UILabel.make(font: AppFonts.regular(12), color: AppColors.textSecondary)
     private let timeLabel = UILabel.make(font: AppFonts.regular(11), color: AppColors.textTertiary)
     private let addressLabel = UILabel.make(font: AppFonts.regular(11), color: AppColors.textSecondary, lines: 2)
-    private let amountLabel = UILabel.make(font: AppFonts.bold(16), color: AppColors.textPrimary, align: .right)
+    private let amountLabel = UILabel.make(font: AppFonts.semibold(16), color: AppColors.topTitle, align: .right)
     private let statusBadge = StyleKit.badgeLabel()
     private let deliveryLabel = UILabel.make(font: AppFonts.regular(11), color: AppColors.textSecondary, align: .right, lines: 1)
-    private let productsLabel = UILabel.make(font: AppFonts.bold(10), color: AppColors.textTertiary)
+    private let productsLabel = UILabel.make(font: AppFonts.semibold(10), color: AppColors.textTertiary)
     private let chipsView = OrderChipsView()
 
-    private let viewButton = OrderListCell.actionButton(title: S.orderActionViewOrder, icon: "eye", color: AppColors.info)
+    // Portal: View Order = neutral outline (navy text), Accept = success outline, Reject = danger outline.
+    private let viewButton = OrderListCell.actionButton(title: S.orderActionViewOrder, icon: "eye", color: AppColors.textPrimary,
+                                                        stroke: AppColors.border)
     private let primaryButton = OrderListCell.actionButton(title: S.orderActionAccept, icon: "checkmark", color: AppColors.success)
     private let rejectButton = OrderListCell.actionButton(title: S.orderActionReject, icon: "xmark", color: AppColors.danger)
     private let actionsRow = UIStackView.horizontal(spacing: 8, alignment: .center)
@@ -47,12 +49,14 @@ final class OrderListCell: UITableViewCell {
         contentView.addSubview(card)
         card.pinEdges(to: contentView, insets: UIEdgeInsets(top: 6, left: 16, bottom: 6, right: 16))
 
-        avatar.font = AppFonts.bold(15)
+        avatar.font = AppFonts.semibold(15)
         avatar.textColor = .white
         avatar.textAlignment = .center
         avatar.layer.cornerRadius = AppMetrics.radiusMD
         avatar.layer.masksToBounds = true
         avatar.constrainSize(44)
+        // Portal initials avatar: 135° indigo → violet gradient (square, radius 10).
+        StyleKit.applyAvatarGradient(to: avatar, size: CGSize(width: 44, height: 44))
 
         let infoCol = UIStackView.vertical(spacing: 2, alignment: .leading)
         infoCol.addArrangedSubview(traderNameLabel)
@@ -103,13 +107,12 @@ final class OrderListCell: UITableViewCell {
         amountLabel.text = OrderFormat.money(order.amount, currency: currency)
 
         avatar.text = OrderFormat.initials(name)
-        avatar.backgroundColor = OrderFormat.logoColor(order.traderId ?? 0)
 
         let key = order.resolvedStatusKey
         let color = OrderFormat.statusColor(key)
         statusBadge.text = OrderFormat.humanize(key)
         statusBadge.textColor = color
-        statusBadge.backgroundColor = color.withAlphaComponent(0.11)
+        statusBadge.backgroundColor = color.withAlphaComponent(0.12)
 
         let location = order.trader?.location ?? ""
         addressLabel.text = location
@@ -174,18 +177,20 @@ final class OrderListCell: UITableViewCell {
     @objc private func primaryTapped() { onPrimary?() }
     @objc private func rejectTapped() { onReject?() }
 
-    static func actionButton(title: String, icon: String, color: UIColor) -> UIButton {
+    static func actionButton(title: String, icon: String, color: UIColor, stroke: UIColor? = nil) -> UIButton {
         var config = UIButton.Configuration.plain()
         config.title = title
         config.image = UIImage(systemName: icon)
         config.imagePadding = 6
         config.baseForegroundColor = color
-        config.background.strokeColor = color.withAlphaComponent(0.5)
+        config.background.backgroundColor = AppColors.surface
+        config.background.strokeColor = stroke ?? color
         config.background.strokeWidth = 1
         config.background.cornerRadius = AppMetrics.radiusSM
+        config.cornerStyle = .fixed
         config.contentInsets = NSDirectionalEdgeInsets(top: 9, leading: 8, bottom: 9, trailing: 8)
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-            var out = incoming; out.font = AppFonts.bold(12); return out
+            var out = incoming; out.font = AppFonts.semibold(12); return out
         }
         let button = UIButton(configuration: config)
         button.titleLabel?.adjustsFontSizeToFitWidth = true
@@ -215,8 +220,8 @@ final class OrderChipsView: UIView {
         let label = PaddingLabel(insets: UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10))
         label.text = text
         label.font = AppFonts.regular(11)
-        label.textColor = AppColors.textPrimary
-        label.backgroundColor = AppColors.surfaceVariant
+        label.textColor = AppColors.textSecondary
+        label.backgroundColor = AppColors.surface
         label.layer.cornerRadius = 12
         label.layer.borderWidth = 1
         label.layer.borderColor = AppColors.border.cgColor
@@ -309,11 +314,11 @@ final class OrderStatusTabsView: UIView {
         container.tag = index
         container.addTarget(self, action: #selector(tabTapped(_:)), for: .touchUpInside)
 
-        let label = UILabel.make(title, font: AppFonts.regular(13), color: AppColors.textSecondary, lines: 1)
+        let label = UILabel.make(title, font: AppFonts.medium(13), color: AppColors.textSecondary, lines: 1)
 
         let count = PaddingLabel(insets: UIEdgeInsets(top: 1, left: 6, bottom: 1, right: 6))
         count.text = "0"
-        count.font = AppFonts.bold(10)
+        count.font = AppFonts.semibold(10)
         count.textAlignment = .center
         count.layer.cornerRadius = 9
         count.layer.masksToBounds = true
@@ -326,7 +331,7 @@ final class OrderStatusTabsView: UIView {
 
         let indicator = UIView()
         indicator.backgroundColor = OrderFormat.statusColor(nil)
-        indicator.layer.cornerRadius = 1.5
+        indicator.layer.cornerRadius = 1
         indicator.forAutoLayout()
 
         container.addSubviews(row, indicator)
@@ -337,7 +342,7 @@ final class OrderStatusTabsView: UIView {
             indicator.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             indicator.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             indicator.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-            indicator.heightAnchor.constraint(equalToConstant: 3)
+            indicator.heightAnchor.constraint(equalToConstant: 2)
         ])
         return (container, label, count, indicator)
     }
@@ -355,12 +360,13 @@ final class OrderStatusTabsView: UIView {
     private func applySelection() {
         for (index, tab) in tabs.enumerated() {
             let selected = index == selectedIndex
-            tab.label.font = selected ? AppFonts.bold(13) : AppFonts.regular(13)
+            tab.label.font = selected ? AppFonts.semibold(13) : AppFonts.medium(13)
             tab.label.textColor = selected ? AppColors.purplePrimary : AppColors.textSecondary
             tab.indicator.isHidden = !selected
-            tab.indicator.backgroundColor = selected ? AppColors.purplePrimary : .clear
-            tab.count.textColor = selected ? AppColors.purplePrimary : AppColors.textSecondary
-            tab.count.backgroundColor = selected ? AppColors.purpleLight : AppColors.surfaceVariant
+            // Portal Orders Queue: active tab gets the orange accent underline + count.
+            tab.indicator.backgroundColor = selected ? AppColors.accent : .clear
+            tab.count.textColor = selected ? AppColors.accent : AppColors.textSecondary
+            tab.count.backgroundColor = selected ? AppColors.accentBg : AppColors.borderLight
         }
     }
 }
@@ -398,7 +404,7 @@ final class OrderDateRangeSheet: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = AppColors.surface
 
-        let title = UILabel.make(S.ordersDateRange, font: AppFonts.bold(16), color: AppColors.textPrimary)
+        let title = UILabel.make(S.ordersDateRange, font: AppFonts.semibold(16), color: AppColors.topTitle)
 
         configurePicker(fromPicker)
         configurePicker(toPicker)
@@ -439,6 +445,7 @@ final class OrderDateRangeSheet: UIViewController {
         picker.datePickerMode = .date
         picker.preferredDatePickerStyle = .compact
         picker.timeZone = TimeZone(identifier: "UTC")
+        picker.tintColor = AppColors.purplePrimary
     }
 
     private func labeledRow(_ text: String, picker: UIDatePicker) -> UIView {

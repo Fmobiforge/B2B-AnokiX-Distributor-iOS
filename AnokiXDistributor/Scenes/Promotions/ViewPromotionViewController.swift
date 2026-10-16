@@ -651,7 +651,8 @@ private final class PromoHeroView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        gradientLayer.colors = [UIColor(hex: 0x7C3AED).cgColor, UIColor(hex: 0x4338CA).cgColor]
+        // Decorative placeholder: the portal's indigo → violet accent gradient.
+        gradientLayer.colors = [AppColors.gradientStart.cgColor, AppColors.gradientEnd.cgColor]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)
         gradientLayer.endPoint = CGPoint(x: 1, y: 1)
         layer.insertSublayer(gradientLayer, at: 0)

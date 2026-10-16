@@ -100,14 +100,16 @@ final class DashboardHeaderView: UIView, NibLoadable {
         super.awakeFromNib()
         backgroundColor = AppColors.surface
         subtitleLabel.text = S.dashboardSubtitle
-        subtitleLabel.font = AppFonts.light(AppMetrics.textBodySM)
+        subtitleLabel.font = AppFonts.regular(AppMetrics.textBodySM)
         subtitleLabel.textColor = AppColors.textSecondary
-        welcomeLabel.font = AppFonts.bold(AppMetrics.textTitle)
-        welcomeLabel.textColor = AppColors.textPrimary
+        welcomeLabel.font = AppFonts.semibold(AppMetrics.textTitle)
+        welcomeLabel.textColor = AppColors.topTitle
+        // Portal avatar: 135° indigo → violet gradient, white semibold initials (36pt circle).
         avatarLabel.layer.cornerRadius = 18
         avatarLabel.layer.masksToBounds = true
-        avatarLabel.backgroundColor = AppColors.purpleLight
-        avatarLabel.textColor = AppColors.purplePrimary
+        StyleKit.applyAvatarGradient(to: avatarLabel, size: CGSize(width: 36, height: 36))
+        avatarLabel.textColor = .white
+        avatarLabel.font = AppFonts.semibold(AppMetrics.textTitle)
         menuButton.tintColor = AppColors.textPrimary
         notificationsButton.tintColor = AppColors.textPrimary
     }
@@ -136,7 +138,7 @@ final class LogoHeaderView: UIView, NibLoadable {
         logoImageView.image = BrandAssets.logoBlack
         logoImageView.applyBrandLogoSizing()
         subtitleLabel.text = S.loginSubtitle
-        subtitleLabel.font = AppFonts.light(AppMetrics.textLabel)
+        subtitleLabel.font = AppFonts.regular(AppMetrics.textLabel)
         subtitleLabel.textColor = AppColors.textSecondary
         notificationsButton.tintColor = AppColors.textPrimary
     }
@@ -153,9 +155,9 @@ final class PageTitleSectionView: UIView, NibLoadable {
     override func awakeFromNib() {
         super.awakeFromNib()
         backgroundColor = AppColors.surface
-        titleLabel.font = AppFonts.bold(AppMetrics.textHeadline)
-        titleLabel.textColor = AppColors.textPrimary
-        subtitleLabel.font = AppFonts.light(AppMetrics.textBodySM)
+        titleLabel.font = AppFonts.semibold(AppMetrics.textHeadline)
+        titleLabel.textColor = AppColors.topTitle
+        subtitleLabel.font = AppFonts.regular(AppMetrics.textBodySM)
         subtitleLabel.textColor = AppColors.textSecondary
     }
 
@@ -179,18 +181,18 @@ enum TabBarStyling {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = AppColors.surface
-        appearance.shadowColor = AppColors.border
+        appearance.shadowColor = AppColors.borderLight
 
         let normal = appearance.stackedLayoutAppearance.normal
         normal.titleTextAttributes = [
-            .font: AppFonts.regular(AppMetrics.bottomNavTextSize),
+            .font: AppFonts.medium(AppMetrics.bottomNavTextSize),
             .foregroundColor: AppColors.textTertiary
         ]
         normal.iconColor = AppColors.textTertiary
 
         let selected = appearance.stackedLayoutAppearance.selected
         selected.titleTextAttributes = [
-            .font: AppFonts.medium(AppMetrics.bottomNavTextSize),
+            .font: AppFonts.semibold(AppMetrics.bottomNavTextSize),
             .foregroundColor: AppColors.purplePrimary
         ]
         selected.iconColor = AppColors.purplePrimary

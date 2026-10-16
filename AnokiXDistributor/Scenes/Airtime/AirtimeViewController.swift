@@ -130,7 +130,7 @@ final class AirtimeViewController: BaseSecondaryViewController {
             let button = UIButton(type: .system)
             var config = UIButton.Configuration.plain()
             config.contentInsets = NSDirectionalEdgeInsets(top: 9, leading: 16, bottom: 9, trailing: 16)
-            config.background.cornerRadius = AppMetrics.radiusMD
+            config.cornerStyle = .capsule
             config.background.strokeWidth = 1
             button.configuration = config
             button.addAction(UIAction { [weak self] _ in self?.selectTab(index) }, for: .touchUpInside)
@@ -150,10 +150,12 @@ final class AirtimeViewController: BaseSecondaryViewController {
         for (i, button) in tabButtons.enumerated() {
             let selected = i == index
             var config = button.configuration
+            // The VAS module keeps its green sub-theme (matches the green VAS actions below);
+            // only the pill shape and weights follow the portal chip rule.
             config?.background.backgroundColor = selected ? AppColors.successBg : AppColors.surface
             config?.background.strokeColor = selected ? AppColors.success : AppColors.border
             config?.attributedTitle = AttributedString(Self.tabTitles[i], attributes: AttributeContainer([
-                .font: AppFonts.bold(13),
+                .font: selected ? AppFonts.semibold(13) : AppFonts.medium(13),
                 .foregroundColor: selected ? AppColors.success : AppColors.textSecondary
             ]))
             button.configuration = config

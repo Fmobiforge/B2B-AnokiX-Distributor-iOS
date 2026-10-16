@@ -24,7 +24,7 @@ final class NotificationsViewController: BaseSecondaryViewController {
     private let summaryScroll = UIScrollView()
     private let summaryRow = UIStackView.horizontal(spacing: 10, alignment: .fill)
     private let tabAll = UILabel.make("All", font: AppFonts.bold(14), color: AppColors.purplePrimary)
-    private let tabUnread = UILabel.make("Unread", font: AppFonts.bold(14), color: AppColors.textSecondary)
+    private let tabUnread = UILabel.make("Unread", font: AppFonts.medium(14), color: AppColors.textSecondary)
     private let listStack = UIStackView.vertical(spacing: 12, alignment: .fill)
     private let emptyView = UIStackView.vertical(spacing: 4, alignment: .center)
     private let pageInfoLabel = UILabel.make("", font: AppFonts.regular(12), color: AppColors.textSecondary)
@@ -120,6 +120,7 @@ final class NotificationsViewController: BaseSecondaryViewController {
         stack.addArrangedSubview(paginationRow)
 
         spinner.hidesWhenStopped = true
+        spinner.color = AppColors.purplePrimary
         spinner.forAutoLayout()
         container.addSubview(spinner)
 
@@ -200,6 +201,8 @@ final class NotificationsViewController: BaseSecondaryViewController {
         let all = filter == "all"
         tabAll.textColor = all ? AppColors.purplePrimary : AppColors.textSecondary
         tabUnread.textColor = all ? AppColors.textSecondary : AppColors.purplePrimary
+        tabAll.font = all ? AppFonts.semibold(14) : AppFonts.medium(14)
+        tabUnread.font = all ? AppFonts.medium(14) : AppFonts.semibold(14)
     }
 
     // MARK: - Summary cards

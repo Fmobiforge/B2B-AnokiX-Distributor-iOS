@@ -181,7 +181,7 @@ final class ReturnsViewController: BaseSecondaryViewController {
         ])
 
         let label = UILabel.make(title, font: AppFonts.regular(12), color: AppColors.textSecondary, lines: 1)
-        let valueLabel = UILabel.make(value, font: AppFonts.bold(22), color: AppColors.textPrimary, lines: 1)
+        let valueLabel = UILabel.make(value, font: AppFonts.semibold(22), color: AppColors.topTitle, lines: 1)
         let subLabel = UILabel.make(sub, font: AppFonts.regular(10), color: subColor, lines: 1)
         let stack = UIStackView.vertical(spacing: 4, alignment: .leading)
         stack.forAutoLayout()
@@ -287,13 +287,13 @@ final class ReturnsViewController: BaseSecondaryViewController {
         let avatar = UILabel()
         let name = r.resolvedTraderName
         avatar.text = OrderFormat.initials(name)
-        avatar.font = AppFonts.bold(13)
+        avatar.font = AppFonts.semibold(13)
         avatar.textColor = .white
         avatar.textAlignment = .center
-        avatar.backgroundColor = OrderFormat.logoColor(r.traderId ?? 0)
         avatar.layer.cornerRadius = 18
         avatar.layer.masksToBounds = true
         avatar.constrainSize(36)
+        StyleKit.applyAvatarGradient(to: avatar, size: CGSize(width: 36, height: 36))
         let nameLabel = UILabel.make(name, font: AppFonts.bold(12), color: AppColors.textPrimary, lines: 1)
         let traderCol = UIStackView.vertical(spacing: 2, alignment: .leading)
         traderCol.addArrangedSubview(nameLabel)
@@ -319,7 +319,8 @@ final class ReturnsViewController: BaseSecondaryViewController {
         let grid2 = infoRow(S.quantityLabel, "\(r.totalQuantity ?? 0)", S.creditNoteLabel, r.creditNoteNumber ?? "—")
 
         // Actions
-        let viewButton = OrderListCell.actionButton(title: S.viewBtn, icon: "eye", color: AppColors.purplePrimary)
+        let viewButton = OrderListCell.actionButton(title: S.viewBtn, icon: "eye", color: AppColors.textPrimary,
+                                                    stroke: AppColors.border)
         viewButton.addAction(UIAction { [weak self] _ in self?.openDetail(r) }, for: .touchUpInside)
         let actionsRow = UIStackView.horizontal(spacing: 8, alignment: .fill)
         actionsRow.distribution = .fillEqually

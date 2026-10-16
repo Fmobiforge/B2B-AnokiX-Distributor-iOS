@@ -514,7 +514,7 @@ final class CreateProductViewController: BaseSecondaryViewController,
         attachDatePicker(to: promoEndField, picker: promoEndPicker)
         stack.addArrangedSubview(promoDateRow)
 
-        let availLabel = UILabel.make("Available For Ordering", font: AppFonts.bold(15), color: AppColors.purpleDark)
+        let availLabel = UILabel.make("Available For Ordering", font: AppFonts.semibold(15), color: AppColors.topTitle)
         availableSwitch.isOn = true
         availableSwitch.onTintColor = AppColors.purplePrimary
         let availRow = UIStackView.horizontal(spacing: 8, alignment: .center)
@@ -556,7 +556,7 @@ final class CreateProductViewController: BaseSecondaryViewController,
 
     private func addReviewRow(_ label: String, _ value: String) {
         let left = UILabel.make(label, font: AppFonts.regular(14), color: AppColors.textSecondary)
-        let right = UILabel.make(value, font: AppFonts.bold(14), color: AppColors.purpleDark, align: .right, lines: 0)
+        let right = UILabel.make(value, font: AppFonts.semibold(14), color: AppColors.topTitle, align: .right, lines: 0)
         right.setContentHuggingPriority(.defaultLow, for: .horizontal)
         let row = UIStackView.horizontal(spacing: 8, alignment: .top)
         row.addArrangedSubview(left)
@@ -1015,7 +1015,7 @@ final class CreateProductViewController: BaseSecondaryViewController,
     // MARK: - UI builders
 
     private func sectionTitle(_ text: String) -> UILabel {
-        UILabel.make(text, font: AppFonts.bold(18), color: AppColors.purpleDark, lines: 0)
+        UILabel.make(text, font: AppFonts.semibold(18), color: AppColors.topTitle, lines: 0)
     }
 
     private func subtitle(_ text: String) -> UILabel {

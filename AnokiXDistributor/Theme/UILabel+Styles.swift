@@ -18,7 +18,7 @@ extension UILabel {
     }
 
     static func display(_ text: String? = nil) -> UILabel {
-        make(text, font: AppFonts.bold(AppMetrics.textDisplay), color: AppColors.purplePrimary)
+        make(text, font: AppFonts.semibold(AppMetrics.textDisplay), color: AppColors.topTitle)
     }
     static func headline(_ text: String? = nil) -> UILabel {
         make(text, font: AppFonts.bold(AppMetrics.textHeadline), color: AppColors.textPrimary)

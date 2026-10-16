@@ -42,7 +42,7 @@ final class AddProductOptionsViewController: BaseSecondaryViewController {
         ])
 
         let heading = UILabel.make("How would you like to add this product?",
-                                   font: AppFonts.bold(24), color: AppColors.purpleDark, align: .center, lines: 0)
+                                   font: AppFonts.semibold(24), color: AppColors.topTitle, align: .center, lines: 0)
         content.addArrangedSubview(heading)
         content.setCustomSpacing(24, after: heading)
 
