@@ -162,16 +162,19 @@ final class DashboardViewController: BaseMainViewController {
         renderRevenue(total: rev?.formattedTotal ?? "R1,245,600.00",
                       trendLabel: rev?.trend?.label ?? "↑ 18.6% from previous period",
                       compare: d?.meta?.comparePeriodLabel ?? "vs previous period",
-                      values: rev?.chart?.values ?? [12, 18, 14, 22, 19, 27, 24],
+                      values: rev?.chart?.values ?? [],
                       labels: rev?.chart?.labels ?? [])
 
+        // Missing / empty categories show "No sales data yet" — never sample data.
         let catData = d?.topSellingCategories
-        let cats = catData?.items?.map {
+        let catItems = catData?.items ?? []
+        let cats = catItems.map {
             CategoryRow(name: $0.name ?? "", amount: $0.formattedAmount ?? "",
                         percentage: $0.percentage ?? 0, color: AppColors.fromHex($0.color))
-        } ?? MockData.fallbackCategories
+        }
+        let hasCategorySales = catItems.contains { ($0.amount ?? 0) > 0 || ($0.percentage ?? 0) > 0 }
         let centerMain = compactCurrency(catData?.total ?? cats.reduce(0) { $0 + $1.percentage })
-        renderCategories(cats, centerMain: catData == nil ? nil : centerMain)
+        renderCategories(hasCategorySales ? cats : [], centerMain: centerMain)
 
         let orders = d?.recentOrders?.items?.map {
             RecentOrderRow(orderId: $0.orderId ?? "", trader: $0.trader ?? "",
@@ -464,11 +467,18 @@ final class DashboardViewController: BaseMainViewController {
         amountRow.addArrangedSubview(UIView())
 
         let compareLabel = UILabel.make(compare, font: AppFonts.light(AppMetrics.textLabel), color: AppColors.textSecondary)
-        let chart = RevenueChartView()
-        chart.backgroundColor = .clear
-        chart.currencySymbol = currencySymbol
-        chart.values = values
-        chart.labels = labels
+        // Portal: an all-zero (or missing) series shows "No sales data yet", not a flat line.
+        let chart: UIView
+        if values.contains(where: { $0 > 0 }) {
+            let line = RevenueChartView()
+            line.backgroundColor = .clear
+            line.currencySymbol = currencySymbol
+            line.values = values
+            line.labels = labels
+            chart = line
+        } else {
+            chart = Self.noSalesLabel()
+        }
         chart.constrainHeight(170)
 
         let body = UIStackView.vertical(spacing: 10, alignment: .fill)
@@ -479,8 +489,21 @@ final class DashboardViewController: BaseMainViewController {
         stack.addArrangedSubview(card)
     }
 
+    private static func noSalesLabel() -> UILabel {
+        let label = UILabel.make(S.noSalesData, font: AppFonts.regular(13), color: AppColors.textSecondary)
+        label.textAlignment = .center
+        return label
+    }
+
     private func renderCategories(_ items: [CategoryRow], centerMain: String?) {
         let card = SectionCard(title: "Top Selling Categories")
+        guard !items.isEmpty else {
+            let empty = Self.noSalesLabel()
+            empty.constrainHeight(128)
+            card.body.addArrangedSubview(empty)
+            stack.addArrangedSubview(card)
+            return
+        }
 
         let donut = DonutChartView()
         donut.strokeWidth = 15

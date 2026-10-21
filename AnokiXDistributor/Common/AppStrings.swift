@@ -122,6 +122,7 @@ enum S {
     static let viewAll = "View all"
     static let overview = "Overview"
     static let revenueOverview = "Revenue Overview"
+    static let noSalesData = "No sales data yet"
     static let recentOrders = "Recent Orders"
     static let inventorySummary = "Inventory Summary"
     static let markAllRead = "Mark all as read"
