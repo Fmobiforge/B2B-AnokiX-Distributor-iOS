@@ -7,10 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F0A1E51000000000000000B1 /* Inter-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0A1E51000000000000000A1 /* Inter-Light.ttf */; };
-		F0A1E51000000000000000B2 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0A1E51000000000000000A2 /* Inter-Regular.ttf */; };
-		F0A1E51000000000000000B3 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0A1E51000000000000000A3 /* Inter-Medium.ttf */; };
-		F0A1E51000000000000000B4 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0A1E51000000000000000A4 /* Inter-SemiBold.ttf */; };
 		00A84BA38C1DDCDD2CC084AF /* BaseSettingsFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B89C53AE0FA44F6AC60938 /* BaseSettingsFormViewController.swift */; };
 		05DD9A32506397943A80E42B /* ProductsTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D23903BB1B9D1D0ACD3F9756 /* ProductsTabViewController.swift */; };
 		09DB1879B4786FD05D411884 /* ReportsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0014905A214A71CA1E9395D0 /* ReportsViewController.swift */; };
@@ -127,6 +123,10 @@
 		EC78A24F5D699EC3B13B30E2 /* WalletDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144D399DFD2B58277C558A57 /* WalletDetailViewController.swift */; };
 		EE80103A8ED4261B8E3F2AD2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CE30754BC688C589CC10447 /* LaunchScreen.storyboard */; };
 		EFCBFA171367B77DFFD7EE02 /* ProductsListChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5099758D04259562C9F773B1 /* ProductsListChrome.swift */; };
+		F0A1E51000000000000000B1 /* Inter-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0A1E51000000000000000A1 /* Inter-Light.ttf */; };
+		F0A1E51000000000000000B2 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0A1E51000000000000000A2 /* Inter-Regular.ttf */; };
+		F0A1E51000000000000000B3 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0A1E51000000000000000A3 /* Inter-Medium.ttf */; };
+		F0A1E51000000000000000B4 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0A1E51000000000000000A4 /* Inter-SemiBold.ttf */; };
 		F0F4D36F5BEF002ED8817E1F /* WarehouseStaffViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DC3D022827C437DC6E70F5 /* WarehouseStaffViewController.swift */; };
 		F16F99058F42D54544F57C4A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F3D5E9791EB24D8F1F3A6DD /* AppDelegate.swift */; };
 		F2F349D9992A0ED51BC1A461 /* Http.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9266F144883BBDE2294D859E /* Http.swift */; };
@@ -138,10 +138,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		F0A1E51000000000000000A1 /* Inter-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Light.ttf"; sourceTree = "<group>"; };
-		F0A1E51000000000000000A2 /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
-		F0A1E51000000000000000A3 /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.ttf"; sourceTree = "<group>"; };
-		F0A1E51000000000000000A4 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		0014905A214A71CA1E9395D0 /* ReportsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsViewController.swift; sourceTree = "<group>"; };
 		018D26E7D221BCBD2E4DD4CC /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 		04336597EC5362495BF38528 /* InventoryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryDetailViewController.swift; sourceTree = "<group>"; };
@@ -262,6 +258,10 @@
 		EA3BBF4ADD424B365522D126 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		EB9A65319ACAC5DBCF8F2C9B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		EE1360C283782AA7BBE256EF /* ProductsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsViewController.swift; sourceTree = "<group>"; };
+		F0A1E51000000000000000A1 /* Inter-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Light.ttf"; sourceTree = "<group>"; };
+		F0A1E51000000000000000A2 /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
+		F0A1E51000000000000000A3 /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.ttf"; sourceTree = "<group>"; };
+		F0A1E51000000000000000A4 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		F0F3580D78FE0F37F17CD7AB /* BaseSecondaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseSecondaryViewController.swift; sourceTree = "<group>"; };
 		F22AE8737A47FA2D4534E553 /* ForgotPasswordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordViewController.swift; sourceTree = "<group>"; };
 		F4A72DDF0CD936A09436CC31 /* InventoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryViewController.swift; sourceTree = "<group>"; };
@@ -285,17 +285,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		F0A1E51000000000000000C1 /* Fonts */ = {
-			isa = PBXGroup;
-			children = (
-				F0A1E51000000000000000A1 /* Inter-Light.ttf */,
-				F0A1E51000000000000000A3 /* Inter-Medium.ttf */,
-				F0A1E51000000000000000A2 /* Inter-Regular.ttf */,
-				F0A1E51000000000000000A4 /* Inter-SemiBold.ttf */,
-			);
-			path = Fonts;
-			sourceTree = "<group>";
-		};
 		06D461DBAD58A9508465AADA /* Reports */ = {
 			isa = PBXGroup;
 			children = (
@@ -712,6 +701,17 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		F0A1E51000000000000000C1 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				F0A1E51000000000000000A1 /* Inter-Light.ttf */,
+				F0A1E51000000000000000A3 /* Inter-Medium.ttf */,
+				F0A1E51000000000000000A2 /* Inter-Regular.ttf */,
+				F0A1E51000000000000000A4 /* Inter-SemiBold.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1081,7 +1081,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.7;
+				MARKETING_VERSION = 1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.distributorapp;
 				PRODUCT_MODULE_NAME = AnokiXDistributor;
 				PRODUCT_NAME = "AnokiX Distributor";
@@ -1166,7 +1166,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.7;
+				MARKETING_VERSION = 1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anokix.distributorapp;
 				PRODUCT_MODULE_NAME = AnokiXDistributor;
 				PRODUCT_NAME = "AnokiX Distributor";
