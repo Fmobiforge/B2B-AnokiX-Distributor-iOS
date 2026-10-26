@@ -1112,7 +1112,8 @@ final class HcProductViewController: BaseSecondaryViewController {
                                                           brandName: product.brand, size: product.size,
                                                           uom: product.uom)
         if let image = currentImage, !image.fileName.isEmpty, !gtin.isEmpty {
-            prefill.hcImage = CreateProductViewController.HcImage(gtin: gtin, fileName: image.fileName,
+            prefill.hcImage = CreateProductViewController.HcImage(gtin: Self.imageGtin(image, fallback: gtin),
+                                                                  fileName: image.fileName,
                                                                   previewUrl: image.previewUrl)
         }
         let wizard = CreateProductViewController()
@@ -1120,6 +1121,20 @@ final class HcProductViewController: BaseSecondaryViewController {
         wizard.onSaved = onSaved
         wizard.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(wizard, animated: true)
+    }
+
+    /// The GTIN the image is stored under, which the server needs to import it. A product can
+    /// carry several GTINs (e.g. 6001285005845 with images under 6009706344153), so this comes
+    /// from the image's file name ("{gtin}_{id}") or its CDN path, not the product's GTIN —
+    /// sending a mismatched pair makes products/create fail with HTTP 500.
+    private static func imageGtin(_ image: HcLookupData.Image, fallback: String) -> String {
+        let prefix = String(image.fileName.split(separator: "_").first ?? "")
+        if AddProductFlow.isBarcode(prefix) { return prefix }
+        if let url = image.previewUrl.flatMap(URL.init(string:)),
+           let folder = url.pathComponents.dropFirst().first, AddProductFlow.isBarcode(folder) {
+            return folder
+        }
+        return fallback
     }
 
     /// From the library: back to the list. From a barcode: the match was wrong, so the barcode
