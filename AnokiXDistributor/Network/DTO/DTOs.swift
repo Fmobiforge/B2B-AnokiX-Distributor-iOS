@@ -2980,3 +2980,175 @@ struct VasOnboardCustomerData: Decodable {
         }
     }
 }
+
+// MARK: - Add Product: Hirt & Carter catalogue
+
+extension JSONDecoding {
+    /// true / 1 / "1" / "true".
+    static func flexBool<K: CodingKey>(_ c: KeyedDecodingContainer<K>, key: K) -> Bool {
+        if let v = try? c.decode(Bool.self, forKey: key) { return v }
+        if let v = try? c.decode(Int.self, forKey: key) { return v != 0 }
+        if let v = try? c.decode(String.self, forKey: key) { return v == "1" || v.lowercased() == "true" }
+        return false
+    }
+
+    static func flexInt<K: CodingKey>(_ c: KeyedDecodingContainer<K>, key: K) -> Int {
+        if let v = try? c.decode(Int.self, forKey: key) { return v }
+        if let v = try? c.decode(Double.self, forKey: key) { return Int(v) }
+        if let v = try? c.decode(String.self, forKey: key) { return Int(v) ?? 0 }
+        return 0
+    }
+}
+
+/// `data` block of GET api/distributor/products/hc-library — one page of the Hirt & Carter
+/// catalogue. `available` is false when the integration is off; `libraryReady` is false while
+/// the first sync is still running. `brands` is the full brand list for the filter.
+struct HcLibraryData: Decodable {
+    let available: Bool
+    let libraryReady: Bool
+    let total: Int
+    let page: Int
+    let totalPages: Int
+    let brands: [String]
+    let items: [Item]
+
+    enum CodingKeys: String, CodingKey { case available, libraryReady, total, page, totalPages, brands, items }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        available = JSONDecoding.flexBool(c, key: .available)
+        libraryReady = available && JSONDecoding.flexBool(c, key: .libraryReady)
+        total = max(0, JSONDecoding.flexInt(c, key: .total))
+        page = max(1, JSONDecoding.flexInt(c, key: .page))
+        totalPages = JSONDecoding.flexInt(c, key: .totalPages)
+        brands = ((try? c.decode([String?].self, forKey: .brands)) ?? [])
+            .compactMap { $0?.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+        items = ((try? c.decode([Item?].self, forKey: .items)) ?? [])
+            .compactMap { $0 }
+            .filter { !$0.gtin.isEmpty }
+    }
+
+    struct Item: Decodable {
+        let gtin: String
+        let brand: String?
+        let name: String?
+        let size: String?
+        let uom: String?
+        let hasImages: Bool
+        let imageCount: Int
+        let thumbUrl: String?
+        /// The distributor already has a product with this barcode.
+        let alreadyAdded: Bool
+
+        enum CodingKeys: String, CodingKey {
+            case gtin, brand, name, size, uom, hasImages, imageCount, thumbUrl, alreadyAdded
+        }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            gtin = (JSONDecoding.flexString(c, key: .gtin) ?? "").trimmingCharacters(in: .whitespaces)
+            brand = try? c.decodeIfPresent(String.self, forKey: .brand)
+            name = try? c.decodeIfPresent(String.self, forKey: .name)
+            size = JSONDecoding.flexString(c, key: .size)
+            uom = try? c.decodeIfPresent(String.self, forKey: .uom)
+            hasImages = JSONDecoding.flexBool(c, key: .hasImages)
+            imageCount = JSONDecoding.flexInt(c, key: .imageCount)
+            thumbUrl = try? c.decodeIfPresent(String.self, forKey: .thumbUrl)
+            alreadyAdded = JSONDecoding.flexBool(c, key: .alreadyAdded)
+        }
+    }
+}
+
+/// `data` block of GET api/distributor/products/external-lookup?barcode=… — the full
+/// Hirt & Carter record. `available` is false when the service cannot be reached; `found`
+/// is false (with no product) when Hirt & Carter has no data for the barcode.
+struct HcLookupData: Decodable {
+    let available: Bool
+    let found: Bool
+    let product: Product?
+
+    enum CodingKeys: String, CodingKey { case available, found, product }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        available = JSONDecoding.flexBool(c, key: .available)
+        product = available ? (try? c.decodeIfPresent(Product.self, forKey: .product)) ?? nil : nil
+        found = available && JSONDecoding.flexBool(c, key: .found) && product != nil
+    }
+
+    struct Product: Decodable {
+        let gtin: String
+        let name: String?
+        let brand: String?
+        let size: String?
+        let uom: String?
+        let articleNumber: String?
+        let images: [Image]
+        let content: [Content]
+
+        enum CodingKeys: String, CodingKey { case gtin, name, brand, size, uom, articleNumber, images, content }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            gtin = (JSONDecoding.flexString(c, key: .gtin) ?? "").trimmingCharacters(in: .whitespaces)
+            name = try? c.decodeIfPresent(String.self, forKey: .name)
+            brand = try? c.decodeIfPresent(String.self, forKey: .brand)
+            size = JSONDecoding.flexString(c, key: .size)
+            uom = try? c.decodeIfPresent(String.self, forKey: .uom)
+            articleNumber = JSONDecoding.flexString(c, key: .articleNumber)
+            images = ((try? c.decode([Image?].self, forKey: .images)) ?? []).compactMap { $0 }
+            content = ((try? c.decode([Content?].self, forKey: .content)) ?? [])
+                .compactMap { $0 }
+                .filter { !$0.value.isEmpty || !$0.name.isEmpty }
+        }
+
+        /// Images that can be shown (and therefore chosen for import).
+        var previewImages: [Image] { images.filter { $0.previewable && !($0.previewUrl ?? "").isEmpty } }
+    }
+
+    struct Image: Decodable {
+        /// Sent back as `hc_image` so the server imports this picture.
+        let fileName: String
+        let angleName: String
+        let previewable: Bool
+        let previewUrl: String?
+
+        enum CodingKeys: String, CodingKey { case fileName, angleName, previewable, previewUrl }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            fileName = ((try? c.decodeIfPresent(String.self, forKey: .fileName)) ?? nil)?
+                .trimmingCharacters(in: .whitespaces) ?? ""
+            angleName = ((try? c.decodeIfPresent(String.self, forKey: .angleName)) ?? nil)?
+                .trimmingCharacters(in: .whitespaces) ?? ""
+            previewable = JSONDecoding.flexBool(c, key: .previewable)
+            previewUrl = try? c.decodeIfPresent(String.self, forKey: .previewUrl)
+        }
+    }
+
+    /// One row of "Product content" (sub-brand, dimensions, marketing copy, …).
+    struct Content: Decodable {
+        let heading: String
+        let name: String
+        let value: String
+
+        enum CodingKeys: String, CodingKey { case heading, name, value }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            heading = (JSONDecoding.flexString(c, key: .heading) ?? "").trimmingCharacters(in: .whitespaces)
+            name = (JSONDecoding.flexString(c, key: .name) ?? "").trimmingCharacters(in: .whitespaces)
+            value = (JSONDecoding.flexString(c, key: .value) ?? "").trimmingCharacters(in: .whitespaces)
+        }
+    }
+}
+
+/// `data` block of POST api/distributor/products/external-request.
+struct HcRequestData: Decodable {
+    let alreadyRequested: Bool
+    let createdAt: String?
+
+    enum CodingKeys: String, CodingKey { case alreadyRequested, request }
+    enum RequestKeys: String, CodingKey { case createdAt }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        alreadyRequested = JSONDecoding.flexBool(c, key: .alreadyRequested)
+        let request = try? c.nestedContainer(keyedBy: RequestKeys.self, forKey: .request)
+        createdAt = request.flatMap { try? $0.decodeIfPresent(String.self, forKey: .createdAt) } ?? nil
+    }
+}

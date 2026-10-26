@@ -218,6 +218,66 @@ final class ApiClient {
         }
     }
 
+    // MARK: Add Product — barcode lookup + Hirt & Carter catalogue
+
+    /// The distributor's own product carrying `barcode` (api/distributor/products/get-by-barcode).
+    /// Returned raw so "Add To Catalogue" can send the record's fields back unchanged, as the
+    /// portal does. A missing product is not an error: the endpoint answers 404 /
+    /// "Product not found." and the completion gets `nil`.
+    func getProductByBarcode(_ barcode: String, completion: @escaping (Result<JSON?, ApiError>) -> Void) {
+        Http.get(baseUrl: Self.baseURL, path: "api/distributor/products/get-by-barcode",
+                 query: ["barcode": barcode], token: session.token) { r in
+            var result: Result<JSON?, ApiError>
+            let envelope: JSON? = r.body.flatMap { $0.isEmpty ? nil : JSON(parseJSON: $0) }
+            if let env = envelope, env["status"].boolValue {
+                let data = env["data"]
+                if data["product"].type == .dictionary {
+                    result = .success(data["product"])
+                } else if data["id"].exists() || data["barcode"].exists() || data["sku"].exists() {
+                    result = .success(data)
+                } else {
+                    result = .success(nil)
+                }
+            } else {
+                let message = envelope?["message"].string
+                let notFound = r.code == 404 || (message?.lowercased().contains("not found") ?? false)
+                if notFound {
+                    result = .success(nil)
+                } else {
+                    result = .failure(ApiError(message: message
+                        ?? (envelope == nil ? "Network error (HTTP \(r.code))" : "Request failed")))
+                }
+            }
+            DispatchQueue.main.async { completion(result) }
+        }
+    }
+
+    /// Full Hirt & Carter record (images + content) for one barcode.
+    func hcLookup(barcode: String, completion: @escaping (Result<HcLookupData, ApiError>) -> Void) {
+        getAuthed("api/distributor/products/external-lookup", query: ["barcode": barcode],
+                  type: HcLookupData.self, completion: completion)
+    }
+
+    /// One page of the Hirt & Carter library. Blank search / brand are left out and `images=1`
+    /// is only sent for "With images only" — the same query the portal builds.
+    func getHcLibrary(search: String, brand: String?, imagesOnly: Bool, page: Int, perPage: Int,
+                      completion: @escaping (Result<HcLibraryData, ApiError>) -> Void) {
+        var q = ["page": String(max(1, page)), "per_page": String(perPage)]
+        let s = search.trimmingCharacters(in: .whitespaces)
+        if !s.isEmpty { q["search"] = s }
+        if let b = brand?.trimmingCharacters(in: .whitespaces), !b.isEmpty { q["brand"] = b }
+        if imagesOnly { q["images"] = "1" }
+        getAuthed("api/distributor/products/hc-library", query: q, type: HcLibraryData.self,
+                  completion: completion)
+    }
+
+    /// Ask Hirt & Carter to add a product their catalogue lacks
+    /// (gtin, brand, product_name, size, uom and optional sku / note).
+    func requestHcProduct(form: [String: String], completion: @escaping (Result<HcRequestData, ApiError>) -> Void) {
+        postAuthed("api/distributor/products/external-request", form: form, type: HcRequestData.self,
+                   completion: completion)
+    }
+
     // MARK: Promotions
 
     /// Promotions/campaigns list + KPI summary. Pass "" for all campaign types.

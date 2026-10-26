@@ -111,6 +111,8 @@
 		BE933853D85D93987BBEA23F /* CreateTraderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05CB68ED6C6896B36D24E8E /* CreateTraderViewController.swift */; };
 		BFED9B6D70345BF7710E0944 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F9A6678A643764978A70A54 /* LoginViewController.swift */; };
 		C0EB7079699F9FA61F600415 /* CreateProductViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E2E3916F538EFDDE6A3F24 /* CreateProductViewController.swift */; };
+		A1D0C0F1E2B3A4C5D6E7F802 /* AddProductFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D0C0F1E2B3A4C5D6E7F801 /* AddProductFlow.swift */; };
+		A1D0C0F1E2B3A4C5D6E7F804 /* HcLibraryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D0C0F1E2B3A4C5D6E7F803 /* HcLibraryViewController.swift */; };
 		C2AA46B1E34FCA88EFB447AB /* SettingsPreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5714ACF14BF2BB387765D603 /* SettingsPreferencesViewController.swift */; };
 		C5C9B519F2832EBBDCEB459D /* Countries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F95E8B3CD1A4B08AB345FD /* Countries.swift */; };
 		C76B3718097DFF63A20E2202 /* StyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EBF42877BF96F9CC486A9D /* StyleKit.swift */; };
@@ -142,6 +144,8 @@
 		018D26E7D221BCBD2E4DD4CC /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 		04336597EC5362495BF38528 /* InventoryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryDetailViewController.swift; sourceTree = "<group>"; };
 		05E2E3916F538EFDDE6A3F24 /* CreateProductViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateProductViewController.swift; sourceTree = "<group>"; };
+		A1D0C0F1E2B3A4C5D6E7F801 /* AddProductFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProductFlow.swift; sourceTree = "<group>"; };
+		A1D0C0F1E2B3A4C5D6E7F803 /* HcLibraryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HcLibraryViewController.swift; sourceTree = "<group>"; };
 		0881138E23115F2F6C519B1B /* ReturnsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnsViewController.swift; sourceTree = "<group>"; };
 		0EBE2BF2B2360A8EF39D131A /* FinancesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancesViewController.swift; sourceTree = "<group>"; };
 		0F3D5E9791EB24D8F1F3A6DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -469,8 +473,10 @@
 		42E6FBBE47E72281B1572CAA /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				A1D0C0F1E2B3A4C5D6E7F801 /* AddProductFlow.swift */,
 				1CDA6C338D22242462AE5674 /* AddProductOptionsViewController.swift */,
 				05E2E3916F538EFDDE6A3F24 /* CreateProductViewController.swift */,
+				A1D0C0F1E2B3A4C5D6E7F803 /* HcLibraryViewController.swift */,
 				C3BE86A57B8DB5241F851A0C /* ProductCell.swift */,
 				5099758D04259562C9F773B1 /* ProductsListChrome.swift */,
 				D23903BB1B9D1D0ACD3F9756 /* ProductsTabViewController.swift */,
@@ -896,6 +902,8 @@
 				63292C978763AD1A78F35AA1 /* Components.swift in Sources */,
 				C5C9B519F2832EBBDCEB459D /* Countries.swift in Sources */,
 				C0EB7079699F9FA61F600415 /* CreateProductViewController.swift in Sources */,
+				A1D0C0F1E2B3A4C5D6E7F802 /* AddProductFlow.swift in Sources */,
+				A1D0C0F1E2B3A4C5D6E7F804 /* HcLibraryViewController.swift in Sources */,
 				87D0FD7E7175AF44915EEB94 /* CreatePromotionViewController.swift in Sources */,
 				BE933853D85D93987BBEA23F /* CreateTraderViewController.swift in Sources */,
 				2AADDEB874DBC35D3A80FB6A /* DTOs.swift in Sources */,

@@ -16,6 +16,33 @@ final class CreateProductViewController: BaseSecondaryViewController,
     /// Called after a successful create/update/delete so the list can refresh.
     var onSaved: (() -> Void)?
 
+    /// Image picked on the Hirt & Carter product screen; the server imports it (hc_gtin +
+    /// hc_image) unless the user uploads their own.
+    struct HcImage {
+        let gtin: String
+        let fileName: String
+        let previewUrl: String?
+    }
+
+    /// Values carried over from a barcode lookup or the Hirt & Carter catalogue
+    /// ("Use this product"). Brand and unit are matched by name once the lookups load.
+    struct Prefill {
+        var barcode: String? = nil
+        var name: String? = nil
+        var brandName: String? = nil
+        var size: String? = nil
+        var uom: String? = nil
+        var hcImage: HcImage? = nil
+    }
+
+    /// Create mode only.
+    var prefill: Prefill?
+    private var hcImage: HcImage?
+    private let hcBanner = UIView()
+    private let hcBannerText = UILabel()
+    private let hcRemoveButton = UIButton(type: .system)
+    private let hcImageHint = UILabel()
+
     override var screenTitle: String { productId == nil ? "Create New Product" : "Edit Product" }
     // When editing, show a trash action in the title bar (mirrors Android's header delete).
     override var trailingIcon: String? { productId == nil ? nil : "ic_delete" }
@@ -152,6 +179,7 @@ final class CreateProductViewController: BaseSecondaryViewController,
             formStack.addArrangedSubview(step)
         }
         showStep(0)
+        if productId == nil { applyPrefill() }
     }
 
     override func loadData() {
@@ -339,7 +367,9 @@ final class CreateProductViewController: BaseSecondaryViewController,
             }
             return true
         case 2:
-            if primaryImageData == nil && !primaryProvided { return fail("Please upload a primary product image.") }
+            if primaryImageData == nil && !primaryProvided && hcImage == nil {
+                return fail("Please upload a primary product image.")
+            }
             return true
         case 3:
             if text(sellingPriceField).isEmpty { return fail("Please enter the selling price.") }
@@ -362,6 +392,7 @@ final class CreateProductViewController: BaseSecondaryViewController,
     private func buildBasicStep() -> UIStackView {
         let stack = UIStackView.vertical(spacing: 14, alignment: .fill)
         stack.addArrangedSubview(sectionTitle("Basic Information"))
+        stack.addArrangedSubview(buildHcBanner())
         stack.addArrangedSubview(hPair(
             fieldGroup("Product Name *", nameField, placeholder: "Enter product name"),
             pickerGroup("Brand *", brandButton, placeholder: "Select brand", action: #selector(pickBrand))))
@@ -466,7 +497,29 @@ final class CreateProductViewController: BaseSecondaryViewController,
             primaryImageView.leadingAnchor.constraint(equalTo: primaryBox.leadingAnchor, constant: 6),
             primaryImageView.trailingAnchor.constraint(equalTo: primaryBox.trailingAnchor, constant: -6)
         ])
+        // Drops the Hirt & Carter image (an uploaded image already overrides it).
+        hcRemoveButton.setImage(UIImage(systemName: "xmark.circle.fill",
+            withConfiguration: UIImage.SymbolConfiguration(pointSize: 20, weight: .regular)), for: .normal)
+        hcRemoveButton.tintColor = AppColors.textSecondary
+        hcRemoveButton.accessibilityLabel = "Remove Hirt & Carter image"
+        hcRemoveButton.isHidden = true
+        hcRemoveButton.addTarget(self, action: #selector(removeHcImage), for: .touchUpInside)
+        hcRemoveButton.forAutoLayout()
+        primaryBox.addSubview(hcRemoveButton)
+        NSLayoutConstraint.activate([
+            hcRemoveButton.topAnchor.constraint(equalTo: primaryBox.topAnchor, constant: 4),
+            hcRemoveButton.trailingAnchor.constraint(equalTo: primaryBox.trailingAnchor, constant: -4),
+            hcRemoveButton.widthAnchor.constraint(equalToConstant: 36),
+            hcRemoveButton.heightAnchor.constraint(equalToConstant: 36)
+        ])
         stack.addArrangedSubview(primaryBox)
+        hcImageHint.text = "Image from Hirt & Carter will be used unless you upload your own."
+        hcImageHint.font = AppFonts.regular(12)
+        hcImageHint.textColor = AppColors.textSecondary
+        hcImageHint.numberOfLines = 0
+        hcImageHint.isHidden = true
+        stack.addArrangedSubview(hcImageHint)
+        stack.setCustomSpacing(6, after: primaryBox)
 
         // Additional images
         stack.addArrangedSubview(UILabel.make("Additional Images (max 5)", font: AppFonts.bold(13), color: AppColors.textPrimary))
@@ -725,6 +778,7 @@ final class CreateProductViewController: BaseSecondaryViewController,
                     self.primaryImageView.image = UIImage(data: data)
                     self.primaryImageView.isHidden = false
                     self.primaryPlaceholder.isHidden = true
+                    self.renderHcImage()   // an upload replaces the catalogue image
                 } else {
                     self.newAdditionalImages.append(data)
                     self.renderAdditionalChips()
@@ -821,6 +875,104 @@ final class CreateProductViewController: BaseSecondaryViewController,
         return chip
     }
 
+    // MARK: - Prefill from a barcode / the Hirt & Carter catalogue
+
+    /// "Prefilled from the Hirt & Carter catalogue" notice (hidden unless prefilled).
+    private func buildHcBanner() -> UIView {
+        hcBanner.backgroundColor = AddProductFlow.Palette.infoBg
+        hcBanner.layer.cornerRadius = 8
+        hcBanner.layer.borderWidth = 1
+        hcBanner.layer.borderColor = AddProductFlow.Palette.infoBorder.cgColor
+        hcBanner.isHidden = true
+
+        let icon = UIImageView(image: UIImage(systemName: "info.circle"))
+        icon.tintColor = AddProductFlow.Palette.infoIcon
+        icon.contentMode = .scaleAspectFit
+        icon.constrainSize(18)
+        let title = UILabel.make("Prefilled from the Hirt & Carter catalogue", font: AppFonts.semibold(14),
+                                 color: AppColors.textPrimary, lines: 0)
+        hcBannerText.font = AppFonts.regular(13)
+        hcBannerText.textColor = AppColors.textSecondary
+        hcBannerText.numberOfLines = 0
+        let texts = UIStackView.vertical(spacing: 4, alignment: .fill)
+        texts.addArrangedSubview(title)
+        texts.addArrangedSubview(hcBannerText)
+        let row = UIStackView.horizontal(spacing: 10, alignment: .top)
+        row.addArrangedSubview(icon)
+        row.addArrangedSubview(texts)
+        row.forAutoLayout()
+        hcBanner.addSubview(row)
+        row.pinEdges(to: hcBanner, insets: UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12))
+        return hcBanner
+    }
+
+    /// Seeds a new product from the Add Product flow (the portal's "initialData").
+    private func applyPrefill() {
+        guard let p = prefill else { return }
+        let barcode = AddProductFlow.digits(p.barcode)
+        if !barcode.isEmpty { barcodeField.text = barcode }
+        if let name = p.name?.trimmingCharacters(in: .whitespaces), !name.isEmpty { nameField.text = name }
+        hcImage = p.hcImage
+
+        let size = (p.size ?? "").trimmingCharacters(in: .whitespaces)
+        if hcImage != nil || !size.isEmpty {
+            var parts: [String] = []
+            if !size.isEmpty {
+                let uom = (p.uom ?? "").trimmingCharacters(in: .whitespaces)
+                parts.append("Pack size: " + (uom.isEmpty ? size : "\(size) \(uom)"))
+            }
+            parts.append("Please check the details and complete the remaining fields. "
+                         + "Product data supplied by Hirt & Carter Digital.")
+            hcBannerText.text = parts.joined(separator: " · ")
+            hcBanner.isHidden = false
+        }
+        renderHcImage()
+    }
+
+    /// Select the brand and unit whose names match the catalogue's (case-insensitive).
+    private func matchHcLookups() {
+        guard let p = prefill else { return }
+        if selectedBrandId == nil,
+           let wanted = p.brandName?.trimmingCharacters(in: .whitespaces).lowercased(), !wanted.isEmpty,
+           let brand = brands.first(where: { ($0.name ?? "").trimmingCharacters(in: .whitespaces).lowercased() == wanted }) {
+            selectedBrandId = brand.id
+            setPickerTitle(brandButton, brand.name ?? "")
+        }
+        if selectedUnitId == nil,
+           let wanted = p.uom?.trimmingCharacters(in: .whitespaces).lowercased(), !wanted.isEmpty,
+           let unit = units.first(where: { ($0.name ?? "").trimmingCharacters(in: .whitespaces).lowercased() == wanted }),
+           let id = unit.id {
+            selectedUnitId = id
+            setPickerTitle(unitButton, unit.name ?? "")
+        }
+    }
+
+    /// Shows the catalogue image as the primary image until the user uploads their own.
+    private func renderHcImage() {
+        let showHc = hcImage != nil && primaryImageData == nil
+        hcRemoveButton.isHidden = !showHc
+        hcImageHint.isHidden = !showHc
+        if showHc {
+            primaryImageView.isHidden = false
+            primaryPlaceholder.isHidden = true
+            if let url = hcImage?.previewUrl.flatMap(URL.init(string:)) {
+                ImageLoader.load(url) { [weak self] image in
+                    guard let self = self, self.hcImage != nil, self.primaryImageData == nil else { return }
+                    self.primaryImageView.image = image
+                }
+            }
+        } else if primaryImageData == nil && !primaryProvided {
+            primaryImageView.image = nil
+            primaryImageView.isHidden = true
+            primaryPlaceholder.isHidden = false
+        }
+    }
+
+    @objc private func removeHcImage() {
+        hcImage = nil
+        renderHcImage()
+    }
+
     // MARK: - Base info / edit load
 
     private func loadBaseInfo() {
@@ -830,7 +982,7 @@ final class CreateProductViewController: BaseSecondaryViewController,
             self.units = data.productUnits ?? []
             self.allCategories = data.productCategories ?? []
             self.parentCategories = self.allCategories.filter { $0.parentId == nil }
-            if self.productId != nil { self.loadProductForEdit() }
+            if self.productId != nil { self.loadProductForEdit() } else { self.matchHcLookups() }
         }
     }
 
@@ -926,6 +1078,10 @@ final class CreateProductViewController: BaseSecondaryViewController,
         var files: [Http.FilePart] = []
         if let data = primaryImageData {
             files.append(Http.FilePart(field: "image", fileName: "image.jpg", mimeType: "image/jpeg", data: data))
+        } else if productId == nil, let image = hcImage {
+            // No upload: ask the server to import the chosen Hirt & Carter image instead.
+            form["hc_gtin"] = image.gtin
+            form["hc_image"] = image.fileName
         }
         for (i, data) in newAdditionalImages.enumerated() {
             files.append(Http.FilePart(field: "additional_image_\(i)", fileName: "additional_\(i).jpg",
@@ -980,6 +1136,11 @@ final class CreateProductViewController: BaseSecondaryViewController,
     /// Pop the wizard (and the options screen) back to the products list.
     private func popToProductList() {
         guard let nav = navigationController else { return }
+        // Opened through the Add Product flow (chooser → library / barcode → …): unwind it all.
+        if nav.viewControllers.contains(where: { $0 is AddProductOptionsViewController }) {
+            AddProductFlow.finish(from: self)
+            return
+        }
         let remaining = nav.viewControllers.filter {
             !($0 is CreateProductViewController) && !($0 is AddProductOptionsViewController)
         }
