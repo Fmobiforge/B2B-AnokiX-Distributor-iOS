@@ -79,7 +79,7 @@ final class AddProductOptionsViewController: BaseSecondaryViewController {
             let badge = libraryReady
                 ? (libraryTotal > 0 ? "\(AddProductFlow.count(libraryTotal)) products" : "NEW")
                 : nil
-            cardsStack.addArrangedSubview(card(.library, symbol: "book", title: "Hirt & Carter Library",
+            cardsStack.addArrangedSubview(card(.library, symbol: "book", title: "anokiX Library",
                 description: libraryReady
                     ? "Browse and search the national product catalogue, with images and details"
                     : "Library is being prepared — please try again later",

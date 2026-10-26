@@ -12,7 +12,7 @@ import UIKit
 final class HcLibraryViewController: BaseSecondaryViewController, UICollectionViewDataSource,
         UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
 
-    override var screenTitle: String { "Hirt & Carter Library" }
+    override var screenTitle: String { "anokiX Library" }
 
     var onSaved: (() -> Void)?
 
