@@ -174,7 +174,7 @@ final class ProductsChromeView: UIView {
     }
 
     private func matchesStatus(_ item: ProductItem) -> Bool {
-        status.isEmpty || status.caseInsensitiveCompare(item.status) == .orderedSame
+        status.isEmpty || status.caseInsensitiveCompare(item.statusLabel) == .orderedSame
     }
 
     private func notifyChanged() {
@@ -276,11 +276,12 @@ final class ProductsChromeView: UIView {
     }
 
     @objc private func pickStatus() {
-        // The API documents Active / Pending / InActive; anything else a product carries
-        // is appended below so the filter always covers the data on screen.
-        var labels = ["All Status", "Active", "Pending", "Inactive"]
-        for item in items where !item.status.isEmpty && !labels.contains(item.status) {
-            labels.append(item.status)
+        // The portal's status labels (Active / Pending Review / InActive), matched against the
+        // badge text; any other status a product carries is appended so the filter always
+        // covers the data on screen.
+        var labels = ["All Status", ProductItem.labelActive, ProductItem.labelPending, ProductItem.labelInactive]
+        for item in items where !item.statusLabel.isEmpty && !labels.contains(item.statusLabel) {
+            labels.append(item.statusLabel)
         }
 
         presentPicker(title: "Status", options: labels) { [weak self] index in

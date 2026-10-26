@@ -35,7 +35,42 @@ struct ProductItem {
     var stockQty: Int = 0
     var reorderLevel: Int = 0
 
-    var isActive: Bool { status.isEmpty || status.caseInsensitiveCompare("Active") == .orderedSame }
+    /// Status groups the portal styles differently (green / amber / grey).
+    enum StatusKind { case active, pending, inactive, other }
+
+    static let labelActive = "Active"
+    static let labelPending = "Pending Review"
+    static let labelInactive = "InActive"
+
+    /// The portal's status normalisation: "Pending", "pending_review", "Under Review" … are all
+    /// a pending review; "approved" / "enabled" count as active; "disabled" / "rejected" as
+    /// inactive. A blank status is active (the list mapper's default).
+    var statusKind: StatusKind {
+        let s = status.trimmingCharacters(in: .whitespaces).lowercased()
+            .replacingOccurrences(of: "[\\s-]+", with: "_", options: .regularExpression)
+        switch s {
+        case "": return .active
+        case "pending", "pending_review", "pending_approval", "awaiting_approval", "under_review": return .pending
+        case "active", "approved", "enabled": return .active
+        case "inactive", "in_active", "disabled", "rejected": return .inactive
+        default: return .other
+        }
+    }
+
+    /// Badge text, as on the portal: "Active", "Pending Review", "InActive", or the raw status.
+    var statusLabel: String {
+        switch statusKind {
+        case .active: return Self.labelActive
+        case .pending: return Self.labelPending
+        case .inactive: return Self.labelInactive
+        case .other:
+            return status.replacingOccurrences(of: "_", with: " ")
+                .split(separator: " ").map { $0.prefix(1).uppercased() + $0.dropFirst() }
+                .joined(separator: " ")
+        }
+    }
+
+    var isActive: Bool { statusKind == .active }
     var isOutOfStock: Bool { stockQty <= 0 }
     /// In stock but at or below the reorder level the distributor configured.
     var isLowStock: Bool { stockQty > 0 && reorderLevel > 0 && stockQty <= reorderLevel }

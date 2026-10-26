@@ -55,6 +55,7 @@ final class ProductCell: UICollectionViewCell {
         placeholderIcon.forAutoLayout()
 
         thumbImageView.contentMode = .scaleAspectFill
+        thumbImageView.backgroundColor = AppColors.surface
         thumbImageView.layer.masksToBounds = true
         thumbImageView.isHidden = true
         thumbImageView.forAutoLayout()
@@ -163,6 +164,7 @@ final class ProductCell: UICollectionViewCell {
         imageTask?.cancel()
         thumbImageView.image = nil
         thumbImageView.isHidden = true
+        placeholderIcon.isHidden = false
     }
 
     func configure(_ product: ProductItem) {
@@ -179,17 +181,30 @@ final class ProductCell: UICollectionViewCell {
             from: NSNumber(value: product.stockQty), number: .decimal)
         StyleKit.applyStatusBadge(stockBadge, status: product.stockStatus)
 
-        let statusText = product.status.isEmpty ? "Active" : product.status
-        statusBadge.text = statusText
-        statusBadge.textColor = product.isActive ? AppColors.success : AppColors.textSecondary
-        statusBadge.backgroundColor = product.isActive ? AppColors.successBg : AppColors.borderLight
+        // Portal status pill: green Active, amber Pending Review, grey InActive.
+        statusBadge.text = product.statusLabel
+        switch product.statusKind {
+        case .active:
+            statusBadge.textColor = UIColor(hex: 0x15803D)
+            statusBadge.backgroundColor = UIColor(hex: 0xE5F8EC)
+        case .pending:
+            statusBadge.textColor = UIColor(hex: 0xB45309)
+            statusBadge.backgroundColor = UIColor(hex: 0xFEF1DD)
+        case .inactive, .other:
+            statusBadge.textColor = UIColor(hex: 0x4B5563)
+            statusBadge.backgroundColor = UIColor(hex: 0xEDEEF0)
+        }
 
         thumbImageView.isHidden = true
+        placeholderIcon.isHidden = false
         if let urlString = product.imageUrl, let url = URL(string: urlString) {
             imageTask = ImageLoader.load(url) { [weak self] image in
                 guard let self = self, let image = image else { return }
                 self.thumbImageView.image = image
                 self.thumbImageView.isHidden = false
+                // Imported catalogue images (e.g. Hirt & Carter) have transparent backgrounds:
+                // hide the icon underneath and give the image a white backdrop.
+                self.placeholderIcon.isHidden = true
             }
         }
     }
